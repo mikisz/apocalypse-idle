@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useGame } from '../state/useGame.js'
 import { formatAge } from '../utils/format.js'
 import {
@@ -90,7 +90,7 @@ export default function PopulationView() {
               </div>
               <div className="relative inline-block w-36">
                 <select
-                  value={s.role}
+                  value={s.role || 'idle'}
                   onChange={(e) => setSettlerRole(s.id, e.target.value)}
                   className="appearance-none w-full rounded bg-gray-800 text-white px-3 py-2 pr-8 hover:bg-gray-700 focus:outline-none"
                 >
