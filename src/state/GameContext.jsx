@@ -3,8 +3,11 @@ import { GameContext } from './useGame.js'
 import useGameLoop from '../engine/useGameLoop.js'
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
 import { processTick, applyOfflineProgress } from '../engine/production.js'
+import { processSettlersTick } from '../engine/settlers.js'
 import { defaultState } from './defaultState.js'
 import { getYear, initSeasons } from '../engine/time.js'
+import { getResourceRates } from './selectors.js'
+import { RESOURCES } from '../data/resources.js'
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
@@ -27,7 +30,10 @@ export function GameProvider({ children }) {
         let settlers = progressed.population.settlers
         if (yearAfter > prevYear) {
           const diff = yearAfter - prevYear
-          settlers = settlers.map((s) => ({ ...s, age: s.age + diff }))
+          settlers = settlers.map((s) => ({
+            ...s,
+            ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
+          }))
         }
         const show = Object.keys(gains).length > 0
         return {
@@ -54,22 +60,44 @@ export function GameProvider({ children }) {
   useGameLoop((dt) => {
     setState((prev) => {
       const afterTick = processTick(prev, dt)
-      const nextSeconds = (afterTick.gameTime?.seconds || 0) + dt
-      const computedYear = getYear({
-        ...afterTick,
-        gameTime: { ...afterTick.gameTime, seconds: nextSeconds },
+      const rates = getResourceRates(afterTick)
+      let totalFoodProdBase = 0
+      Object.keys(RESOURCES).forEach((id) => {
+        if (RESOURCES[id].category === 'FOOD') {
+          totalFoodProdBase += rates[id]?.perSec || 0
+        }
       })
-      let year = afterTick.gameTime?.year || 1
-      let settlers = afterTick.population.settlers
+      const { state: settlersProcessed, telemetry } = processSettlersTick(
+        afterTick,
+        dt,
+        totalFoodProdBase,
+      )
+      const nextSeconds = (settlersProcessed.gameTime?.seconds || 0) + dt
+      const computedYear = getYear({
+        ...settlersProcessed,
+        gameTime: { ...settlersProcessed.gameTime, seconds: nextSeconds },
+      })
+      let year = settlersProcessed.gameTime?.year || 1
+      let settlers = settlersProcessed.population.settlers
       if (computedYear > year) {
         const diff = computedYear - year
         year = computedYear
-        settlers = settlers.map((s) => ({ ...s, age: s.age + diff }))
+        settlers = settlers.map((s) => ({
+          ...s,
+          ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
+        }))
       }
       return {
-        ...afterTick,
-        population: { ...afterTick.population, settlers },
+        ...settlersProcessed,
+        population: { ...settlersProcessed.population, settlers },
         gameTime: { seconds: nextSeconds, year },
+        meta: {
+          ...settlersProcessed.meta,
+          telemetry: {
+            ...settlersProcessed.meta?.telemetry,
+            settlers: telemetry,
+          },
+        },
       }
     })
   }, 1000)
