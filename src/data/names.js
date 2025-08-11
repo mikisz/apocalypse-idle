@@ -68,13 +68,15 @@ export const LAST_NAMES = [
   'Martin',
 ];
 
+import { DAYS_PER_YEAR } from '../engine/time.js';
+
 export function makeRandomSettler({ sex } = {}) {
   const chosenSex = sex || (Math.random() < 0.5 ? 'M' : 'F');
   const firstPool = FIRST_NAMES[chosenSex];
   const firstName = firstPool[Math.floor(Math.random() * firstPool.length)];
   const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
-  const baseAge = 18 * 365 * 86400;
-  const randomDays = Math.floor(Math.random() * 365) * 86400;
+  const baseAge = 18 * DAYS_PER_YEAR;
+  const randomDays = Math.floor(Math.random() * DAYS_PER_YEAR);
   return {
     id: globalThis.crypto?.randomUUID
       ? globalThis.crypto.randomUUID()
@@ -83,7 +85,7 @@ export function makeRandomSettler({ sex } = {}) {
     lastName,
     sex: chosenSex,
     isDead: false,
-    ageSeconds: baseAge + randomDays,
+    ageDays: baseAge + randomDays,
     role: null,
     skills: {},
   };

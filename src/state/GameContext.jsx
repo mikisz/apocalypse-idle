@@ -3,9 +3,14 @@ import { GameContext } from './useGame.js';
 import useGameLoop from '../engine/useGameLoop.js';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
 import { processTick, applyOfflineProgress } from '../engine/production.js';
-import { processSettlersTick } from '../engine/settlers.js';
+import { processSettlersTick, computeRoleBonuses } from '../engine/settlers.js';
 import { defaultState } from './defaultState.js';
-import { getYear, initSeasons } from '../engine/time.js';
+import {
+  getYear,
+  initSeasons,
+  SECONDS_PER_DAY,
+  DAYS_PER_YEAR,
+} from '../engine/time.js';
 import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
 
@@ -24,20 +29,21 @@ export function GameProvider({ children }) {
       const now = Date.now();
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
       if (elapsed > 0) {
+        const bonuses = computeRoleBonuses(base.population?.settlers || []);
         const { state: progressed, gains } = applyOfflineProgress(
           base,
           elapsed,
+          bonuses,
         );
-        const secondsAfter = progressed.gameTime?.seconds || 0;
-        const yearAfter = getYear(progressed);
-        let settlers = progressed.population.settlers;
-        if (yearAfter > prevYear) {
-          const diff = yearAfter - prevYear;
-          settlers = settlers.map((s) => ({
-            ...s,
-            ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
-          }));
-        }
+        const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
+        const yearAfter = getYear({
+          ...progressed,
+          gameTime: { ...progressed.gameTime, seconds: secondsAfter },
+        });
+        const settlers = progressed.population.settlers.map((s) => ({
+          ...s,
+          ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
+        }));
         const show = Object.keys(gains).length > 0;
         return {
           ...progressed,
@@ -62,7 +68,8 @@ export function GameProvider({ children }) {
   // Main game loop: increment time and produce resources
   useGameLoop((dt) => {
     setState((prev) => {
-      const afterTick = processTick(prev, dt);
+      const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
+      const afterTick = processTick(prev, dt, roleBonuses);
       const rates = getResourceRates(afterTick);
       let totalFoodProdBase = 0;
       Object.keys(RESOURCES).forEach((id) => {
@@ -74,6 +81,8 @@ export function GameProvider({ children }) {
         afterTick,
         dt,
         totalFoodProdBase,
+        Math.random,
+        roleBonuses,
       );
       const nextSeconds = (settlersProcessed.gameTime?.seconds || 0) + dt;
       const computedYear = getYear({
@@ -87,7 +96,7 @@ export function GameProvider({ children }) {
         year = computedYear;
         settlers = settlers.map((s) => ({
           ...s,
-          ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
+          ageDays: (s.ageDays || 0) + diff * DAYS_PER_YEAR,
         }));
       }
       return {

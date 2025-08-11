@@ -1,3 +1,5 @@
+import { DAYS_PER_YEAR } from '../engine/time.js';
+
 export function formatAmount(n) {
   const abs = Math.abs(n || 0);
   const sign = n < 0 ? '-' : '';
@@ -19,9 +21,9 @@ export function formatRate(perSec) {
   return `${sign}${formatAmount(perSec)}/s`;
 }
 
-export function formatAge(ageSeconds = 0) {
-  const totalDays = Math.floor((ageSeconds || 0) / 86400);
-  const years = Math.floor(totalDays / 365);
-  const days = totalDays % 365;
-  return { years, days };
+export function formatAge(ageDays = 0) {
+  const totalDays = Math.floor(ageDays || 0);
+  const years = Math.floor(totalDays / DAYS_PER_YEAR);
+  const day = totalDays % DAYS_PER_YEAR;
+  return { years, days: day + 1 };
 }

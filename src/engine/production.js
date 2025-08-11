@@ -4,6 +4,7 @@ import {
   getBuildingCost,
 } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
+import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity } from '../state/selectors.js';
 import { BALANCE } from '../data/balance.js';
@@ -15,7 +16,7 @@ export function clampResource(value, capacity) {
   return Math.round(result * 1e6) / 1e6;
 }
 
-export function applyProduction(state, seconds = 1) {
+export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
   const resources = { ...state.resources };
   PRODUCTION_BUILDINGS.forEach((b) => {
@@ -24,7 +25,9 @@ export function applyProduction(state, seconds = 1) {
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;
       const mult = getSeasonMultiplier(season, category);
-      const gain = base * mult * count * seconds;
+      const role = ROLE_BY_RESOURCE[res];
+      const bonusPercent = roleBonuses[role] || 0;
+      const gain = base * mult * count * (1 + bonusPercent / 100) * seconds;
       const capacity = getCapacity(state, res);
       const currentEntry = resources[res] || { amount: 0, discovered: false };
       const next = clampResource(currentEntry.amount + gain, capacity);
@@ -41,14 +44,14 @@ export function applyProduction(state, seconds = 1) {
   return { ...state, resources };
 }
 
-export function processTick(state, seconds = 1) {
-  return applyProduction(state, seconds);
+export function processTick(state, seconds = 1, roleBonuses = {}) {
+  return applyProduction(state, seconds, roleBonuses);
 }
 
-export function applyOfflineProgress(state, elapsedSeconds) {
+export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
   if (elapsedSeconds <= 0) return { state, gains: {} };
   const before = JSON.parse(JSON.stringify(state.resources));
-  let current = applyProduction({ ...state }, elapsedSeconds);
+  let current = applyProduction({ ...state }, elapsedSeconds, roleBonuses);
   const settlers =
     state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
   if (settlers > 0) {

@@ -12,7 +12,7 @@ describe('PopulationView', () => {
       lastName: 'Settler',
       sex: 'M',
       isDead: false,
-      ageSeconds: 0,
+      ageDays: 0,
       role: null,
       skills: {},
     };
@@ -28,7 +28,7 @@ describe('PopulationView', () => {
     const select = screen.getByRole('combobox');
     expect(select.value).toBe('idle');
 
-    fireEvent.change(select, { target: { value: 'farming' } });
-    expect(setSettlerRole).toHaveBeenCalledWith('s1', 'farming');
+    fireEvent.change(select, { target: { value: 'farmer' } });
+    expect(setSettlerRole).toHaveBeenCalledWith('s1', 'farmer');
   });
 });

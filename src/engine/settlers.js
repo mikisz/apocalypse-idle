@@ -5,6 +5,7 @@ import {
 } from '../data/balance.js';
 import { getCapacity } from '../state/selectors.js';
 import { clampResource } from './production.js';
+import { SECONDS_PER_DAY } from './time.js';
 
 export function computeRoleBonuses(settlers) {
   const bonuses = {};
@@ -28,6 +29,7 @@ export function processSettlersTick(
   seconds = BALANCE.TICK_SECONDS,
   totalFoodProdBase = 0,
   rng = Math.random,
+  roleBonuses = null,
 ) {
   const settlers = state.population?.settlers
     ? [...state.population.settlers]
@@ -35,8 +37,8 @@ export function processSettlersTick(
   const living = settlers.filter((s) => !s.isDead);
 
   // Compute bonuses
-  const bonuses = computeRoleBonuses(living);
-  const totalFoodBonusPercent = bonuses['farming'] || 0;
+  const bonuses = roleBonuses || computeRoleBonuses(living);
+  const totalFoodBonusPercent = bonuses['farmer'] || 0;
 
   const bonusGainPerSec = totalFoodProdBase * (totalFoodBonusPercent / 100);
   const totalSettlersConsumption =
@@ -69,8 +71,8 @@ export function processSettlersTick(
   } else {
     starvationTimer += seconds;
     if (starvationTimer >= BALANCE.STARVATION_DEATH_TIMER_SECONDS) {
-      const oldest = Math.max(...living.map((s) => s.ageSeconds));
-      const victims = living.filter((s) => s.ageSeconds === oldest);
+      const oldest = Math.max(...living.map((s) => s.ageDays || 0));
+      const victims = living.filter((s) => (s.ageDays || 0) === oldest);
       if (victims.length > 0) {
         const idx = Math.floor(rng() * victims.length);
         const victim = victims[idx];
@@ -91,7 +93,7 @@ export function processSettlersTick(
   // Aging and XP
   for (const s of settlers) {
     if (!s.isDead) {
-      s.ageSeconds = (s.ageSeconds || 0) + seconds;
+      s.ageDays = (s.ageDays || 0) + seconds / SECONDS_PER_DAY;
       if (s.role) {
         if (!s.skills) s.skills = {};
         const entry = s.skills[s.role] || { level: 0, xp: 0 };
