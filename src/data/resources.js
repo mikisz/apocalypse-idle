@@ -31,6 +31,22 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 100,
   },
+  planks: {
+    id: 'planks',
+    name: 'Planks',
+    icon: '\u{1F332}',
+    category: 'CONSTRUCTION_MATERIALS',
+    startingAmount: 0,
+    startingCapacity: 0,
+  },
+  metalParts: {
+    id: 'metalParts',
+    name: 'Metal Parts',
+    icon: '\u2699\uFE0F',
+    category: 'CONSTRUCTION_MATERIALS',
+    startingAmount: 0,
+    startingCapacity: 0,
+  },
   science: {
     id: 'science',
     name: 'Science',

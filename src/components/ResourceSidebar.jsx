@@ -31,6 +31,7 @@ export default function ResourceSidebar() {
     FOOD: 'Food',
     RAW: 'Raw Materials',
     SOCIETY: 'Society',
+    CONSTRUCTION_MATERIALS: 'Construction Materials',
   };
   RESOURCE_LIST.forEach((r) => {
     const amount = state.resources[r.id]?.amount || 0;
