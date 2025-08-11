@@ -9,6 +9,16 @@ export default function Drawer() {
     const handleFile = (e) => {
       const file = e.target.files?.[0]
       if (!file) return
+
+      if (file.type !== 'application/json') {
+        setState((prev) => ({
+          ...prev,
+          log: ['Failed to load save: Invalid file type', ...prev.log].slice(0, 100),
+        }))
+        e.target.value = ''
+        return
+      }
+
       const reader = new FileReader()
       reader.onload = (ev) => {
         try {
