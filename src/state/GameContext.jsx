@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { GameContext } from './useGame.js';
 import useGameLoop from '../engine/useGameLoop.js';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
@@ -18,6 +24,21 @@ import {
 } from '../engine/time.js';
 import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
+import { ROLE_BUILDINGS } from '../data/roles.js';
+
+function mergeDeep(target, source) {
+  const out = { ...target };
+  Object.keys(source).forEach((key) => {
+    const srcVal = source[key];
+    const tgtVal = target?.[key];
+    if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
+      out[key] = mergeDeep(tgtVal || {}, srcVal);
+    } else if (srcVal !== undefined) {
+      out[key] = srcVal;
+    }
+  });
+  return out;
+}
 
 function prepareLoadedState(loaded) {
   const gameTime =
@@ -67,9 +88,73 @@ function prepareLoadedState(loaded) {
 
 export function GameProvider({ children }) {
   const initialLoad = loadGame();
-  const [state, setState] = useState(() => {
-    if (initialLoad.state && !initialLoad.error)
-      return prepareLoadedState(initialLoad.state);
+  const [state, setState] = useState(() => {const loadedRaw = loadGame();
+
+let loaded = null;
+let loadError = null;
+
+if (loadedRaw && typeof loadedRaw === 'object' && ('state' in loadedRaw || 'error' in loadedRaw)) {
+  loadError = loadedRaw.error ?? null;
+  loaded = loadedRaw.state ?? null;
+} else {
+  loaded = loadedRaw;
+}
+
+// Jeśli jest błąd wczytywania – log i przejście na domyślny stan (bez psucia gry)
+if (loadError) {
+  console.warn('[loadGame] error:', loadError);
+}
+
+if (loaded) {
+  const gameTime =
+    typeof loaded.gameTime === 'number'
+      ? { seconds: loaded.gameTime }
+      : loaded.gameTime || { seconds: 0 };
+
+  const base = mergeDeep(defaultState, { ...loaded, gameTime });
+  base.meta = { ...base.meta, seasons: initSeasons() };
+
+  const prevYear = base.gameTime.year || getYear(base);
+  base.gameTime.year = prevYear;
+
+  const now = Date.now();
+  const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
+
+  if (elapsed > 0) {
+    const bonuses = computeRoleBonuses(base.population?.settlers || []);
+    const { state: progressed, gains } = applyOfflineProgress(base, elapsed, bonuses);
+
+    const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
+    const yearAfter = getYear({
+      ...progressed,
+      gameTime: { ...progressed.gameTime, seconds: secondsAfter },
+    });
+
+    const settlers = progressed.population.settlers.map((s) => ({
+      ...s,
+      ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
+    }));
+
+    const show = Object.keys(gains).length > 0;
+
+    return {
+      ...progressed,
+      population: { ...progressed.population, settlers },
+      gameTime: { seconds: secondsAfter, year: yearAfter },
+      ui: {
+        ...progressed.ui,
+        offlineProgress: show ? { elapsed, gains } : null,
+      },
+      lastSaved: now,
+    };
+  }
+
+  return {
+    ...base,
+    gameTime: { ...base.gameTime, year: prevYear },
+    lastSaved: now,
+  };
+}
     return { ...defaultState, lastSaved: Date.now() };
   });
   const [loadError, setLoadError] = useState(!!initialLoad.error);
@@ -158,6 +243,11 @@ export function GameProvider({ children }) {
       const settler = prev.population.settlers.find((s) => s.id === id);
       if (!settler) return prev;
       const normalized = role === 'idle' ? null : role;
+      if (normalized) {
+        const building = ROLE_BUILDINGS[normalized];
+        const count = prev.buildings?.[building]?.count || 0;
+        if (count <= 0) return prev;
+      }
       const settlers = prev.population.settlers.map((s) =>
         s.id === id ? { ...s, role: normalized } : s,
       );

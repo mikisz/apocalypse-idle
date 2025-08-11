@@ -11,6 +11,9 @@ export default function PopulationView() {
   const [onlyLiving, setOnlyLiving] = useState(true);
   const [unassignedOnly, setUnassignedOnly] = useState(false);
   const settlers = state.population?.settlers ?? [];
+  const availableRoles = ROLE_LIST.filter(
+    (r) => (state.buildings?.[r.building]?.count || 0) > 0,
+  );
   const filtered = settlers
     .filter((s) => !onlyLiving || !s.isDead)
     .filter((s) => !unassignedOnly || s.role == null);
@@ -100,7 +103,7 @@ export default function PopulationView() {
                   className="appearance-none w-full rounded bg-gray-800 text-white px-3 py-2 pr-8 hover:bg-gray-700 focus:outline-none"
                 >
                   <option value="idle">Idle</option>
-                  {ROLE_LIST.map((r) => (
+                  {availableRoles.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.name}
                     </option>

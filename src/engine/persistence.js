@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'apocalypse-idle-save';
 
-export const CURRENT_SAVE_VERSION = 2;
+export const CURRENT_SAVE_VERSION = 3;
 
 export const migrations = [
   {
@@ -13,6 +13,46 @@ export const migrations = [
         save.gameTime = { seconds: 0 };
       }
       if ('schemaVersion' in save) delete save.schemaVersion;
+      return save;
+    },
+  },
+  {
+    from: 2,
+    to: 3,
+    up(save) {
+      if (!save.ui || typeof save.ui !== 'object' || Array.isArray(save.ui)) {
+        save.ui = {
+          activeTab: 'base',
+          drawerOpen: false,
+          offlineProgress: null,
+        };
+      }
+      if (!Array.isArray(save.log)) {
+        save.log = [];
+      }
+      if (
+        !save.research ||
+        typeof save.research !== 'object' ||
+        Array.isArray(save.research)
+      ) {
+        save.research = { current: null, completed: [], progress: {} };
+      } else {
+        save.research.current = save.research.current ?? null;
+        save.research.completed = Array.isArray(save.research.completed)
+          ? save.research.completed
+          : [];
+        save.research.progress =
+          typeof save.research.progress === 'object' &&
+          save.research.progress !== null &&
+          !Array.isArray(save.research.progress)
+            ? save.research.progress
+            : {};
+      }
+      if (!save.population || typeof save.population !== 'object') {
+        save.population = { settlers: [] };
+      } else if (!Array.isArray(save.population.settlers)) {
+        save.population.settlers = [];
+      }
       return save;
     },
   },
@@ -59,6 +99,25 @@ export function validateSave(obj) {
     typeof obj.gameTime !== 'object'
   )
     throw new Error('Invalid save: gameTime must be number or object');
+  if (obj.version >= 3) {
+    if (!('ui' in obj)) throw new Error('Invalid save: missing ui');
+    if (typeof obj.ui !== 'object' || obj.ui === null || Array.isArray(obj.ui))
+      throw new Error('Invalid save: ui must be object');
+    if (!('log' in obj)) throw new Error('Invalid save: missing log');
+    if (!Array.isArray(obj.log))
+      throw new Error('Invalid save: log must be array');
+    if (!('research' in obj)) throw new Error('Invalid save: missing research');
+    if (
+      typeof obj.research !== 'object' ||
+      obj.research === null ||
+      Array.isArray(obj.research)
+    )
+      throw new Error('Invalid save: research must be object');
+    if (!('settlers' in obj.population))
+      throw new Error('Invalid save: missing settlers');
+    if (!Array.isArray(obj.population.settlers))
+      throw new Error('Invalid save: settlers must be array');
+  }
   return true;
 }
 
