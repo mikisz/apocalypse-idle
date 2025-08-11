@@ -20,7 +20,7 @@ export default function TopBar() {
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          {time.season.icon} {time.season.label}
+          {time.season.icon} {time.season.label}, Day {time.day}
         </button>
         {open && (
           <div
