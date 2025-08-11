@@ -26,7 +26,8 @@ export function assignmentsSummary(settlers) {
 
 export function processSettlersTick(state, seconds = BALANCE.TICK_SECONDS, totalFoodProdBase = 0, rng = Math.random) {
   const settlers = state.population?.settlers ? [...state.population.settlers] : []
-  const colony = { ...state.colony }
+  const starvationTimer = state.colony?.starvationTimerSeconds || 0
+  const colony = { ...(state.colony || {}), starvationTimerSeconds: starvationTimer }
 
   const living = settlers.filter((s) => !s.isDead)
 

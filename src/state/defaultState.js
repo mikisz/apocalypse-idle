@@ -23,6 +23,7 @@ export const defaultState = {
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
   buildings: initBuildings(),
+  colony: { starvationTimerSeconds: 0 },
   population: { settlers: [makeRandomSettler()] },
   log: [],
   lastSaved: Date.now(),

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { processTick, demolishBuilding } from '../production.js';
+import { processSettlersTick } from '../settlers.js';
 import { defaultState } from '../../state/defaultState.js';
 import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
 
@@ -23,5 +24,10 @@ describe('economy basics', () => {
     expect(after.resources.wood.amount).toBe(
       Math.floor(prevCost.wood * blueprint.refund),
     );
+  });
+
+  test('processSettlersTick handles default state', () => {
+    const state = clone(defaultState);
+    expect(() => processSettlersTick(state)).not.toThrow();
   });
 });
