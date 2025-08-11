@@ -11,7 +11,7 @@ import {
 import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { getCapacity } from '../state/selectors.js';
-import { formatAmount, formatRate } from '../utils/format.js';
+import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
 
 function BuildingRow({ building }) {
@@ -29,6 +29,14 @@ function BuildingRow({ building }) {
       return { res, perSec: base * mult };
     },
   );
+  const perInputs = Object.entries(building.inputsPerSecBase || {}).map(
+    ([res, base]) => ({ res, perSec: base }),
+  );
+
+  const formatPerSec = (perSec, res) => {
+    const sign = perSec >= 0 ? '+' : '';
+    return `${sign}${formatAmount(perSec)} ${RESOURCES[res].name}/s`;
+  };
 
   const build = () => {
     if (!canAfford) return;
@@ -94,8 +102,13 @@ function BuildingRow({ building }) {
             .join(', ')}
         </div>
         {perOutputs.map((o) => (
-          <div key={o.res}>
-            {RESOURCES[o.res].name} {formatRate(o.perSec)}
+          <div key={`out-${o.res}`}>
+            Produces: {formatPerSec(o.perSec, o.res)}
+          </div>
+        ))}
+        {perInputs.map((i) => (
+          <div key={`in-${i.res}`}>
+            Consumes: {formatPerSec(-i.perSec, i.res)}
           </div>
         ))}
         {building.capacityAdd && (
@@ -103,11 +116,15 @@ function BuildingRow({ building }) {
             {Object.entries(building.capacityAdd)
               .map(
                 ([res, cap]) =>
-                  `+${formatAmount(cap)} ${RESOURCES[res].name} cap`,
+                  `+${formatAmount(cap)} ${RESOURCES[res].name} capacity`,
               )
               .join(', ')}
           </div>
         )}
+        {building.outputsPerSecBase?.power &&
+          getCapacity(state, 'power') <= 0 && (
+            <div>No Power storage. Excess is lost.</div>
+          )}
       </div>
     </div>
   );
@@ -116,12 +133,15 @@ function BuildingRow({ building }) {
 export default function BaseView() {
   const { state } = useGame();
   const prodGroups = {};
+  const completedResearch = state.research.completed || [];
   PRODUCTION_BUILDINGS.forEach((b) => {
+    if (b.requiresResearch && !completedResearch.includes(b.requiresResearch))
+      return;
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
   });
-  const GROUP_ORDER = ['Food', 'Production', 'Science'];
+  const GROUP_ORDER = ['Food', 'Production', 'Science', 'Energy'];
   const prodGroupKeys = [
     ...GROUP_ORDER.filter((g) => prodGroups[g]),
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
@@ -141,7 +161,11 @@ export default function BaseView() {
             </Accordion>
           ))}
           <Accordion title="Storage">
-            {STORAGE_BUILDINGS.map((b) => (
+            {STORAGE_BUILDINGS.filter(
+              (b) =>
+                !b.requiresResearch ||
+                completedResearch.includes(b.requiresResearch),
+            ).map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
           </Accordion>

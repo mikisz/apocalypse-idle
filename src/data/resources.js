@@ -55,6 +55,14 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 400,
   },
+  power: {
+    id: 'power',
+    name: 'Power',
+    icon: '⚡',
+    category: 'ENERGY',
+    startingAmount: 0,
+    startingCapacity: 2,
+  },
 };
 
 export const RESOURCE_LIST = Object.values(RESOURCES);

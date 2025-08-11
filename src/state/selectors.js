@@ -29,6 +29,20 @@ export function getResourceRates(
   PRODUCTION_BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     if (count <= 0) return;
+    let factor = 1;
+    if (b.inputsPerSecBase) {
+      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        const need = base * count;
+        const have = state.resources[res]?.amount || 0;
+        const ratio = need > 0 ? have / need : 1;
+        factor = Math.min(factor, ratio);
+      });
+      factor = Math.min(1, factor);
+      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        const amt = base * count * factor;
+        rates[res] = (rates[res] || 0) - amt;
+      });
+    }
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;
       const mult = getSeasonMultiplier(season, category);
@@ -36,7 +50,7 @@ export function getResourceRates(
       const bonusPercent = roleBonuses[role] || 0;
       const researchBonus = getResearchOutputBonus(state, res);
       const perSec =
-        base * mult * count * (1 + bonusPercent / 100 + researchBonus);
+        base * mult * count * (1 + bonusPercent / 100 + researchBonus) * factor;
       rates[res] = (rates[res] || 0) + perSec;
     });
   });

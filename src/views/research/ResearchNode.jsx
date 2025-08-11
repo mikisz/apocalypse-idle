@@ -18,6 +18,10 @@ function buildTooltip(node) {
   if (node.unlocks?.categories?.length) {
     lines.push(`New resource category: ${node.unlocks.categories.join(', ')}`);
   }
+  if (node.unlocks?.resources?.length) {
+    const names = node.unlocks.resources.map((r) => r).join(', ');
+    lines.push(`New resources: ${names}`);
+  }
   const effs = Array.isArray(node.effects)
     ? node.effects
     : node.effects
