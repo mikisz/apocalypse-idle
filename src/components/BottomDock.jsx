@@ -18,8 +18,11 @@ export default function BottomDock() {
           key={t.id}
           onClick={() => setActiveTab(t.id)}
           aria-label={t.label}
+          aria-current={state.ui.activeTab === t.id ? 'page' : undefined}
           className={`flex-1 py-2 text-xl ${
-            state.ui.activeTab === t.id ? 'text-ink' : 'text-muted'
+            state.ui.activeTab === t.id
+              ? 'text-ink bg-panel font-semibold'
+              : 'text-muted'
           }`}
         >
           {t.icon}
