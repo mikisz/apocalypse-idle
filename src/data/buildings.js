@@ -62,7 +62,9 @@ export const BUILDINGS = [
 ];
 
 export const BUILDING_MAP = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
-export const PRODUCTION_BUILDINGS = BUILDINGS.filter((b) => b.type === 'production');
+export const PRODUCTION_BUILDINGS = BUILDINGS.filter(
+  (b) => b.type === 'production',
+);
 export const STORAGE_BUILDINGS = BUILDINGS.filter((b) => b.type === 'storage');
 
 export function getBuildingCost(building, countBuilt) {

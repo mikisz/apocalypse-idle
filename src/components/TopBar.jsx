@@ -30,7 +30,7 @@ export default function TopBar() {
           >
             {Object.entries(modifiers).map(([key, val]) => (
               <div key={key} className="whitespace-nowrap">
-                {(labels[key] || key)} x{val.toFixed(2)}
+                {labels[key] || key} x{val.toFixed(2)}
               </div>
             ))}
           </div>

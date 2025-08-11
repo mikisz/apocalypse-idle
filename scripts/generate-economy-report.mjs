@@ -1,62 +1,66 @@
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import { execSync } from 'child_process'
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
-import { BUILDINGS } from '../src/data/buildings.js'
-import { RESOURCES } from '../src/data/resources.js'
-import { initSeasons, SECONDS_PER_DAY, getSeasonMultiplier } from '../src/engine/time.js'
-import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js'
-import { defaultState } from '../src/state/defaultState.js'
-import { getCapacity } from '../src/state/selectors.js'
+import { BUILDINGS } from '../src/data/buildings.js';
+import { RESOURCES } from '../src/data/resources.js';
+import {
+  initSeasons,
+  SECONDS_PER_DAY,
+  getSeasonMultiplier,
+} from '../src/engine/time.js';
+import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js';
+import { defaultState } from '../src/state/defaultState.js';
+import { getCapacity } from '../src/state/selectors.js';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const repoRoot = path.resolve(__dirname, '..')
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, '..');
 
 function getCommitInfo() {
   try {
-    const hash = execSync('git rev-parse HEAD').toString().trim()
-    const date = execSync('git show -s --format=%ci HEAD').toString().trim()
-    return { hash, date }
+    const hash = execSync('git rev-parse HEAD').toString().trim();
+    const date = execSync('git show -s --format=%ci HEAD').toString().trim();
+    return { hash, date };
   } catch {
-    return { hash: 'unknown', date: 'unknown' }
+    return { hash: 'unknown', date: 'unknown' };
   }
 }
 
-const { hash: commitHash, date: commitDate } = getCommitInfo()
+const { hash: commitHash, date: commitDate } = getCommitInfo();
 
-const seasons = initSeasons()
-const resourceKeys = Object.keys(RESOURCES)
+const seasons = initSeasons();
+const resourceKeys = Object.keys(RESOURCES);
 
 function computeResourceMultiplier(resId, season) {
-  const building = BUILDINGS.find((b) => b.outputResource === resId)
-  let speedKey
-  let yieldKey
+  const building = BUILDINGS.find((b) => b.outputResource === resId);
+  let speedKey;
+  let yieldKey;
   if (building) {
-    speedKey = building.seasonSpeedKey
-    yieldKey = building.seasonYieldKey
+    speedKey = building.seasonSpeedKey;
+    yieldKey = building.seasonYieldKey;
   } else {
-    const keys = RESOURCES[resId]?.seasonalKeys || []
-    speedKey = keys[0]
-    yieldKey = keys[1]
+    const keys = RESOURCES[resId]?.seasonalKeys || [];
+    speedKey = keys[0];
+    yieldKey = keys[1];
   }
-  const speed = season.modifiers?.[speedKey] ?? 1
-  const yieldMult = yieldKey ? season.modifiers?.[yieldKey] ?? 1 : 1
-  return yieldMult / speed
+  const speed = season.modifiers?.[speedKey] ?? 1;
+  const yieldMult = yieldKey ? (season.modifiers?.[yieldKey] ?? 1) : 1;
+  return yieldMult / speed;
 }
 
-const seasonData = {}
+const seasonData = {};
 seasons.forEach((s) => {
-  const multipliers = {}
+  const multipliers = {};
   resourceKeys.forEach((r) => {
-    multipliers[r] = computeResourceMultiplier(r, s)
-  })
-  seasonData[s.id] = { durationSec: s.days * SECONDS_PER_DAY, multipliers }
-})
+    multipliers[r] = computeResourceMultiplier(r, s);
+  });
+  seasonData[s.id] = { durationSec: s.days * SECONDS_PER_DAY, multipliers };
+});
 
 const resources = resourceKeys.map((id) => {
-  const r = RESOURCES[id]
+  const r = RESOURCES[id];
   return {
     key: id,
     displayName: r.name,
@@ -64,29 +68,29 @@ const resources = resourceKeys.map((id) => {
     startingAmount: defaultState.resources[id]?.amount ?? 0,
     startingCapacity: getCapacity(defaultState, id),
     unit: null,
-  }
-})
+  };
+});
 
 function buildingType(b) {
-  if (b.addsCapacity) return 'storage'
-  if (b.cycleTimeSec) return 'production'
-  return 'other'
+  if (b.addsCapacity) return 'storage';
+  if (b.cycleTimeSec) return 'production';
+  return 'other';
 }
 
 function baseProductionPerSec(b) {
-  if (!b.cycleTimeSec || !b.outputResource) return {}
-  const rate = (b.harvestAmount * b.outputValue) / b.cycleTimeSec
-  return { [b.outputResource]: rate }
+  if (!b.cycleTimeSec || !b.outputResource) return {};
+  const rate = (b.harvestAmount * b.outputValue) / b.cycleTimeSec;
+  return { [b.outputResource]: rate };
 }
 
 function buildingSeasonMultipliers(b) {
-  if (!b.cycleTimeSec) return {}
-  const result = {}
+  if (!b.cycleTimeSec) return {};
+  const result = {};
   seasons.forEach((s) => {
-    const mods = getSeasonMultiplier(s, b)
-    result[s.id] = (mods.yield ?? 1) / (mods.speed ?? 1)
-  })
-  return result
+    const mods = getSeasonMultiplier(s, b);
+    result[s.id] = (mods.yield ?? 1) / (mods.speed ?? 1);
+  });
+  return result;
 }
 
 const buildings = BUILDINGS.map((b) => ({
@@ -100,9 +104,9 @@ const buildings = BUILDINGS.map((b) => ({
   seasonalMode: b.cycleTimeSec ? 'default' : 'ignore',
   seasonalCustom: null,
   seasonalMultipliers: buildingSeasonMultipliers(b),
-}))
+}));
 
-const roles = []
+const roles = [];
 
 const snapshot = {
   version: commitHash,
@@ -120,96 +124,111 @@ const snapshot = {
   startingState: {
     season: seasons[0].id,
     year: 1,
-    resources: Object.fromEntries(resources.map((r) => [r.key, r.startingAmount])),
+    resources: Object.fromEntries(
+      resources.map((r) => [r.key, r.startingAmount]),
+    ),
     buildings: Object.fromEntries(
-      BUILDINGS.filter((b) => b.startsWithCount > 0).map((b) => [b.id, b.startsWithCount])
+      BUILDINGS.filter((b) => b.startsWithCount > 0).map((b) => [
+        b.id,
+        b.startsWithCount,
+      ]),
     ),
   },
-}
+};
 
-fs.mkdirSync(path.join(repoRoot, 'docs'), { recursive: true })
+fs.mkdirSync(path.join(repoRoot, 'docs'), { recursive: true });
 fs.writeFileSync(
   path.join(repoRoot, 'docs/economy-snapshot.json'),
-  JSON.stringify(snapshot, null, 2) + '\n'
-)
+  JSON.stringify(snapshot, null, 2) + '\n',
+);
 
 function formatCost(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v)
-  return entries.length ? entries.map(([k, v]) => `${k}: ${v}`).join(', ') : '-'
+  const entries = Object.entries(obj || {}).filter(([, v]) => v);
+  return entries.length
+    ? entries.map(([k, v]) => `${k}: ${v}`).join(', ')
+    : '-';
 }
 
 function formatObj(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v)
+  const entries = Object.entries(obj || {}).filter(([, v]) => v);
   return entries.length
-    ? entries.map(([k, v]) => `${k}: ${Number(v.toFixed ? v.toFixed(3) : v)}`).join(', ')
-    : '-'
+    ? entries
+        .map(([k, v]) => `${k}: ${Number(v.toFixed ? v.toFixed(3) : v)}`)
+        .join(', ')
+    : '-';
 }
 
-let md = ''
-md += '# Economy Report\n\n'
-md += '## 1) Overview\n'
-md += `Economy generated from commit **${commitHash}** on ${commitDate}. Save version: **${CURRENT_SAVE_VERSION}**.\n`
-md += 'Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.\n\n'
+let md = '';
+md += '# Economy Report\n\n';
+md += '## 1) Overview\n';
+md += `Economy generated from commit **${commitHash}** on ${commitDate}. Save version: **${CURRENT_SAVE_VERSION}**.\n`;
+md +=
+  'Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.\n\n';
 
-md += '## 2) Resources\n'
-md += '| key | displayName | category | startingAmount | startingCapacity | unit |\n'
-md += '| - | - | - | - | - | - |\n'
+md += '## 2) Resources\n';
+md +=
+  '| key | displayName | category | startingAmount | startingCapacity | unit |\n';
+md += '| - | - | - | - | - | - |\n';
 resources.forEach((r) => {
-  md += `| ${r.key} | ${r.displayName} | ${r.category} | ${r.startingAmount} | ${r.startingCapacity} | ${r.unit ?? ''} |\n`
-})
-md += '\nGlobal rules: resources cannot go negative; amounts are clamped to capacity.\n\n'
+  md += `| ${r.key} | ${r.displayName} | ${r.category} | ${r.startingAmount} | ${r.startingCapacity} | ${r.unit ?? ''} |\n`;
+});
+md +=
+  '\nGlobal rules: resources cannot go negative; amounts are clamped to capacity.\n\n';
 
-md += '## 3) Seasons and Global Modifiers\n'
-md += '| season | duration (sec) |'
-resourceKeys.forEach((r) => (md += ` ${r} |`))
-md += '\n| - | - |'
-resourceKeys.forEach(() => (md += ' - |'))
-md += '\n'
+md += '## 3) Seasons and Global Modifiers\n';
+md += '| season | duration (sec) |';
+resourceKeys.forEach((r) => (md += ` ${r} |`));
+md += '\n| - | - |';
+resourceKeys.forEach(() => (md += ' - |'));
+md += '\n';
 seasons.forEach((s) => {
-  md += `| ${s.id} | ${seasonData[s.id].durationSec} |`
+  md += `| ${s.id} | ${seasonData[s.id].durationSec} |`;
   resourceKeys.forEach((r) => {
-    md += ` ${seasonData[s.id].multipliers[r].toFixed(3)} |`
-  })
-  md += '\n'
-})
-md += '\n'
+    md += ` ${seasonData[s.id].multipliers[r].toFixed(3)} |`;
+  });
+  md += '\n';
+});
+md += '\n';
 
-md += '## 4) Buildings\n'
-md += '| id | name | type | cost | refund | storage | base prod/s | season mults |\n'
-md += '| - | - | - | - | - | - | - | - |\n'
+md += '## 4) Buildings\n';
+md +=
+  '| id | name | type | cost | refund | storage | base prod/s | season mults |\n';
+md += '| - | - | - | - | - | - | - | - |\n';
 BUILDINGS.forEach((b, idx) => {
-  const row = buildings[idx]
-  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`
-})
-md += '\n'
+  const row = buildings[idx];
+  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
+});
+md += '\n';
 
-md += '## 5) Population and Roles\n'
-md += 'No role-based production modifiers in effect.\n\n'
+md += '## 5) Population and Roles\n';
+md += 'No role-based production modifiers in effect.\n\n';
 
-md += '## 6) Production Math (Exact Formula)\n'
-md += 'Per building per tick:\n\n'
-md += '`effectiveCycle = cycleTimeSec * seasonSpeed`\n\n'
-md += '`effectiveHarvest = harvestAmount * outputValue * seasonYield`\n\n'
-md += '`cycles = floor((elapsed + timer) / effectiveCycle)`\n\n'
-md += '`production = effectiveHarvest * count * cycles`\n\n'
-md += 'Sum production for each resource across buildings, then `clampResource(value, capacity)` where values below 0 become 0 and above capacity become capacity.\n\n'
-md += 'Offline progress is applied in 60-second chunks.\n\n'
+md += '## 6) Production Math (Exact Formula)\n';
+md += 'Per building per tick:\n\n';
+md += '`effectiveCycle = cycleTimeSec * seasonSpeed`\n\n';
+md += '`effectiveHarvest = harvestAmount * outputValue * seasonYield`\n\n';
+md += '`cycles = floor((elapsed + timer) / effectiveCycle)`\n\n';
+md += '`production = effectiveHarvest * count * cycles`\n\n';
+md +=
+  'Sum production for each resource across buildings, then `clampResource(value, capacity)` where values below 0 become 0 and above capacity become capacity.\n\n';
+md += 'Offline progress is applied in 60-second chunks.\n\n';
 
-md += '## 7) Costs, Refunds, and Edge Rules\n'
-md += 'Building costs scale by `cost * 1.15^count`, rounded up. Demolition refunds 50% of the previous cost (floored) and adds back resources subject to capacity. Resource values are rounded to 6 decimals in clamping and cannot be negative.\n\n'
+md += '## 7) Costs, Refunds, and Edge Rules\n';
+md +=
+  'Building costs scale by `cost * 1.15^count`, rounded up. Demolition refunds 50% of the previous cost (floored) and adds back resources subject to capacity. Resource values are rounded to 6 decimals in clamping and cannot be negative.\n\n';
 
-md += '## 8) Starting State\n'
-md += `Starting season: ${seasons[0].id}, Year: 1.\n\n`
-md += '### Resources\n'
-md += '| resource | amount | capacity |\n| - | - | - |\n'
+md += '## 8) Starting State\n';
+md += `Starting season: ${seasons[0].id}, Year: 1.\n\n`;
+md += '### Resources\n';
+md += '| resource | amount | capacity |\n| - | - | - |\n';
 resources.forEach((r) => {
-  md += `| ${r.key} | ${r.startingAmount} | ${r.startingCapacity} |\n`
-})
-md += '\n### Buildings\n'
-md += '| building | count |\n| - | - |\n'
+  md += `| ${r.key} | ${r.startingAmount} | ${r.startingCapacity} |\n`;
+});
+md += '\n### Buildings\n';
+md += '| building | count |\n| - | - |\n';
 BUILDINGS.filter((b) => b.startsWithCount > 0).forEach((b) => {
-  md += `| ${b.id} | ${b.startsWithCount} |\n`
-})
-md += '\n'
+  md += `| ${b.id} | ${b.startsWithCount} |\n`;
+});
+md += '\n';
 
-fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md)
+fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);

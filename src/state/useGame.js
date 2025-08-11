@@ -1,7 +1,7 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext } from 'react';
 
-export const GameContext = createContext(null)
+export const GameContext = createContext(null);
 
 export function useGame() {
-  return useContext(GameContext)
+  return useContext(GameContext);
 }

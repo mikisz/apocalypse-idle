@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-ink: #e8edf6;
@@ -9,6 +9,14 @@
   --color-stroke: #232b3d;
 }
 
-:root { color-scheme: dark; }
-html, body, #root { height: 100%; }
-body { @apply bg-bg text-ink antialiased; }
+:root {
+  color-scheme: dark;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  @apply bg-bg text-ink antialiased;
+}

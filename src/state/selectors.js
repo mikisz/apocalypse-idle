@@ -31,7 +31,8 @@ export function getResourceRates(state, includeConsumption = false) {
   });
 
   if (includeConsumption) {
-    const settlers = state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
+    const settlers =
+      state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
     const consumption = settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
     rates.potatoes = (rates.potatoes || 0) - consumption;
   }
