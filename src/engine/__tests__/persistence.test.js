@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach } from 'vitest'
-import { saveGame, loadGame, deleteSave, SCHEMA_VERSION } from '../persistence.js'
+import { saveGame, loadGame, SCHEMA_VERSION } from '../persistence.js'
 
 describe('persistence engine', () => {
   beforeEach(() => {

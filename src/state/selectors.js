@@ -1,5 +1,5 @@
 import { BUILDINGS } from '../data/buildings.js'
-import { getSeasonModifiers } from '../engine/time.js'
+import { getSeason, getSeasonMultiplier } from '../engine/time.js'
 import { formatRate } from '../utils/format.js'
 
 export function getCapacity(state, resourceId) {
@@ -8,15 +8,16 @@ export function getCapacity(state, resourceId) {
 }
 
 export function getResourceProductionSummary(state) {
-  const mods = getSeasonModifiers(state)
+  const season = getSeason(state)
   const groupedCategories = {}
   const groupedTypes = {}
   BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0
     if (count > 0 && b.growthTime) {
-      const effectiveGrowth = b.growthTime * mods.farmingSpeed
+      const mods = getSeasonMultiplier(season, b.resource, b)
+      const effectiveGrowth = b.growthTime * mods.speed
       const effectiveHarvest =
-        b.harvestAmount * mods.farmingYield * b.yieldValue
+        b.harvestAmount * mods.yield * b.yieldValue
       const res = b.resource
       groupedCategories[res] = groupedCategories[res] || []
       groupedCategories[res].push({

@@ -1,5 +1,5 @@
 import { BUILDINGS } from '../data/buildings.js'
-import { getSeasonModifiers } from './time.js'
+import { getSeason, getSeasonMultiplier } from './time.js'
 import { getCapacity } from '../state/selectors.js'
 
 export function getProductionRates(state) {
@@ -38,7 +38,7 @@ export function processTick(state, seconds = 1) {
     resources[res] = { amount: nextAmount, capacity, stocks }
   })
 
-  const mods = getSeasonModifiers(state)
+  const season = getSeason(state)
   const timers = { ...state.timers }
 
   BUILDINGS.forEach((b) => {
@@ -46,8 +46,9 @@ export function processTick(state, seconds = 1) {
     if (count <= 0 || !b.growthTime) return
     const resId = b.resource
     const type = b.type
-    const effectiveGrowth = b.growthTime * mods.farmingSpeed
-    const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.yieldValue
+    const mods = getSeasonMultiplier(season, resId, b)
+    const effectiveGrowth = b.growthTime * mods.speed
+    const effectiveHarvest = b.harvestAmount * mods.yield * b.yieldValue
     const group = { ...(timers[resId] || {}) }
     let timer = (group[b.id] ?? effectiveGrowth) - seconds
     let cycles = 0

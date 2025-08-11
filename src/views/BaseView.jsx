@@ -3,7 +3,7 @@ import { useGame } from '../state/useGame.js'
 import EventLog from '../components/EventLog.jsx'
 import ResourceSidebar from '../components/ResourceSidebar.jsx'
 import { FOOD_BUILDINGS, RESOURCE_BUILDINGS } from '../data/buildings.js'
-import { getSeasonModifiers } from '../engine/time.js'
+import { getSeason, getSeasonMultiplier } from '../engine/time.js'
 import { getCapacity } from '../state/selectors.js'
 import { formatRate } from '../utils/format.js'
 
@@ -26,10 +26,11 @@ function AccordionItem({ title, children, defaultOpen = false }) {
 function BuildingRow({ building }) {
   const { state, setState } = useGame()
   const count = state.buildings[building.id]?.count || 0
-  const mods = getSeasonModifiers(state)
-  const effectiveGrowth = building.growthTime * mods.farmingSpeed
+  const season = getSeason(state)
+  const mods = getSeasonMultiplier(season, building.resource, building)
+  const effectiveGrowth = building.growthTime * mods.speed
   const effectiveHarvest =
-    building.harvestAmount * mods.farmingYield * building.yieldValue
+    building.harvestAmount * mods.yield * building.yieldValue
   const costEntries = Object.entries(building.cost || {})
   const canAfford = costEntries.every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
