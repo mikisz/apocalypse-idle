@@ -4,7 +4,9 @@ export function formatRate({ amountPerHarvest, intervalSec }) {
 }
 
 export function formatAmount(n) {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}m`
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`
-  return `${n}`
+  const rounded = Math.round(n)
+  if (rounded >= 1000000)
+    return `${parseFloat((rounded / 1000000).toFixed(1))}m`
+  if (rounded >= 1000) return `${parseFloat((rounded / 1000).toFixed(1))}k`
+  return `${rounded}`
 }
