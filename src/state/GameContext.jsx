@@ -4,7 +4,7 @@ import useGameLoop from '../engine/useGameLoop.js'
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
 import { processTick, applyOfflineProgress } from '../engine/production.js'
 import { defaultState } from './defaultState.js'
-import { getSeason, initSeasons } from '../engine/time.js'
+import { getSeason, getSeasonDay, initSeasons } from '../engine/time.js'
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
@@ -14,7 +14,7 @@ export function GameProvider({ children }) {
         typeof loaded.gameTime === 'number'
           ? { seconds: loaded.gameTime }
           : loaded.gameTime || { seconds: 0 }
-      const meta = loaded.meta || { seasons: initSeasons() }
+      const meta = { seasons: initSeasons() }
       const base = { ...loaded, gameTime, meta }
       const now = Date.now()
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000)
@@ -104,6 +104,7 @@ export function GameProvider({ children }) {
   }, [])
 
   const selectSeason = useCallback(() => getSeason(state), [state])
+  const selectSeasonDay = useCallback(() => getSeasonDay(state), [state])
 
   const value = useMemo(
     () => ({
@@ -115,8 +116,18 @@ export function GameProvider({ children }) {
       dismissOfflineModal,
       resetGame,
       selectSeason,
+      selectSeasonDay,
     }),
-    [state, setActiveTab, toggleDrawer, setSettlerRole, dismissOfflineModal, resetGame, selectSeason],
+    [
+      state,
+      setActiveTab,
+      toggleDrawer,
+      setSettlerRole,
+      dismissOfflineModal,
+      resetGame,
+      selectSeason,
+      selectSeasonDay,
+    ],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>
