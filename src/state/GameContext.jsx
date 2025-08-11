@@ -25,6 +25,7 @@ import {
 import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BUILDINGS } from '../data/roles.js';
+import { createLogEntry } from '../utils/log.js';
 
 function mergeDeep(target, source) {
   const out = { ...target };
@@ -252,7 +253,9 @@ if (loaded) {
         s.id === id ? { ...s, role: normalized } : s,
       );
       const roleName = normalized ?? 'idle';
-      const entry = `${settler.firstName} ${settler.lastName} is now ${roleName}`;
+      const entry = createLogEntry(
+        `${settler.firstName} ${settler.lastName} is now ${roleName}`,
+      );
       const log = [entry, ...prev.log].slice(0, 100);
       return { ...prev, population: { ...prev.population, settlers }, log };
     });

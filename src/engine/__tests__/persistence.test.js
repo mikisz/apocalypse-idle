@@ -29,7 +29,7 @@ describe('persistence migrations and validation', () => {
 
   it('fails validation when essential data is missing', () => {
     const base = {
-      version: 3,
+      version: CURRENT_SAVE_VERSION,
       resources: {},
       buildings: {},
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
@@ -51,5 +51,24 @@ describe('persistence migrations and validation', () => {
 
     const missingSettlers = { ...base, population: {} };
     expect(() => validateSave(missingSettlers)).toThrow();
+  });
+
+  it('converts string log entries to objects', () => {
+    const oldSave = {
+      version: 3,
+      resources: {},
+      buildings: {},
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: ['hello world'],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [] },
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(3);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.log).toHaveLength(1);
+    expect(state.log[0].text).toBe('hello world');
+    expect(typeof state.log[0].id).toBe('string');
   });
 });

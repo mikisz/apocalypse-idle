@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useGame } from '../state/useGame.js';
 import { exportSaveFile, load } from '../engine/persistence.js';
+import { createLogEntry } from '../utils/log.js';
 
 export default function Drawer() {
   const { state, toggleDrawer, setState, resetGame } = useGame();
@@ -13,10 +14,10 @@ export default function Drawer() {
     if (file.type !== 'application/json') {
       setState((prev) => ({
         ...prev,
-        log: ['Failed to load save: Invalid file type', ...prev.log].slice(
-          0,
-          100,
-        ),
+        log: [
+          createLogEntry('Failed to load save: Invalid file type'),
+          ...prev.log,
+        ].slice(0, 100),
       }));
       e.target.value = '';
       return;
@@ -30,16 +31,16 @@ export default function Drawer() {
         const note = migratedFrom
           ? `Save loaded (migrated from v${migratedFrom})`
           : 'Save loaded';
-        const log = [note, ...(loaded.log || [])].slice(0, 100);
+        const log = [createLogEntry(note), ...(loaded.log || [])].slice(0, 100);
         setState({ ...loaded, log });
       } catch (err) {
         console.error(err);
         setState((prev) => ({
           ...prev,
-          log: [`Failed to load save: ${err.message}`, ...prev.log].slice(
-            0,
-            100,
-          ),
+          log: [
+            createLogEntry(`Failed to load save: ${err.message}`),
+            ...prev.log,
+          ].slice(0, 100),
         }));
       }
     };
@@ -74,7 +75,10 @@ export default function Drawer() {
                   exportSaveFile(state);
                   setState((prev) => ({
                     ...prev,
-                    log: ['Save exported', ...prev.log].slice(0, 100),
+                    log: [createLogEntry('Save exported'), ...prev.log].slice(
+                      0,
+                      100,
+                    ),
                   }));
                 }}
               >
