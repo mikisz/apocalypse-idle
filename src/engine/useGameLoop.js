@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-// Prosta pętla gry na setInterval; dt w sekundach
-export default function useGameLoop(callback, intervalMs = 250) {
+// Simple game loop using setInterval; dt in seconds
+export default function useGameLoop(callback, intervalMs = 1000) {
   const lastRef = useRef(performance.now())
 
   useEffect(() => {
