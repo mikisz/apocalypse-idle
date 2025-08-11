@@ -6,28 +6,40 @@ const DEFAULT_SEASONS = [
     label: 'Spring',
     icon: '🌱',
     days: 90,
-    modifiers: { farmingSpeed: 0.8, farmingYield: 1.1 },
+    modifiers: {
+      food: { speed: 0.8, yield: 1.1 },
+      wood: { speed: 0.8, yield: 1.1 },
+    },
   },
   {
     id: 'summer',
     label: 'Summer',
     icon: '☀️',
     days: 90,
-    modifiers: { farmingSpeed: 1.0, farmingYield: 1.0 },
+    modifiers: {
+      food: { speed: 1.0, yield: 1.0 },
+      wood: { speed: 1.0, yield: 1.0 },
+    },
   },
   {
     id: 'autumn',
     label: 'Autumn',
     icon: '🍂',
     days: 90,
-    modifiers: { farmingSpeed: 1.1, farmingYield: 1.0 },
+    modifiers: {
+      food: { speed: 1.1, yield: 1.0 },
+      wood: { speed: 1.1, yield: 1.0 },
+    },
   },
   {
     id: 'winter',
     label: 'Winter',
     icon: '❄️',
     days: 90,
-    modifiers: { farmingSpeed: 2.0, farmingYield: 0.0 },
+    modifiers: {
+      food: { speed: 2.0, yield: 0.0 },
+      wood: { speed: 2.0, yield: 0.0 },
+    },
   },
 ]
 
@@ -90,9 +102,23 @@ export function getDayInSeason(state) {
 export const getSeasonDay = getDayInSeason
 
 export function getSeasonModifiers(state) {
-  return getTimeBreakdown(state).season.modifiers || {
-    farmingSpeed: 1,
-    farmingYield: 1,
+  return getTimeBreakdown(state).season.modifiers || {}
+}
+
+export function getSeasonMultiplier(season, resourceKey, building) {
+  const base = season?.modifiers?.[resourceKey] || { speed: 1, yield: 1 }
+  let { speed = 1, yield: yieldMult = 1 } = base
+  const seasonal = building?.seasonal
+  if (seasonal?.mode === 'ignore') {
+    speed = 1
+    yieldMult = 1
+  } else if (seasonal?.mode === 'custom') {
+    const custom = seasonal?.modifiers?.[season.id]?.[resourceKey]
+    if (typeof custom === 'number') {
+      speed = custom
+      yieldMult = custom
+    }
   }
+  return { speed, yield: yieldMult }
 }
 

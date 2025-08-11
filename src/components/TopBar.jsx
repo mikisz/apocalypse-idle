@@ -8,7 +8,8 @@ export default function TopBar() {
   const modifiers = getSeasonModifiers(state)
   const [open, setOpen] = useState(false)
 
-  const labels = { farmingSpeed: 'Growth', farmingYield: 'Yield' }
+  const first = Object.values(modifiers)[0] || { speed: 1, yield: 1 }
+  const labels = { speed: 'Growth', yield: 'Yield' }
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">
@@ -29,7 +30,7 @@ export default function TopBar() {
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
           >
-            {Object.entries(modifiers).map(([key, val]) => (
+            {Object.entries(first).map(([key, val]) => (
               <div key={key} className="whitespace-nowrap">
                 {(labels[key] || key)} x{val.toFixed(1)}
               </div>
