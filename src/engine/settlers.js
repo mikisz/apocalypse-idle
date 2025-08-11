@@ -1,11 +1,10 @@
-import { BALANCE, XP_TIME_TO_NEXT_LEVEL_SECONDS, ROLE_BONUS_PER_SETTLER } from '../data/balance.js'
-
-// Utility clamp
-function clamp(v, min, max) {
-  if (!Number.isFinite(v)) v = 0
-  if (!Number.isFinite(max)) return Math.max(min, v)
-  return Math.max(min, Math.min(max, v))
-}
+import {
+  BALANCE,
+  XP_TIME_TO_NEXT_LEVEL_SECONDS,
+  ROLE_BONUS_PER_SETTLER,
+} from '../data/balance.js'
+import { getCapacity } from '../state/selectors.js'
+import { clampResource } from './production.js'
 
 export function computeRoleBonuses(settlers) {
   const bonuses = {}
@@ -24,31 +23,43 @@ export function assignmentsSummary(settlers) {
   return { assigned: assigned.length, living: living.length }
 }
 
-export function processSettlersTick(state, seconds = BALANCE.TICK_SECONDS, totalFoodProdBase = 0, rng = Math.random) {
+export function processSettlersTick(
+  state,
+  seconds = BALANCE.TICK_SECONDS,
+  totalFoodProdBase = 0,
+  rng = Math.random,
+) {
   const settlers = state.population?.settlers ? [...state.population.settlers] : []
-  const colony = { ...state.colony }
-
   const living = settlers.filter((s) => !s.isDead)
 
   // Compute bonuses
   const bonuses = computeRoleBonuses(living)
   const totalFoodBonusPercent = bonuses['farming'] || 0
 
-  const totalFoodProdWithBonus = totalFoodProdBase * (1 + totalFoodBonusPercent / 100)
+  const bonusGainPerSec = totalFoodProdBase * (totalFoodBonusPercent / 100)
   const totalSettlersConsumption = living.length * BALANCE.FOOD_CONSUMPTION_PER_SETTLER
-  const netFoodPerSec = totalFoodProdWithBonus - totalSettlersConsumption
+  const netFoodPerSec = totalFoodProdBase + bonusGainPerSec - totalSettlersConsumption
 
-  colony.foodStorage = clamp(
-    colony.foodStorage + netFoodPerSec * seconds,
-    0,
-    colony.foodStorageCap,
+  const capacity = getCapacity(state, 'potatoes')
+  const currentEntry = state.resources.potatoes || { amount: 0, discovered: false }
+  const nextAmount = clampResource(
+    currentEntry.amount + (bonusGainPerSec - totalSettlersConsumption) * seconds,
+    capacity,
   )
+  const resources = {
+    ...state.resources,
+    potatoes: {
+      amount: nextAmount,
+      discovered: currentEntry.discovered || nextAmount > 0,
+    },
+  }
 
-  if (colony.foodStorage > 0) {
-    colony.starvationTimerSeconds = 0
+  let starvationTimer = state.colony?.starvationTimerSeconds || 0
+  if (nextAmount > 0) {
+    starvationTimer = 0
   } else {
-    colony.starvationTimerSeconds += seconds
-    if (colony.starvationTimerSeconds >= BALANCE.STARVATION_DEATH_TIMER_SECONDS) {
+    starvationTimer += seconds
+    if (starvationTimer >= BALANCE.STARVATION_DEATH_TIMER_SECONDS) {
       const oldest = Math.max(...living.map((s) => s.ageSeconds))
       const victims = living.filter((s) => s.ageSeconds === oldest)
       if (victims.length > 0) {
@@ -63,9 +74,10 @@ export function processSettlersTick(state, seconds = BALANCE.TICK_SECONDS, total
           }
         }
       }
-      colony.starvationTimerSeconds = 0
+      starvationTimer = 0
     }
   }
+  const colony = { ...state.colony, starvationTimerSeconds: starvationTimer }
 
   // Aging and XP
   for (const s of settlers) {
@@ -107,13 +119,13 @@ export function processSettlersTick(state, seconds = BALANCE.TICK_SECONDS, total
     totalFoodProdBase,
     totalFoodBonusPercent,
     totalSettlersConsumption,
-    foodStorage: colony.foodStorage,
-    starvationTimerSeconds: colony.starvationTimerSeconds,
+    potatoes: nextAmount,
+    starvationTimerSeconds: starvationTimer,
     roleBonuses: bonuses,
   }
 
   return {
-    state: { ...state, colony, population: { ...state.population, settlers } },
+    state: { ...state, colony, resources, population: { ...state.population, settlers } },
     telemetry,
   }
 }

@@ -6,15 +6,18 @@ import { makeRandomSettler } from '../data/names.js';
 const initResources = () => {
   const obj = {};
   Object.values(RESOURCES).forEach((r) => {
-    obj[r.id] = { amount: r.startingAmount || 0 };
+    const amt = r.startingAmount || 0;
+    obj[r.id] = { amount: amt, discovered: amt > 0 };
   });
   return obj;
 };
 
 const initBuildings = () => ({
-  potatoField: { count: 1 },
+  potatoField: { count: 2 },
   loggingCamp: { count: 1 },
 });
+
+const initSettlers = () => [makeRandomSettler()];
 
 export const defaultState = {
   version: CURRENT_SAVE_VERSION,
@@ -23,7 +26,7 @@ export const defaultState = {
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
   buildings: initBuildings(),
-  population: { settlers: [makeRandomSettler()] },
+  population: { settlers: initSettlers() },
   log: [],
   lastSaved: Date.now(),
 };

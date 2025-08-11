@@ -20,10 +20,13 @@ function Accordion({ title, children, defaultOpen = false }) {
   );
 }
 
-function ResourceRow({ name, amount, capacity, rate }) {
+function ResourceRow({ icon, name, amount, capacity, rate }) {
   return (
     <div className="flex items-center justify-between text-sm tabular-nums">
-      <span>{name}</span>
+      <span className="flex items-center gap-1">
+        <span>{icon}</span>
+        <span>{name}</span>
+      </span>
       <span className="flex flex-col items-end">
         <span>
           {formatAmount(amount)} / {formatAmount(capacity)}
@@ -36,24 +39,31 @@ function ResourceRow({ name, amount, capacity, rate }) {
 
 export default function ResourceSidebar() {
   const { state } = useGame();
-  const rates = getResourceRates(state);
-  const groups = {};
+  const rates = getResourceRates(state, true);
+  const groups = { FOOD: [], RAW: [] };
   RESOURCE_LIST.forEach((r) => {
-    const cat = r.category;
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push({
-      id: r.id,
-      name: r.name,
-      amount: state.resources[r.id]?.amount || 0,
-      capacity: getCapacity(state, r.id),
-      rate: rates[r.id]?.label,
-    });
+    const amount = state.resources[r.id]?.amount || 0;
+    const capacity = getCapacity(state, r.id);
+    const rateInfo = rates[r.id];
+    const discovered = state.resources[r.id]?.discovered;
+    if (rateInfo.perSec !== 0 || amount > 0 || discovered) {
+      groups[r.category].push({
+        id: r.id,
+        name: r.name,
+        icon: r.icon,
+        amount,
+        capacity,
+        rate: rateInfo.label,
+      });
+    }
   });
-  const entries = Object.entries(groups).map(([cat, items]) => ({
-    title: cat === 'FOOD' ? 'Food' : 'Raw Materials',
-    items,
-    defaultOpen: true,
-  }));
+  const entries = [];
+  if (groups.FOOD.length > 0) {
+    entries.push({ title: 'Food', items: groups.FOOD, defaultOpen: true });
+  }
+  if (groups.RAW.length > 0) {
+    entries.push({ title: 'Raw Materials', items: groups.RAW, defaultOpen: true });
+  }
 
   return (
     <div className="border border-stroke rounded overflow-hidden bg-bg2">

@@ -15,7 +15,8 @@ export function formatAmount(n) {
 
 export function formatRate(perSec) {
   if (!Number.isFinite(perSec)) perSec = 0;
-  return `+${formatAmount(perSec)}/s`;
+  const sign = perSec >= 0 ? '+' : '';
+  return `${sign}${formatAmount(perSec)}/s`;
 }
 
 export function formatAge(ageSeconds = 0) {

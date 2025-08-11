@@ -2,6 +2,7 @@ import { PRODUCTION_BUILDINGS, BUILDING_MAP, getBuildingCost } from '../data/bui
 import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity } from '../state/selectors.js';
+import { BALANCE } from '../data/balance.js';
 
 export function clampResource(value, capacity) {
   let v = Number.isFinite(value) ? value : 0;
@@ -21,10 +22,17 @@ export function applyProduction(state, seconds = 1) {
       const mult = getSeasonMultiplier(season, category);
       const gain = base * mult * count * seconds;
       const capacity = getCapacity(state, res);
-      const current = resources[res]?.amount || 0;
-      const next = clampResource(current + gain, capacity);
-      resources[res] = { amount: next };
+      const currentEntry = resources[res] || { amount: 0, discovered: false };
+      const next = clampResource(currentEntry.amount + gain, capacity);
+      resources[res] = {
+        amount: next,
+        discovered: currentEntry.discovered || count > 0 || next > 0,
+      };
     });
+  });
+  Object.keys(resources).forEach((res) => {
+    const entry = resources[res];
+    if (entry.amount > 0) entry.discovered = true;
   });
   return { ...state, resources };
 }
@@ -37,6 +45,21 @@ export function applyOfflineProgress(state, elapsedSeconds) {
   if (elapsedSeconds <= 0) return { state, gains: {} };
   const before = JSON.parse(JSON.stringify(state.resources));
   let current = applyProduction({ ...state }, elapsedSeconds);
+  const settlers = state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
+  if (settlers > 0) {
+    const consumption =
+      settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER * elapsedSeconds;
+    const cap = getCapacity(current, 'potatoes');
+    const entry = current.resources.potatoes || { amount: 0, discovered: false };
+    const next = clampResource(entry.amount - consumption, cap);
+    current.resources.potatoes = {
+      amount: next,
+      discovered: entry.discovered || next > 0,
+    };
+  }
+  Object.keys(current.resources).forEach((res) => {
+    if (current.resources[res].amount > 0) current.resources[res].discovered = true;
+  });
   const gains = {};
   Object.keys(before).forEach((res) => {
     const gain = (current.resources[res]?.amount || 0) - (before[res]?.amount || 0);
@@ -56,12 +79,18 @@ export function demolishBuilding(state, buildingId) {
   Object.entries(prevCost).forEach(([res, amt]) => {
     const refund = Math.floor(amt * refundRate);
     const capacity = getCapacity({ ...state, buildings }, res);
-    const current = resources[res]?.amount || 0;
-    resources[res] = { amount: clampResource(current + refund, capacity) };
+    const currentEntry = resources[res] || { amount: 0, discovered: false };
+    const next = clampResource(currentEntry.amount + refund, capacity);
+    resources[res] = {
+      amount: next,
+      discovered: currentEntry.discovered || next > 0,
+    };
   });
   Object.keys(resources).forEach((res) => {
     const capacity = getCapacity({ ...state, buildings }, res);
-    resources[res].amount = clampResource(resources[res].amount, capacity);
+    const entry = resources[res];
+    entry.amount = clampResource(entry.amount, capacity);
+    if (entry.amount > 0) entry.discovered = true;
   });
   return { ...state, resources, buildings };
 }

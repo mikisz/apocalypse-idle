@@ -50,8 +50,12 @@ function BuildingRow({ building }) {
     setState((prev) => {
       const resources = { ...prev.resources };
       costEntries.forEach(([res, amt]) => {
-        const current = prev.resources[res]?.amount || 0;
-        resources[res] = { amount: current - amt };
+        const currentEntry = resources[res] || { amount: 0, discovered: false };
+        const next = currentEntry.amount - amt;
+        resources[res] = {
+          amount: next,
+          discovered: currentEntry.discovered || next > 0,
+        };
       });
       const newCount = count + 1;
       const buildings = {
@@ -60,7 +64,9 @@ function BuildingRow({ building }) {
       };
       Object.keys(resources).forEach((res) => {
         const cap = getCapacity({ ...prev, buildings }, res);
-        resources[res].amount = Math.min(cap, resources[res].amount);
+        const entry = resources[res];
+        entry.amount = Math.min(cap, entry.amount);
+        if (entry.amount > 0) entry.discovered = true;
       });
       return { ...prev, resources, buildings };
     });
