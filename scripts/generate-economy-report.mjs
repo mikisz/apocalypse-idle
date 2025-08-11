@@ -5,7 +5,11 @@ import { execSync } from 'child_process';
 
 import { BUILDINGS } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
-import { initSeasons, getSeasonMultiplier, SEASON_DURATION } from '../src/engine/time.js';
+import {
+  initSeasons,
+  getSeasonMultiplier,
+  SEASON_DURATION,
+} from '../src/engine/time.js';
 import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js';
 import { defaultState } from '../src/state/defaultState.js';
 import { getCapacity } from '../src/state/selectors.js';

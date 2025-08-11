@@ -233,13 +233,7 @@
   ],
   "roles": [],
   "formula": {
-    "order": [
-      "base",
-      "season",
-      "roles",
-      "sum",
-      "clamp"
-    ],
+    "order": ["base", "season", "roles", "sum", "clamp"],
     "demolitionRefund": 0.5,
     "clampRule": "min(value, capacity) and never negative"
   },
