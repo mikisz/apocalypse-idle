@@ -1,3 +1,4 @@
+import React from 'react';
 import { useGame } from '../state/useGame.js';
 import Accordion from './Accordion.jsx';
 import { getCapacity, getResourceRates } from '../state/selectors.js';

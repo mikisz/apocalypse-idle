@@ -1,3 +1,4 @@
+import React from 'react';
 import { useGame } from '../state/useGame.js';
 import EventLog from '../components/EventLog.jsx';
 import ResourceSidebar from '../components/ResourceSidebar.jsx';
@@ -11,7 +12,7 @@ import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { getCapacity } from '../state/selectors.js';
 import { formatAmount, formatRate } from '../utils/format.js';
-import { demolishBuilding } from '../engine/production.js';
+import { clampResource, demolishBuilding } from '../engine/production.js';
 
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
@@ -49,7 +50,7 @@ function BuildingRow({ building }) {
       Object.keys(resources).forEach((res) => {
         const cap = getCapacity({ ...prev, buildings }, res);
         const entry = resources[res];
-        entry.amount = Math.min(cap, entry.amount);
+        entry.amount = clampResource(entry.amount, cap);
         if (entry.amount > 0) entry.discovered = true;
       });
       return { ...prev, resources, buildings };
