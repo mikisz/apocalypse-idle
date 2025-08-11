@@ -37,10 +37,11 @@ export function GameProvider({ children }) {
 
   const setSettlerRole = useCallback((id, role) => {
     setState((prev) => {
+      const settler = prev.population.settlers.find((s) => s.id === id)
+      if (!settler) return prev
       const settlers = prev.population.settlers.map((s) =>
         s.id === id ? { ...s, role } : s,
       )
-      const settler = prev.population.settlers.find((s) => s.id === id)
       const entry = `${settler.firstName} ${settler.lastName} is now ${role}`
       const log = [entry, ...prev.log].slice(0, 100)
       return { ...prev, population: { ...prev.population, settlers }, log }
