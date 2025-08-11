@@ -89,14 +89,14 @@ export function saveGame(state) {
 }
 
 export function loadGame() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return { state: null, error: null };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
     const { state } = load(raw);
-    return state;
+    return { state, error: null };
   } catch (err) {
     console.error('Load failed', err);
-    return null;
+    return { state: null, error: err };
   }
 }
 
