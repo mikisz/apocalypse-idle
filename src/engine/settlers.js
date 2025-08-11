@@ -51,6 +51,7 @@ export function processSettlersTick(
   const currentEntry = state.resources.potatoes || {
     amount: 0,
     discovered: false,
+    produced: 0,
   };
   // Potatoes after this tick: current amount + netFoodPerSec * seconds (clamped to capacity)
   const nextAmount = clampResource(
@@ -62,6 +63,7 @@ export function processSettlersTick(
     potatoes: {
       amount: nextAmount,
       discovered: currentEntry.discovered || nextAmount > 0,
+      produced: currentEntry.produced,
     },
   };
 

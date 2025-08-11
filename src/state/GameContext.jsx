@@ -4,6 +4,11 @@ import useGameLoop from '../engine/useGameLoop.js';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
 import { processTick, applyOfflineProgress } from '../engine/production.js';
 import { processSettlersTick, computeRoleBonuses } from '../engine/settlers.js';
+import {
+  startResearch,
+  cancelResearch,
+  processResearchTick,
+} from '../engine/research.js';
 import { defaultState } from './defaultState.js';
 import {
   getYear,
@@ -70,7 +75,8 @@ export function GameProvider({ children }) {
     setState((prev) => {
       const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
       const afterTick = processTick(prev, dt, roleBonuses);
-      const rates = getResourceRates(afterTick);
+      const withResearch = processResearchTick(afterTick, dt);
+      const rates = getResourceRates(withResearch);
       let totalFoodProdBase = 0;
       Object.keys(RESOURCES).forEach((id) => {
         if (RESOURCES[id].category === 'FOOD') {
@@ -78,7 +84,7 @@ export function GameProvider({ children }) {
         }
       });
       const { state: settlersProcessed, telemetry } = processSettlersTick(
-        afterTick,
+        withResearch,
         dt,
         totalFoodProdBase,
         Math.random,
@@ -158,6 +164,14 @@ export function GameProvider({ children }) {
     });
   }, []);
 
+  const beginResearch = useCallback((id) => {
+    setState((prev) => startResearch(prev, id));
+  }, []);
+
+  const abortResearch = useCallback(() => {
+    setState((prev) => cancelResearch(prev));
+  }, []);
+
   const dismissOfflineModal = useCallback(() => {
     setState((prev) => ({
       ...prev,
@@ -180,6 +194,8 @@ export function GameProvider({ children }) {
       setActiveTab,
       toggleDrawer,
       setSettlerRole,
+      beginResearch,
+      abortResearch,
       setState,
       dismissOfflineModal,
       resetGame,
@@ -189,6 +205,8 @@ export function GameProvider({ children }) {
       setActiveTab,
       toggleDrawer,
       setSettlerRole,
+      beginResearch,
+      abortResearch,
       dismissOfflineModal,
       resetGame,
     ],

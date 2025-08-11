@@ -6,7 +6,7 @@ import {
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
-import { getCapacity } from '../state/selectors.js';
+import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { BALANCE } from '../data/balance.js';
 
 export function clampResource(value, capacity) {
@@ -27,13 +27,20 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
       const mult = getSeasonMultiplier(season, category);
       const role = ROLE_BY_RESOURCE[res];
       const bonusPercent = roleBonuses[role] || 0;
-      const gain = base * mult * count * (1 + bonusPercent / 100) * seconds;
+      const researchBonus = getResearchOutputBonus(state, res);
+      const gain =
+        base *
+        mult *
+        count *
+        (1 + bonusPercent / 100 + researchBonus) *
+        seconds;
       const capacity = getCapacity(state, res);
       const currentEntry = resources[res] || { amount: 0, discovered: false };
       const next = clampResource(currentEntry.amount + gain, capacity);
       resources[res] = {
         amount: next,
         discovered: currentEntry.discovered || count > 0 || next > 0,
+        produced: (currentEntry.produced || 0) + Math.max(0, gain),
       };
     });
   });
@@ -97,6 +104,7 @@ export function demolishBuilding(state, buildingId) {
     resources[res] = {
       amount: next,
       discovered: currentEntry.discovered || next > 0,
+      produced: currentEntry.produced || 0,
     };
   });
   Object.keys(resources).forEach((res) => {

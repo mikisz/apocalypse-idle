@@ -1,5 +1,6 @@
 import { BUILDINGS, PRODUCTION_BUILDINGS } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
+import { RESEARCH_MAP } from '../data/research.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { formatRate } from '../utils/format.js';
 import { BALANCE } from '../data/balance.js';
@@ -14,7 +15,8 @@ export function getCapacity(state, resourceId) {
       fromBuildings += b.capacityAdd[resourceId] * count;
     }
   });
-  return base + fromBuildings;
+  const bonus = getResearchStorageBonus(state, resourceId);
+  return Math.floor((base + fromBuildings) * (1 + bonus));
 }
 
 export function getResourceRates(
@@ -32,7 +34,9 @@ export function getResourceRates(
       const mult = getSeasonMultiplier(season, category);
       const role = ROLE_BY_RESOURCE[res];
       const bonusPercent = roleBonuses[role] || 0;
-      const perSec = base * mult * count * (1 + bonusPercent / 100);
+      const researchBonus = getResearchOutputBonus(state, res);
+      const perSec =
+        base * mult * count * (1 + bonusPercent / 100 + researchBonus);
       rates[res] = (rates[res] || 0) + perSec;
     });
   });
@@ -50,4 +54,48 @@ export function getResourceRates(
     formatted[id] = { perSec, label: formatRate(perSec) };
   });
   return formatted;
+}
+
+function gatherEffects(state, type) {
+  const completed = state.research?.completed || [];
+  const effects = [];
+  completed.forEach((id) => {
+    const r = RESEARCH_MAP[id];
+    if (!r?.effects) return;
+    const list = Array.isArray(r.effects) ? r.effects : [r.effects];
+    list.forEach((e) => {
+      if (!type || e.type === type || (!e.type && type === 'output')) {
+        effects.push(e);
+      }
+    });
+  });
+  return effects;
+}
+
+function effectApplies(e, resId) {
+  if (e.resource && e.resource === resId) return true;
+  if (e.category) {
+    if (e.category === 'WOOD') return ['wood', 'planks'].includes(resId);
+    if (e.category === 'SCRAP') return ['scrap', 'metalParts'].includes(resId);
+    if (e.category === 'RAW') return RESOURCES[resId]?.category === 'RAW';
+    if (e.category === 'CONSTRUCTION_MATERIALS')
+      return RESOURCES[resId]?.category === 'CONSTRUCTION_MATERIALS';
+  }
+  return false;
+}
+
+export function getResearchOutputBonus(state, resId) {
+  let bonus = 0;
+  gatherEffects(state, 'output').forEach((e) => {
+    if (effectApplies(e, resId)) bonus += e.percent || 0;
+  });
+  return bonus;
+}
+
+export function getResearchStorageBonus(state, resId) {
+  let bonus = 0;
+  gatherEffects(state, 'storage').forEach((e) => {
+    if (effectApplies(e, resId)) bonus += e.percent || 0;
+  });
+  return bonus;
 }

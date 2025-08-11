@@ -7,7 +7,7 @@ const initResources = () => {
   const obj = {};
   Object.values(RESOURCES).forEach((r) => {
     const amt = r.startingAmount || 0;
-    obj[r.id] = { amount: amt, discovered: amt > 0 };
+    obj[r.id] = { amount: amt, discovered: amt > 0, produced: 0 };
   });
   return obj;
 };
@@ -19,6 +19,8 @@ const initBuildings = () => ({
 
 const initSettlers = () => [makeRandomSettler()];
 
+const initResearch = () => ({ current: null, completed: [], progress: {} });
+
 export const defaultState = {
   version: CURRENT_SAVE_VERSION,
   gameTime: { seconds: 0 },
@@ -26,6 +28,7 @@ export const defaultState = {
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
   buildings: initBuildings(),
+  research: initResearch(),
   population: { settlers: initSettlers() },
   log: [],
   lastSaved: Date.now(),
