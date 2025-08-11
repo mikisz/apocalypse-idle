@@ -11,7 +11,7 @@ export default function TopBar() {
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">
-      <span className="tabular-nums text-xl">Year {time.year}, Day {time.day}</span>
+      <span className="tabular-nums text-xl">Year {time.year}</span>
       <h1 className="font-semibold">Apocalypse Idle</h1>
       <div className="relative flex items-center gap-2">
         <button
@@ -20,7 +20,7 @@ export default function TopBar() {
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          {time.season.icon} {time.season.label}
+          {time.season.icon} {time.season.label}, Day {time.day}
         </button>
         {open && (
           <div

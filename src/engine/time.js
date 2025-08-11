@@ -22,9 +22,8 @@ export function getTimeBreakdown(state) {
   const season = SEASONS[seasonIndex];
   const yearDuration = SEASON_DURATION * SEASONS.length;
   const year = Math.floor(seconds / yearDuration) + 1;
-  const secondsInYear = seconds % yearDuration;
-  const day = Math.floor(secondsInYear / SECONDS_PER_DAY) + 1;
   const secondsInSeason = seconds % SEASON_DURATION;
+  const day = Math.floor(secondsInSeason / SECONDS_PER_DAY) + 1;
   return { year, day, season, secondsInSeason };
 }
 
