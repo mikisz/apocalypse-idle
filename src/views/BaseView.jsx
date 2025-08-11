@@ -115,6 +115,17 @@ function BuildingRow({ building }) {
 
 export default function BaseView() {
   const { state } = useGame();
+  const prodGroups = {};
+  PRODUCTION_BUILDINGS.forEach((b) => {
+    const cat = b.category || 'Production';
+    if (!prodGroups[cat]) prodGroups[cat] = [];
+    prodGroups[cat].push(b);
+  });
+  const GROUP_ORDER = ['Food', 'Production', 'Science'];
+  const prodGroupKeys = [
+    ...GROUP_ORDER.filter((g) => prodGroups[g]),
+    ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
+  ];
   return (
     <div className="p-4 space-y-6 pb-20 md:flex md:space-y-0 md:space-x-6">
       <div className="md:w-64 md:flex-shrink-0">
@@ -122,11 +133,13 @@ export default function BaseView() {
       </div>
       <div className="flex-1 space-y-6">
         <div className="border border-stroke rounded">
-          <Accordion title="Production" defaultOpen>
-            {PRODUCTION_BUILDINGS.map((b) => (
-              <BuildingRow key={b.id} building={b} />
-            ))}
-          </Accordion>
+          {prodGroupKeys.map((key) => (
+            <Accordion key={key} title={key} defaultOpen>
+              {prodGroups[key].map((b) => (
+                <BuildingRow key={b.id} building={b} />
+              ))}
+            </Accordion>
+          ))}
           <Accordion title="Storage">
             {STORAGE_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
