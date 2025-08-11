@@ -7,8 +7,13 @@ const DEFAULT_SEASONS = [
     icon: '🌱',
     days: 90,
     modifiers: {
-      food: { speed: 0.8, yield: 1.1 },
-      wood: { speed: 0.8, yield: 1.1 },
+      farmingSpeed: 0.8,
+      farmingYield: 1.1,
+      workSpeed: 0.8,
+      workYield: 1.1,
+      smeltingSpeed: 1.0,
+      smeltingYield: 1.0,
+      seasonRain: 1.0,
     },
   },
   {
@@ -17,8 +22,13 @@ const DEFAULT_SEASONS = [
     icon: '☀️',
     days: 90,
     modifiers: {
-      food: { speed: 1.0, yield: 1.0 },
-      wood: { speed: 1.0, yield: 1.0 },
+      farmingSpeed: 1.0,
+      farmingYield: 1.0,
+      workSpeed: 1.0,
+      workYield: 1.0,
+      smeltingSpeed: 1.0,
+      smeltingYield: 1.0,
+      seasonRain: 1.0,
     },
   },
   {
@@ -27,8 +37,13 @@ const DEFAULT_SEASONS = [
     icon: '🍂',
     days: 90,
     modifiers: {
-      food: { speed: 1.1, yield: 1.0 },
-      wood: { speed: 1.1, yield: 1.0 },
+      farmingSpeed: 1.1,
+      farmingYield: 1.0,
+      workSpeed: 1.1,
+      workYield: 1.0,
+      smeltingSpeed: 1.0,
+      smeltingYield: 1.0,
+      seasonRain: 1.0,
     },
   },
   {
@@ -37,8 +52,13 @@ const DEFAULT_SEASONS = [
     icon: '❄️',
     days: 90,
     modifiers: {
-      food: { speed: 2.0, yield: 0.0 },
-      wood: { speed: 2.0, yield: 0.0 },
+      farmingSpeed: 2.0,
+      farmingYield: 0.0,
+      workSpeed: 2.0,
+      workYield: 0.0,
+      smeltingSpeed: 1.0,
+      smeltingYield: 1.0,
+      seasonRain: 1.0,
     },
   },
 ]
@@ -105,20 +125,11 @@ export function getSeasonModifiers(state) {
   return getTimeBreakdown(state).season.modifiers || {}
 }
 
-export function getSeasonMultiplier(season, resourceKey, building) {
-  const base = season?.modifiers?.[resourceKey] || { speed: 1, yield: 1 }
-  let { speed = 1, yield: yieldMult = 1 } = base
-  const seasonal = building?.seasonal
-  if (seasonal?.mode === 'ignore') {
-    speed = 1
-    yieldMult = 1
-  } else if (seasonal?.mode === 'custom') {
-    const custom = seasonal?.modifiers?.[season.id]?.[resourceKey]
-    if (typeof custom === 'number') {
-      speed = custom
-      yieldMult = custom
-    }
-  }
+export function getSeasonMultiplier(season, building) {
+  const speedKey = building?.seasonSpeedKey
+  const yieldKey = building?.seasonYieldKey
+  const speed = season?.modifiers?.[speedKey] ?? 1
+  const yieldMult = season?.modifiers?.[yieldKey] ?? 1
   return { speed, yield: yieldMult }
 }
 

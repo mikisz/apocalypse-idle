@@ -2,7 +2,13 @@ import { useState } from 'react'
 import { useGame } from '../state/useGame.js'
 import EventLog from '../components/EventLog.jsx'
 import ResourceSidebar from '../components/ResourceSidebar.jsx'
-import { FOOD_BUILDINGS, RESOURCE_BUILDINGS } from '../data/buildings.js'
+import {
+  FOOD_BUILDINGS,
+  RESOURCE_BUILDINGS,
+  STORAGE_BUILDINGS,
+  INDUSTRY_BUILDINGS,
+  getBuildingCost,
+} from '../data/buildings.js'
 import { getSeason, getSeasonMultiplier } from '../engine/time.js'
 import { getCapacity } from '../state/selectors.js'
 import { formatRate } from '../utils/format.js'
@@ -27,11 +33,12 @@ function BuildingRow({ building }) {
   const { state, setState } = useGame()
   const count = state.buildings[building.id]?.count || 0
   const season = getSeason(state)
-  const mods = getSeasonMultiplier(season, building.resource, building)
-  const effectiveGrowth = building.growthTime * mods.speed
+  const mods = getSeasonMultiplier(season, building)
+  const effectiveCycle = building.cycleTimeSec * mods.speed
   const effectiveHarvest =
-    building.harvestAmount * mods.yield * building.yieldValue
-  const costEntries = Object.entries(building.cost || {})
+    building.harvestAmount * building.outputValue * mods.yield
+  const scaledCost = getBuildingCost(building, count)
+  const costEntries = Object.entries(scaledCost)
   const canAfford = costEntries.every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
   )
@@ -42,19 +49,7 @@ function BuildingRow({ building }) {
       const resources = { ...prev.resources }
       costEntries.forEach(([res, amt]) => {
         const current = prev.resources[res]?.amount || 0
-        const stocks = {
-          ...(prev.resources[res]?.stocks || {}),
-        }
-        const keys = Object.keys(stocks)
-        if (keys.length > 0) {
-          const key = keys[0]
-          stocks[key] = Math.max(0, (stocks[key] || 0) - amt)
-        }
-        resources[res] = {
-          ...prev.resources[res],
-          amount: current - amt,
-          stocks,
-        }
+        resources[res] = { amount: current - amt }
       })
       const newCount = (prev.buildings[building.id]?.count || 0) + 1
       const buildings = {
@@ -62,11 +57,16 @@ function BuildingRow({ building }) {
         [building.id]: { ...(prev.buildings[building.id] || {}), count: newCount },
       }
       let timers = { ...prev.timers }
-      if (building.growthTime) {
-        const group = { ...(prev.timers?.[building.resource] || {}) }
-        group[building.id] = group[building.id] ?? effectiveGrowth
-        timers = { ...prev.timers, [building.resource]: group }
+      if (building.cycleTimeSec) {
+        const group = { ...(prev.timers?.[building.outputResource] || {}) }
+        group[building.id] = group[building.id] ?? effectiveCycle
+        timers = { ...prev.timers, [building.outputResource]: group }
       }
+      // clamp resources to new capacities
+      Object.keys(resources).forEach((res) => {
+        const cap = getCapacity({ ...prev, buildings }, res)
+        resources[res].amount = Math.min(cap, resources[res].amount)
+      })
       return { ...prev, resources, buildings, timers }
     })
   }
@@ -74,20 +74,12 @@ function BuildingRow({ building }) {
   const demolish = () => {
     if (count <= 0) return
     setState((prev) => {
-      const refundRatio = building.demolishRefundRatio ?? 0.5
       const resources = { ...prev.resources }
-      costEntries.forEach(([res, amt]) => {
-        const refund = Math.floor(amt * refundRatio)
-        const capacity = getCapacity(prev, res)
+      const prevCost = getBuildingCost(building, count - 1)
+      Object.entries(prevCost).forEach(([res, amt]) => {
+        const refund = Math.floor(amt * 0.5)
         const current = prev.resources[res]?.amount || 0
-        const next = Math.min(capacity, current + refund)
-        const stocks = {
-          ...(prev.resources[res]?.stocks || {}),
-        }
-        const keys = Object.keys(stocks)
-        const key = keys[0] || res
-        stocks[key] = (stocks[key] || 0) + refund
-        resources[res] = { ...prev.resources[res], amount: next, stocks }
+        resources[res] = { amount: current + refund }
       })
       const newCount = (prev.buildings[building.id]?.count || 0) - 1
       const buildings = {
@@ -95,11 +87,16 @@ function BuildingRow({ building }) {
         [building.id]: { ...(prev.buildings[building.id] || {}), count: newCount },
       }
       let timers = { ...prev.timers }
-      if (building.growthTime) {
-        const group = { ...(prev.timers?.[building.resource] || {}) }
+      if (building.cycleTimeSec) {
+        const group = { ...(prev.timers?.[building.outputResource] || {}) }
         if (newCount <= 0) delete group[building.id]
-        timers = { ...prev.timers, [building.resource]: group }
+        timers = { ...prev.timers, [building.outputResource]: group }
       }
+      // clamp resources after capacity change
+      Object.keys(resources).forEach((res) => {
+        const cap = getCapacity({ ...prev, buildings }, res)
+        resources[res].amount = Math.min(cap, resources[res].amount)
+      })
       return { ...prev, resources, buildings, timers }
     })
   }
@@ -128,12 +125,19 @@ function BuildingRow({ building }) {
         </div>
       </div>
       <div className="text-xs text-muted">
-        <div>
-          Cost: {costEntries.map(([res, amt]) => `${amt} ${res}`).join(', ')}
-        </div>
-        <div>
-          {formatRate({ amountPerHarvest: effectiveHarvest, intervalSec: effectiveGrowth })}
-        </div>
+        <div>Cost: {costEntries.map(([res, amt]) => `${amt} ${res}`).join(', ')}</div>
+        {building.cycleTimeSec && (
+          <div>
+            {formatRate({ amountPerHarvest: effectiveHarvest, intervalSec: effectiveCycle })}
+          </div>
+        )}
+        {building.addsCapacity && (
+          <div>
+            {Object.entries(building.addsCapacity)
+              .map(([res, cap]) => `+${cap} ${res} cap`)
+              .join(', ')}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -159,10 +163,14 @@ export default function BaseView() {
             ))}
           </AccordionItem>
           <AccordionItem title="Storage">
-            <p className="text-sm text-muted">Coming soon</p>
+            {STORAGE_BUILDINGS.map((b) => (
+              <BuildingRow key={b.id} building={b} />
+            ))}
           </AccordionItem>
           <AccordionItem title="Industry">
-            <p className="text-sm text-muted">Coming soon</p>
+            {INDUSTRY_BUILDINGS.map((b) => (
+              <BuildingRow key={b.id} building={b} />
+            ))}
           </AccordionItem>
         </div>
         <div>
