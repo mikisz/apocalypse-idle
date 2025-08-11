@@ -1,3 +1,7 @@
+import { FOOD_BUILDINGS } from '../data/farms.js'
+import { getSeasonModifiers } from './time.js'
+import { getCapacity } from '../state/selectors.js'
+
 export function getProductionRates(state) {
   const rates = { food: 0, scrap: 0 }
   const settlers = state.population?.settlers ?? []
@@ -18,9 +22,38 @@ export function processTick(state, seconds = 1) {
   const rates = getProductionRates(state)
   const resources = { ...state.resources }
   Object.entries(rates).forEach(([res, rate]) => {
-    resources[res] = (resources[res] || 0) + rate * seconds
+    const capacity = getCapacity(state, res)
+    const current = resources[res]?.amount || 0
+    const nextAmount = Math.min(capacity, current + rate * seconds)
+    resources[res] = { amount: nextAmount, capacity }
   })
-  return { ...state, resources }
+
+  const mods = getSeasonModifiers(state)
+  const timers = { ...(state.timers?.food || {}) }
+  let food = resources.food?.amount || 0
+  const foodCap = getCapacity(state, 'food')
+
+  FOOD_BUILDINGS.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0
+    if (count <= 0) return
+    const effectiveGrowth = b.growthTime * mods.farmingSpeed
+    const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.foodValue
+    let timer = (timers[b.id] ?? effectiveGrowth) - seconds
+    let cycles = 0
+    while (timer <= 0) {
+      cycles++
+      timer += effectiveGrowth
+    }
+    if (cycles > 0) {
+      food += effectiveHarvest * count * cycles
+      if (food > foodCap) food = foodCap
+    }
+    timers[b.id] = timer
+  })
+
+  resources.food = { amount: food, capacity: foodCap }
+
+  return { ...state, resources, timers: { ...state.timers, food: timers } }
 }
 
 export function applyOfflineProgress(state, elapsedSeconds) {
@@ -28,7 +61,9 @@ export function applyOfflineProgress(state, elapsedSeconds) {
   const nextState = processTick(state, elapsedSeconds)
   const gains = {}
   Object.keys(nextState.resources).forEach((res) => {
-    const gain = nextState.resources[res] - (state.resources[res] || 0)
+    const gain =
+      (nextState.resources[res]?.amount || 0) -
+      (state.resources[res]?.amount || 0)
     if (gain > 0) gains[res] = gain
   })
   return { state: nextState, gains }

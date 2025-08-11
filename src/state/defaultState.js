@@ -5,9 +5,16 @@ export const defaultState = {
   gameTime: { seconds: 0 },
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
-  resources: { scrap: 0, food: 0 },
+  resources: {
+    scrap: { amount: 0, capacity: 0 },
+    food: { amount: 0, capacity: 100 },
+  },
+  storage: {
+    food: { base: 100, fromBuildings: 0 },
+  },
   population: { settlers: [makeRandomSettler()] },
   buildings: {},
+  timers: { food: {} },
   log: [],
   lastSaved: Date.now(),
 }
