@@ -28,7 +28,9 @@ export function makeRandomSettler({ sex } = {}) {
   const baseAge = 18 * 365 * 86400
   const randomDays = Math.floor(Math.random() * 365) * 86400
   return {
-    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    id: globalThis.crypto?.randomUUID
+      ? globalThis.crypto.randomUUID()
+      : Date.now().toString(),
     firstName,
     lastName,
     sex: chosenSex,
