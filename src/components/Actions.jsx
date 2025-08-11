@@ -1,4 +1,4 @@
-import { useGame } from '../state/GameContext.jsx'
+import { useGame } from '../state/useGame.js'
 import { buildingDefs } from '../engine/mechanics.js'
 
 function Button({ className = "", ...props }) {

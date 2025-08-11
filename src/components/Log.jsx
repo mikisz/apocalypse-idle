@@ -1,4 +1,4 @@
-import { useGame } from '../state/GameContext.jsx'
+import { useGame } from '../state/useGame.js'
 
 export default function Log() {
   const { state } = useGame()

@@ -1,10 +1,8 @@
-import React, { createContext, useContext, useMemo, useState } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
+import { GameContext } from './useGame.js'
 import useGameLoop from '../engine/useGameLoop.js'
 import { tick } from '../engine/tick.js'
 import { buildingDefs, isBuildingVisible } from '../engine/mechanics.js'
-
-const GameContext = createContext(null)
-export const useGame = () => useContext(GameContext)
 
 const defaultState = {
   resources: {
@@ -25,7 +23,7 @@ export function GameProvider({ children }) {
   }, 250)
 
   // Akcje
-  function addResource(resId, amount) {
+  const addResource = useCallback((resId, amount) => {
     setState((prev) => {
       const r = prev.resources[resId]
       if (!r) return prev
@@ -35,37 +33,45 @@ export function GameProvider({ children }) {
         resources: { ...prev.resources, [resId]: { ...r, amount: newAmount } },
       }
     })
-  }
+  }, [])
 
-  function canAfford(buildingId) {
-    const cost = buildingDefs[buildingId]?.cost || {}
-    return Object.entries(cost).every(([rid, need]) => (state.resources[rid]?.amount || 0) >= need)
-  }
+  const canAfford = useCallback(
+    (buildingId) => {
+      const cost = buildingDefs[buildingId]?.cost || {}
+      return Object.entries(cost).every(
+        ([rid, need]) => (state.resources[rid]?.amount || 0) >= need,
+      )
+    },
+    [state],
+  )
 
-  function buyBuilding(buildingId) {
-    const def = buildingDefs[buildingId]
-    if (!def) return
-    if (!canAfford(buildingId)) return
+  const buyBuilding = useCallback(
+    (buildingId) => {
+      const def = buildingDefs[buildingId]
+      if (!def) return
+      if (!canAfford(buildingId)) return
 
-    setState((prev) => {
-      const newResources = { ...prev.resources }
-      for (const [rid, need] of Object.entries(def.cost)) {
-        const r = newResources[rid]
-        newResources[rid] = { ...r, amount: r.amount - need }
-      }
-      const current = prev.buildings[buildingId]?.count || 0
-      const newBuildings = {
-        ...prev.buildings,
-        [buildingId]: { count: current + 1 },
-      }
-      return {
-        ...prev,
-        resources: newResources,
-        buildings: newBuildings,
-        log: [`Zbudowano: ${def.name}`, ...prev.log].slice(0, 50),
-      }
-    })
-  }
+      setState((prev) => {
+        const newResources = { ...prev.resources }
+        for (const [rid, need] of Object.entries(def.cost)) {
+          const r = newResources[rid]
+          newResources[rid] = { ...r, amount: r.amount - need }
+        }
+        const current = prev.buildings[buildingId]?.count || 0
+        const newBuildings = {
+          ...prev.buildings,
+          [buildingId]: { count: current + 1 },
+        }
+        return {
+          ...prev,
+          resources: newResources,
+          buildings: newBuildings,
+          log: [`Zbudowano: ${def.name}`, ...prev.log].slice(0, 50),
+        }
+      })
+    },
+    [canAfford],
+  )
 
   const value = useMemo(
     () => ({
@@ -75,7 +81,7 @@ export function GameProvider({ children }) {
       canAfford,
       isBuildingVisible: (bId) => isBuildingVisible(state, bId),
     }),
-    [state]
+    [state, addResource, buyBuilding, canAfford],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>

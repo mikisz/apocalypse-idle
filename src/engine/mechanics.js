@@ -1,4 +1,4 @@
-import { resourceDefs } from '../data/resources.js'
+import { resourceDefs } from './resources.js'
 
 // Definicje budynków (data‑driven)
 export const buildingDefs = {
