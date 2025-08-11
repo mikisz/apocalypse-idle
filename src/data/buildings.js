@@ -1,124 +1,75 @@
 export const BUILDINGS = [
   {
     id: 'potatoField',
-    name: 'Potato Field',
-    category: 'food',
-    cost: { scrap: 0, wood: 20, plank: 0, metal: 0 },
-    cycleTimeSec: 8,
-    harvestAmount: 3,
-    outputResource: 'food',
-    outputValue: 1,
-    seasonSpeedKey: 'farmingSpeed',
-    seasonYieldKey: 'farmingYield',
-    startsWithCount: 1,
-  },
-  {
-    id: 'cornField',
-    name: 'Corn Field',
-    category: 'food',
-    cost: { scrap: 0, wood: 30, plank: 0, metal: 0 },
-    cycleTimeSec: 5,
-    harvestAmount: 1,
-    outputResource: 'food',
-    outputValue: 2,
-    seasonSpeedKey: 'farmingSpeed',
-    seasonYieldKey: 'farmingYield',
-    startsWithCount: 0,
-  },
-  {
-    id: 'ricePaddy',
-    name: 'Rice Paddy',
-    category: 'food',
-    cost: { scrap: 0, wood: 15, plank: 0, metal: 0 },
-    cycleTimeSec: 3,
-    harvestAmount: 1,
-    outputResource: 'food',
-    outputValue: 1,
-    seasonSpeedKey: 'farmingSpeed',
-    seasonYieldKey: 'farmingYield',
-    startsWithCount: 0,
+    name: 'Pole Ziemniaków',
+    type: 'production',
+    outputsPerSecBase: { potatoes: 0.375 },
+    costBase: { wood: 20 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    description: 'Reliable staple crop. Production follows seasons.',
   },
   {
     id: 'loggingCamp',
-    name: 'Logging Camp',
-    category: 'resources',
-    cost: { scrap: 50, wood: 0, plank: 0, metal: 0 },
-    cycleTimeSec: 6,
-    harvestAmount: 1,
-    outputResource: 'wood',
-    outputValue: 1,
-    seasonSpeedKey: 'workSpeed',
-    seasonYieldKey: 'workYield',
-    startsWithCount: 1,
+    name: 'Chatka Drwala',
+    type: 'production',
+    outputsPerSecBase: { wood: 0.2 },
+    costBase: { scrap: 30 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    description: 'Steady wood income. Slightly affected by weather.',
   },
   {
-    id: 'sawmill',
-    name: 'Sawmill',
-    category: 'resources',
-    cost: { scrap: 30, wood: 40, plank: 10, metal: 0 },
-    cycleTimeSec: 4,
-    harvestAmount: 1,
-    outputResource: 'plank',
-    outputValue: 1,
-    seasonSpeedKey: 'workSpeed',
-    seasonYieldKey: 'workYield',
-    startsWithCount: 0,
+    id: 'scrapyard',
+    name: 'Złomowisko',
+    type: 'production',
+    outputsPerSecBase: { scrap: 0.06 },
+    costBase: { wood: 35 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    description: 'Collects scrap from nearby ruins.',
   },
   {
-    id: 'scrapYard',
-    name: 'Scrap Yard',
-    category: 'resources',
-    cost: { scrap: 0, wood: 0, plank: 0, metal: 0 },
-    cycleTimeSec: 7,
-    harvestAmount: 1,
-    outputResource: 'scrap',
-    outputValue: 1,
-    seasonSpeedKey: 'workSpeed',
-    seasonYieldKey: 'workYield',
-    startsWithCount: 0,
+    id: 'quarry',
+    name: 'Kamieniołom',
+    type: 'production',
+    outputsPerSecBase: { stone: 0.08 },
+    costBase: { wood: 40, scrap: 15 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    description: 'Extracts stone slowly but steadily.',
   },
   {
-    id: 'smelter',
-    name: 'Smelter',
-    category: 'industry',
-    cost: { scrap: 100, wood: 50, plank: 20, metal: 0 },
-    cycleTimeSec: 10,
-    harvestAmount: 1,
-    outputResource: 'metal',
-    outputValue: 1,
-    seasonSpeedKey: 'smeltingSpeed',
-    seasonYieldKey: 'smeltingYield',
-    startsWithCount: 0,
+    id: 'foodStorage',
+    name: 'Spichlerz',
+    type: 'storage',
+    costBase: { wood: 30, scrap: 10, stone: 10 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { potatoes: 300, corn: 300, rice: 300 },
+    description: 'Increases storage for harvested crops.',
   },
   {
-    id: 'granary',
-    name: 'Granary',
-    category: 'storage',
-    cost: { scrap: 20, wood: 60, plank: 10, metal: 0 },
-    addsCapacity: { food: 200 },
-    startsWithCount: 0,
+    id: 'rawStorage',
+    name: 'Magazyn Surowców',
+    type: 'storage',
+    costBase: { wood: 40, scrap: 20, stone: 20 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { wood: 200, stone: 200, scrap: 200 },
+    description: 'Increases storage for wood, stone and scrap.',
   },
-  {
-    id: 'warehouse',
-    name: 'Warehouse',
-    category: 'storage',
-    cost: { scrap: 30, wood: 80, plank: 20, metal: 0 },
-    addsCapacity: { wood: 200, scrap: 200 },
-    startsWithCount: 0,
-  },
-]
+];
 
-export const BUILDING_MAP = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]))
-export const FOOD_BUILDINGS = BUILDINGS.filter((b) => b.category === 'food')
-export const RESOURCE_BUILDINGS = BUILDINGS.filter((b) => b.category === 'resources')
-export const STORAGE_BUILDINGS = BUILDINGS.filter((b) => b.category === 'storage')
-export const INDUSTRY_BUILDINGS = BUILDINGS.filter((b) => b.category === 'industry')
+export const BUILDING_MAP = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
+export const PRODUCTION_BUILDINGS = BUILDINGS.filter((b) => b.type === 'production');
+export const STORAGE_BUILDINGS = BUILDINGS.filter((b) => b.type === 'storage');
 
 export function getBuildingCost(building, countBuilt) {
-  const factor = Math.pow(1.15, countBuilt)
-  const result = {}
-  Object.entries(building.cost || {}).forEach(([res, amt]) => {
-    result[res] = Math.ceil(amt * factor)
-  })
-  return result
+  const factor = Math.pow(building.costGrowth, countBuilt);
+  const result = {};
+  Object.entries(building.costBase).forEach(([res, amt]) => {
+    result[res] = Math.ceil(amt * factor);
+  });
+  return result;
 }
