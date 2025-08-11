@@ -2,29 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { GameContext } from './useGame.js'
 import useGameLoop from '../engine/useGameLoop.js'
 import { saveGame, loadGame } from '../engine/persistence.js'
-import { firstNames, lastNames } from '../data/names.js'
-
-function createSettler() {
-  const first = firstNames[Math.floor(Math.random() * firstNames.length)]
-  const last = lastNames[Math.floor(Math.random() * lastNames.length)]
-  const gender = Math.random() < 0.5 ? 'male' : 'female'
-  return {
-    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-    firstName: first,
-    lastName: last,
-    gender,
-    age: 18,
-    role: 'idle',
-    morale: 50,
-    skills: {},
-  }
-}
+import { makeRandomSettler } from '../data/names.js'
 
 const defaultState = {
   gameTime: 0,
   ui: { activeTab: 'base', drawerOpen: false },
   resources: { scrap: 0, food: 0 },
-  population: [createSettler()],
+  population: { settlers: [makeRandomSettler()] },
   buildings: {},
   log: [],
 }
@@ -53,13 +37,13 @@ export function GameProvider({ children }) {
 
   const setSettlerRole = useCallback((id, role) => {
     setState((prev) => {
-      const population = prev.population.map((s) =>
+      const settlers = prev.population.settlers.map((s) =>
         s.id === id ? { ...s, role } : s,
       )
-      const settler = prev.population.find((s) => s.id === id)
+      const settler = prev.population.settlers.find((s) => s.id === id)
       const entry = `${settler.firstName} ${settler.lastName} is now ${role}`
       const log = [entry, ...prev.log].slice(0, 100)
-      return { ...prev, population, log }
+      return { ...prev, population: { ...prev.population, settlers }, log }
     })
   }, [])
 
