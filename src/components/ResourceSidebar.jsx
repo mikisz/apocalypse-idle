@@ -36,23 +36,43 @@ function ResourceRow({ name, amount, capacity, rate }) {
 export default function ResourceSidebar() {
   const { state } = useGame()
   const summary = getResourceProductionSummary(state)
-  const resources = [
+  const groups = [
     {
-      id: 'food',
-      name: 'Food',
-      amount: state.resources.food?.amount || 0,
-      capacity: getCapacity(state, 'food'),
-      rate: summary.food?.label,
+      title: 'Food',
+      defaultOpen: true,
+      resources: [
+        {
+          id: 'food',
+          name: 'Food',
+          amount: state.resources.food?.amount || 0,
+          capacity: getCapacity(state, 'food'),
+          rate: summary.food?.label,
+        },
+      ],
+    },
+    {
+      title: 'Resources',
+      resources: [
+        {
+          id: 'wood',
+          name: 'Wood',
+          amount: state.resources.wood?.amount || 0,
+          capacity: getCapacity(state, 'wood'),
+          rate: summary.wood?.label,
+        },
+      ],
     },
   ]
 
   return (
     <div className="border border-stroke rounded overflow-hidden bg-bg2">
-      <Accordion title="Food" defaultOpen>
-        {resources.map((r) => (
-          <ResourceRow key={r.id} {...r} />
-        ))}
-      </Accordion>
+      {groups.map((g) => (
+        <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
+          {g.resources.map((r) => (
+            <ResourceRow key={r.id} {...r} />
+          ))}
+        </Accordion>
+      ))}
     </div>
   )
 }

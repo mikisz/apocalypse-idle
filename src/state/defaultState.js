@@ -8,13 +8,18 @@ export const defaultState = {
   resources: {
     scrap: { amount: 0, capacity: 0 },
     food: { amount: 0, capacity: 100 },
+    wood: { amount: 0, capacity: 100 },
   },
   storage: {
     food: { base: 100, fromBuildings: 0 },
+    wood: { base: 100, fromBuildings: 0 },
   },
   population: { settlers: [makeRandomSettler()] },
-  buildings: {},
-  timers: { food: {} },
+  buildings: {
+    potatoField: { count: 1 },
+    loggingCamp: { count: 1 },
+  },
+  timers: { food: { potatoField: 5 }, wood: { loggingCamp: 2 } },
   log: [],
   lastSaved: Date.now(),
 }
