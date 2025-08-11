@@ -7,6 +7,11 @@ export const SEASONS = [
   { id: 'winter', label: 'Winter', icon: '❄️', multipliers: { FOOD: 0.0, RAW: 0.8 } },
 ];
 
+// Each season lasts 90 days for a 360-day year
+export const DAYS_PER_SEASON = 90;
+export const DAYS_PER_YEAR = DAYS_PER_SEASON * SEASONS.length;
+export const SECONDS_PER_DAY = SEASON_DURATION / DAYS_PER_SEASON;
+
 export function initSeasons() {
   return SEASONS.map((s) => ({ ...s }));
 }
@@ -15,9 +20,11 @@ export function getTimeBreakdown(state) {
   const seconds = state?.gameTime?.seconds || 0;
   const seasonIndex = Math.floor(seconds / SEASON_DURATION) % SEASONS.length;
   const season = SEASONS[seasonIndex];
-  const year = Math.floor(seconds / (SEASON_DURATION * SEASONS.length)) + 1;
+  const yearDuration = SEASON_DURATION * SEASONS.length;
+  const year = Math.floor(seconds / yearDuration) + 1;
   const secondsInSeason = seconds % SEASON_DURATION;
-  return { year, season, secondsInSeason };
+  const day = Math.floor(secondsInSeason / SECONDS_PER_DAY) + 1;
+  return { year, day, season, secondsInSeason };
 }
 
 export function getYear(state) {
