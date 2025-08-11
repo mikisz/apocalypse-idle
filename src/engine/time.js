@@ -1,4 +1,4 @@
-export const SECONDS_PER_DAY = 1 // easy customization of day length
+export const SECONDS_PER_DAY = 3 // easy customization of day length
 
 const DEFAULT_SEASONS = [
   {
