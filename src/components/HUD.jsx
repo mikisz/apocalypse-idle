@@ -1,4 +1,4 @@
-import { useGame } from '../state/GameContext.jsx'
+import { useGame } from '../state/useGame.js'
 import { computeProductionPerSec } from '../engine/mechanics.js'
 
 export default function HUD() {
