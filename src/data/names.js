@@ -25,13 +25,15 @@ export function makeRandomSettler({ sex } = {}) {
   const firstPool = FIRST_NAMES[chosenSex]
   const firstName = firstPool[Math.floor(Math.random() * firstPool.length)]
   const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]
+  const baseAge = 18 * 365 * 86400
+  const randomDays = Math.floor(Math.random() * 365) * 86400
   return {
     id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
     firstName,
     lastName,
     sex: chosenSex,
     isDead: false,
-    ageSeconds: 0,
+    ageSeconds: baseAge + randomDays,
     role: null,
     skills: {},
   }
