@@ -1,4 +1,4 @@
-import { FOOD_BUILDINGS } from '../data/farms.js'
+import { BUILDINGS } from '../data/buildings.js'
 import { getSeasonModifiers } from '../engine/time.js'
 import { formatRate } from '../utils/format.js'
 
@@ -10,30 +10,34 @@ export function getCapacity(state, resourceId) {
 export function getResourceProductionSummary(state) {
   const summaries = {}
   const mods = getSeasonModifiers(state)
-  const buildings = FOOD_BUILDINGS
-  const results = []
-  buildings.forEach((b) => {
+  const grouped = {}
+  BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0
-    if (count > 0) {
+    if (count > 0 && b.growthTime) {
       const effectiveGrowth = b.growthTime * mods.farmingSpeed
-      const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.foodValue
-      results.push({
+      const effectiveHarvest =
+        b.harvestAmount * mods.farmingYield * b.yieldValue
+      const res = b.resource
+      grouped[res] = grouped[res] || []
+      grouped[res].push({
         amountPerHarvest: effectiveHarvest * count,
         intervalSec: effectiveGrowth,
       })
     }
   })
-  if (results.length === 1) {
-    const r = results[0]
-    summaries.food = { ...r, label: formatRate(r) }
-  } else if (results.length > 1) {
-    const perSec = results.reduce(
-      (sum, r) => sum + r.amountPerHarvest / r.intervalSec,
-      0,
-    )
-    summaries.food = { perSec, label: `+${perSec.toFixed(2)}/s` }
-  } else {
-    summaries.food = { perSec: 0, label: '+0/s' }
-  }
+  Object.entries(grouped).forEach(([res, arr]) => {
+    if (arr.length === 1) {
+      const r = arr[0]
+      summaries[res] = { ...r, label: formatRate(r) }
+    } else if (arr.length > 1) {
+      const perSec = arr.reduce(
+        (sum, r) => sum + r.amountPerHarvest / r.intervalSec,
+        0,
+      )
+      summaries[res] = { perSec, label: `+${perSec.toFixed(2)}/s` }
+    } else {
+      summaries[res] = { perSec: 0, label: '+0/s' }
+    }
+  })
   return summaries
 }

@@ -1,9 +1,9 @@
-import { FOOD_BUILDINGS } from '../data/farms.js'
+import { BUILDINGS } from '../data/buildings.js'
 import { getSeasonModifiers } from './time.js'
 import { getCapacity } from '../state/selectors.js'
 
 export function getProductionRates(state) {
-  const rates = { food: 0, scrap: 0 }
+  const rates = { food: 0, scrap: 0, wood: 0 }
   const settlers = state.population?.settlers ?? []
   settlers.forEach((s) => {
     if (s.role === 'farming') rates.food += 1 + s.skills.farming * 0.1
@@ -29,31 +29,33 @@ export function processTick(state, seconds = 1) {
   })
 
   const mods = getSeasonModifiers(state)
-  const timers = { ...(state.timers?.food || {}) }
-  let food = resources.food?.amount || 0
-  const foodCap = getCapacity(state, 'food')
+  const timers = { ...state.timers }
 
-  FOOD_BUILDINGS.forEach((b) => {
+  BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0
-    if (count <= 0) return
+    if (count <= 0 || !b.growthTime) return
+    const resId = b.resource
     const effectiveGrowth = b.growthTime * mods.farmingSpeed
-    const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.foodValue
-    let timer = (timers[b.id] ?? effectiveGrowth) - seconds
+    const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.yieldValue
+    const group = { ...(timers[resId] || {}) }
+    let timer = (group[b.id] ?? effectiveGrowth) - seconds
     let cycles = 0
     while (timer <= 0) {
       cycles++
       timer += effectiveGrowth
     }
     if (cycles > 0) {
-      food += effectiveHarvest * count * cycles
-      if (food > foodCap) food = foodCap
+      const capacity = getCapacity(state, resId)
+      const current = resources[resId]?.amount || 0
+      let next = current + effectiveHarvest * count * cycles
+      if (next > capacity) next = capacity
+      resources[resId] = { amount: next, capacity }
     }
-    timers[b.id] = timer
+    group[b.id] = timer
+    timers[resId] = group
   })
 
-  resources.food = { amount: food, capacity: foodCap }
-
-  return { ...state, resources, timers: { ...state.timers, food: timers } }
+  return { ...state, resources, timers }
 }
 
 export function applyOfflineProgress(state, elapsedSeconds) {
