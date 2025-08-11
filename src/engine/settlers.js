@@ -38,14 +38,13 @@ export function processSettlersTick(
 
   const bonusGainPerSec = totalFoodProdBase * (totalFoodBonusPercent / 100)
   const totalSettlersConsumption = living.length * BALANCE.FOOD_CONSUMPTION_PER_SETTLER
+  // Final food change per second after bonuses and consumption
   const netFoodPerSec = totalFoodProdBase + bonusGainPerSec - totalSettlersConsumption
 
   const capacity = getCapacity(state, 'potatoes')
   const currentEntry = state.resources.potatoes || { amount: 0, discovered: false }
-  const nextAmount = clampResource(
-    currentEntry.amount + (bonusGainPerSec - totalSettlersConsumption) * seconds,
-    capacity,
-  )
+  // Potatoes after this tick: current amount + netFoodPerSec * seconds (clamped to capacity)
+  const nextAmount = clampResource(currentEntry.amount + netFoodPerSec * seconds, capacity)
   const resources = {
     ...state.resources,
     potatoes: {
