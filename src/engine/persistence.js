@@ -69,9 +69,7 @@ export const migrations = [
           if (typeof entry === 'string') return createLogEntry(entry);
           if (entry && typeof entry === 'object') {
             const id =
-              typeof entry.id === 'string'
-                ? entry.id
-                : createLogEntry('').id;
+              typeof entry.id === 'string' ? entry.id : createLogEntry('').id;
             const text =
               typeof entry.text === 'string'
                 ? entry.text
