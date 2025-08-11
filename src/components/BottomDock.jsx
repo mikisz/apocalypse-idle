@@ -1,10 +1,11 @@
+import React from 'react'
 import { useGame } from '../state/useGame.js'
 
 const tabs = [
-  { id: 'base', icon: '🏠' },
-  { id: 'population', icon: '👥' },
-  { id: 'research', icon: '🧠' },
-  { id: 'expeditions', icon: '🗺' },
+  { id: 'base', icon: '🏠', label: 'Base' },
+  { id: 'population', icon: '👥', label: 'Population' },
+  { id: 'research', icon: '🧠', label: 'Research' },
+  { id: 'expeditions', icon: '🗺', label: 'Expeditions' },
 ]
 
 export default function BottomDock() {
@@ -16,11 +17,13 @@ export default function BottomDock() {
         <button
           key={t.id}
           onClick={() => setActiveTab(t.id)}
+          aria-label={t.label}
           className={`flex-1 py-2 text-xl ${
             state.ui.activeTab === t.id ? 'text-ink' : 'text-muted'
           }`}
         >
           {t.icon}
+          <span className="sr-only">{t.label}</span>
         </button>
       ))}
     </nav>
