@@ -3,6 +3,7 @@ import TopBar from './components/TopBar.jsx';
 import BottomDock from './components/BottomDock.jsx';
 import Drawer from './components/Drawer.jsx';
 import OfflineProgressModal from './components/OfflineProgressModal.jsx';
+import CorruptSaveModal from './components/CorruptSaveModal.jsx';
 import BaseView from './views/BaseView.jsx';
 import PopulationView from './views/PopulationView.jsx';
 import ResearchView from './views/ResearchView.jsx';
@@ -34,6 +35,7 @@ export default function App() {
         <BottomDock />
         <Drawer />
         <OfflineProgressModal />
+        <CorruptSaveModal />
       </div>
     </GameProvider>
   );

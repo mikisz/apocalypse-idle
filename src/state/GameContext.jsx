@@ -40,56 +40,124 @@ function mergeDeep(target, source) {
   return out;
 }
 
+function prepareLoadedState(loaded) {
+  const gameTime =
+    typeof loaded.gameTime === 'number'
+      ? { seconds: loaded.gameTime }
+      : loaded.gameTime || { seconds: 0 };
+  const meta = { seasons: initSeasons() };
+  const base = { ...loaded, gameTime, meta };
+  const prevYear = gameTime.year || getYear(base);
+  gameTime.year = prevYear;
+  const now = Date.now();
+  const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
+  if (elapsed > 0) {
+    const bonuses = computeRoleBonuses(base.population?.settlers || []);
+    const { state: progressed, gains } = applyOfflineProgress(
+      base,
+      elapsed,
+      bonuses,
+    );
+    const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
+    const yearAfter = getYear({
+      ...progressed,
+      gameTime: { ...progressed.gameTime, seconds: secondsAfter },
+    });
+    const settlers = progressed.population.settlers.map((s) => ({
+      ...s,
+      ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
+    }));
+    const show = Object.keys(gains).length > 0;
+    return {
+      ...progressed,
+      population: { ...progressed.population, settlers },
+      gameTime: { seconds: secondsAfter, year: yearAfter },
+      ui: {
+        ...progressed.ui,
+        offlineProgress: show ? { elapsed, gains } : null,
+      },
+      lastSaved: now,
+    };
+  }
+  return {
+    ...base,
+    gameTime: { ...gameTime, year: prevYear },
+    lastSaved: now,
+  };
+}
+
 export function GameProvider({ children }) {
-  const [state, setState] = useState(() => {
-    const loaded = loadGame();
-    if (loaded) {
-      const gameTime =
-        typeof loaded.gameTime === 'number'
-          ? { seconds: loaded.gameTime }
-          : loaded.gameTime || { seconds: 0 };
-      const base = mergeDeep(defaultState, { ...loaded, gameTime });
-      base.meta = { ...base.meta, seasons: initSeasons() };
-      const prevYear = base.gameTime.year || getYear(base);
-      base.gameTime.year = prevYear;
-      const now = Date.now();
-      const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
-      if (elapsed > 0) {
-        const bonuses = computeRoleBonuses(base.population?.settlers || []);
-        const { state: progressed, gains } = applyOfflineProgress(
-          base,
-          elapsed,
-          bonuses,
-        );
-        const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
-        const yearAfter = getYear({
-          ...progressed,
-          gameTime: { ...progressed.gameTime, seconds: secondsAfter },
-        });
-        const settlers = progressed.population.settlers.map((s) => ({
-          ...s,
-          ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
-        }));
-        const show = Object.keys(gains).length > 0;
-        return {
-          ...progressed,
-          population: { ...progressed.population, settlers },
-          gameTime: { seconds: secondsAfter, year: yearAfter },
-          ui: {
-            ...progressed.ui,
-            offlineProgress: show ? { elapsed, gains } : null,
-          },
-          lastSaved: now,
-        };
-      }
-      return {
-        ...base,
-        gameTime: { ...base.gameTime, year: prevYear },
-        lastSaved: now,
-      };
-    }
+  const initialLoad = loadGame();
+  const [state, setState] = useState(() => {const loadedRaw = loadGame();
+
+let loaded = null;
+let loadError = null;
+
+if (loadedRaw && typeof loadedRaw === 'object' && ('state' in loadedRaw || 'error' in loadedRaw)) {
+  loadError = loadedRaw.error ?? null;
+  loaded = loadedRaw.state ?? null;
+} else {
+  loaded = loadedRaw;
+}
+
+// Jeśli jest błąd wczytywania – log i przejście na domyślny stan (bez psucia gry)
+if (loadError) {
+  console.warn('[loadGame] error:', loadError);
+}
+
+if (loaded) {
+  const gameTime =
+    typeof loaded.gameTime === 'number'
+      ? { seconds: loaded.gameTime }
+      : loaded.gameTime || { seconds: 0 };
+
+  const base = mergeDeep(defaultState, { ...loaded, gameTime });
+  base.meta = { ...base.meta, seasons: initSeasons() };
+
+  const prevYear = base.gameTime.year || getYear(base);
+  base.gameTime.year = prevYear;
+
+  const now = Date.now();
+  const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
+
+  if (elapsed > 0) {
+    const bonuses = computeRoleBonuses(base.population?.settlers || []);
+    const { state: progressed, gains } = applyOfflineProgress(base, elapsed, bonuses);
+
+    const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
+    const yearAfter = getYear({
+      ...progressed,
+      gameTime: { ...progressed.gameTime, seconds: secondsAfter },
+    });
+
+    const settlers = progressed.population.settlers.map((s) => ({
+      ...s,
+      ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
+    }));
+
+    const show = Object.keys(gains).length > 0;
+
+    return {
+      ...progressed,
+      population: { ...progressed.population, settlers },
+      gameTime: { seconds: secondsAfter, year: yearAfter },
+      ui: {
+        ...progressed.ui,
+        offlineProgress: show ? { elapsed, gains } : null,
+      },
+      lastSaved: now,
+    };
+  }
+
+  return {
+    ...base,
+    gameTime: { ...base.gameTime, year: prevYear },
+    lastSaved: now,
+  };
+}
     return { ...defaultState, lastSaved: Date.now() };
   });
+  const [loadError, setLoadError] = useState(!!initialLoad.error);
 
   // Main game loop: increment time and produce resources
   useGameLoop((dt) => {
@@ -205,12 +273,25 @@ export function GameProvider({ children }) {
     }));
   }, []);
 
+  const retryLoad = useCallback(() => {
+    const { state: loaded, error } = loadGame();
+    if (error) {
+      setLoadError(true);
+      return;
+    }
+    setLoadError(false);
+    if (loaded) {
+      setState(prepareLoadedState(loaded));
+    }
+  }, []);
+
   const resetGame = useCallback(() => {
     if (window.confirm('Reset colony? This will wipe your save.')) {
       deleteSave();
       const fresh = { ...defaultState, lastSaved: Date.now() };
       setState(fresh);
       saveGame(fresh);
+      setLoadError(false);
     }
   }, []);
 
@@ -225,6 +306,8 @@ export function GameProvider({ children }) {
       setState,
       dismissOfflineModal,
       resetGame,
+      loadError,
+      retryLoad,
     }),
     [
       state,
@@ -235,6 +318,8 @@ export function GameProvider({ children }) {
       abortResearch,
       dismissOfflineModal,
       resetGame,
+      loadError,
+      retryLoad,
     ],
   );
 
