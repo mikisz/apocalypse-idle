@@ -105,7 +105,7 @@ export function GameProvider({ children }) {
     setState((prev) => {
       const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
       const afterTick = processTick(prev, dt, roleBonuses);
-      const withResearch = processResearchTick(afterTick, dt);
+      const withResearch = processResearchTick(afterTick, dt, roleBonuses);
       const rates = getResourceRates(withResearch);
       let totalFoodProdBase = 0;
       Object.keys(RESOURCES).forEach((id) => {
