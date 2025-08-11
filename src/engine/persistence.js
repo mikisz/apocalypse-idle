@@ -2,9 +2,12 @@ const STORAGE_KEY = 'apocalypse-idle-save'
 
 export function saveGame(state) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    const data = { ...state, lastSaved: Date.now() }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    return data
   } catch (err) {
     console.error('Save failed', err)
+    return state
   }
 }
 
@@ -15,6 +18,14 @@ export function loadGame() {
   } catch (err) {
     console.error('Load failed', err)
     return null
+  }
+}
+
+export function deleteSave() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch (err) {
+    console.error('Delete failed', err)
   }
 }
 

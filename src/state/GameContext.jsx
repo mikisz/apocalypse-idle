@@ -1,31 +1,58 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameContext } from './useGame.js'
 import useGameLoop from '../engine/useGameLoop.js'
-import { saveGame, loadGame } from '../engine/persistence.js'
-import { makeRandomSettler } from '../data/names.js'
-
-const defaultState = {
-  gameTime: 0,
-  ui: { activeTab: 'base', drawerOpen: false },
-  resources: { scrap: 0, food: 0 },
-  population: { settlers: [makeRandomSettler()] },
-  buildings: {},
-  log: [],
-}
+import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
+import { processTick, applyOfflineProgress } from '../engine/production.js'
+import { defaultState } from './defaultState.js'
 
 export function GameProvider({ children }) {
-  const [state, setState] = useState(() => loadGame() || defaultState)
+  const [state, setState] = useState(() => {
+    const loaded = loadGame()
+    if (loaded) {
+      const now = Date.now()
+      const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000)
+      if (elapsed > 0) {
+        const { state: progressed, gains } = applyOfflineProgress(loaded, elapsed)
+        const show = Object.keys(gains).length > 0
+        return {
+          ...progressed,
+          ui: {
+            ...progressed.ui,
+            offlineProgress: show ? { elapsed, gains } : null,
+          },
+          lastSaved: now,
+        }
+      }
+      return { ...loaded, lastSaved: now }
+    }
+    return { ...defaultState, lastSaved: Date.now() }
+  })
 
-  // Main game loop: increment time every second
+  // Main game loop: increment time and produce resources every second
   useGameLoop(() => {
-    setState((prev) => ({ ...prev, gameTime: prev.gameTime + 1 }))
+    setState((prev) => {
+      const afterTick = processTick(prev)
+      return { ...afterTick, gameTime: afterTick.gameTime + 1 }
+    })
   }, 1000)
 
-  // Autosave
+  // Autosave interval and on unload
+  const stateRef = useRef(state)
   useEffect(() => {
-    const id = setInterval(() => saveGame(state), 10000)
-    return () => clearInterval(id)
+    stateRef.current = state
   }, [state])
+
+  useEffect(() => {
+    const save = () => {
+      setState(() => saveGame(stateRef.current))
+    }
+    const id = setInterval(save, 10000)
+    window.addEventListener('beforeunload', save)
+    return () => {
+      clearInterval(id)
+      window.removeEventListener('beforeunload', save)
+    }
+  }, [])
 
   const setActiveTab = useCallback((tab) => {
     setState((prev) => ({ ...prev, ui: { ...prev.ui, activeTab: tab } }))
@@ -48,9 +75,30 @@ export function GameProvider({ children }) {
     })
   }, [])
 
+  const dismissOfflineModal = useCallback(() => {
+    setState((prev) => ({ ...prev, ui: { ...prev.ui, offlineProgress: null } }))
+  }, [])
+
+  const resetGame = useCallback(() => {
+    if (window.confirm('Reset colony? This will wipe your save.')) {
+      deleteSave()
+      const fresh = { ...defaultState, lastSaved: Date.now() }
+      setState(fresh)
+      saveGame(fresh)
+    }
+  }, [])
+
   const value = useMemo(
-    () => ({ state, setActiveTab, toggleDrawer, setSettlerRole, setState }),
-    [state, setActiveTab, toggleDrawer, setSettlerRole],
+    () => ({
+      state,
+      setActiveTab,
+      toggleDrawer,
+      setSettlerRole,
+      setState,
+      dismissOfflineModal,
+      resetGame,
+    }),
+    [state, setActiveTab, toggleDrawer, setSettlerRole, dismissOfflineModal, resetGame],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>

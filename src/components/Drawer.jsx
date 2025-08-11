@@ -2,7 +2,7 @@ import { useGame } from '../state/useGame.js'
 import { saveGame, loadGame } from '../engine/persistence.js'
 
 export default function Drawer() {
-  const { state, toggleDrawer, setState } = useGame()
+  const { state, toggleDrawer, setState, resetGame } = useGame()
 
   return (
     <>
@@ -27,7 +27,7 @@ export default function Drawer() {
             <div className="flex gap-2">
               <button
                 className="px-2 py-1 rounded border border-stroke"
-                onClick={() => saveGame(state)}
+                onClick={() => setState(saveGame(state))}
               >
                 Save
               </button>
@@ -41,6 +41,15 @@ export default function Drawer() {
                 Load
               </button>
             </div>
+          </section>
+          <section>
+            <h2 className="font-semibold mb-2">🧹 Reset</h2>
+            <button
+              className="px-2 py-1 rounded border border-stroke"
+              onClick={resetGame}
+            >
+              Reset colony
+            </button>
           </section>
         </div>
       </aside>
