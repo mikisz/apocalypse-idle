@@ -1,6 +1,8 @@
+import { createLogEntry } from '../utils/log.js';
+
 const STORAGE_KEY = 'apocalypse-idle-save';
 
-export const CURRENT_SAVE_VERSION = 3;
+export const CURRENT_SAVE_VERSION = 4;
 
 export const migrations = [
   {
@@ -56,6 +58,32 @@ export const migrations = [
       return save;
     },
   },
+  {
+    from: 3,
+    to: 4,
+    up(save) {
+      if (!Array.isArray(save.log)) {
+        save.log = [];
+      } else {
+        save.log = save.log.map((entry) => {
+          if (typeof entry === 'string') return createLogEntry(entry);
+          if (entry && typeof entry === 'object') {
+            const id =
+              typeof entry.id === 'string'
+                ? entry.id
+                : createLogEntry('').id;
+            const text =
+              typeof entry.text === 'string'
+                ? entry.text
+                : String(entry.text ?? '');
+            return { id, text };
+          }
+          return createLogEntry(String(entry));
+        });
+      }
+      return save;
+    },
+  },
 ];
 
 export function applyMigrations(save) {
@@ -106,6 +134,19 @@ export function validateSave(obj) {
     if (!('log' in obj)) throw new Error('Invalid save: missing log');
     if (!Array.isArray(obj.log))
       throw new Error('Invalid save: log must be array');
+    if (
+      obj.version >= 4 &&
+      !obj.log.every(
+        (e) =>
+          e &&
+          typeof e === 'object' &&
+          typeof e.id === 'string' &&
+          typeof e.text === 'string',
+      )
+    )
+      throw new Error(
+        'Invalid save: log entries must be objects with id and text',
+      );
     if (!('research' in obj)) throw new Error('Invalid save: missing research');
     if (
       typeof obj.research !== 'object' ||
