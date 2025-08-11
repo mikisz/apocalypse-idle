@@ -19,13 +19,18 @@ function Accordion({ title, children, defaultOpen = false }) {
   )
 }
 
-function ResourceRow({ name, amount, capacity, rate }) {
+function ResourceRow({ name, amount, capacity, rate, indent = false }) {
   return (
-    <div className="flex items-center justify-between text-sm tabular-nums">
+    <div
+      className={`flex items-center justify-between text-sm tabular-nums ${
+        indent ? 'pl-4' : ''
+      }`}
+    >
       <span>{name}</span>
       <span className="flex flex-col items-end">
         <span>
-          {formatAmount(amount)} / {formatAmount(capacity)}
+          {formatAmount(amount)}
+          {capacity != null && ` / ${formatAmount(capacity)}`}
         </span>
         <span className="text-xs text-muted">{rate}</span>
       </span>
@@ -36,31 +41,44 @@ function ResourceRow({ name, amount, capacity, rate }) {
 export default function ResourceSidebar() {
   const { state } = useGame()
   const summary = getResourceProductionSummary(state)
+  const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1)
   const groups = [
     {
       title: 'Food',
       defaultOpen: true,
-      resources: [
-        {
-          id: 'food',
-          name: 'Food',
-          amount: state.resources.food?.amount || 0,
-          capacity: getCapacity(state, 'food'),
-          rate: summary.food?.label,
-        },
-      ],
+      total: {
+        id: 'food-total',
+        name: 'Food',
+        amount: state.resources.food?.amount || 0,
+        capacity: getCapacity(state, 'food'),
+        rate: summary.categories.food?.label,
+      },
+      items: Object.entries(state.resources.food?.stocks || {})
+        .filter(([k]) => k !== 'misc')
+        .map(([type, amount]) => ({
+          id: type,
+          name: titleCase(type),
+          amount,
+          rate: summary.types[type]?.label,
+        })),
     },
     {
       title: 'Resources',
-      resources: [
-        {
-          id: 'wood',
-          name: 'Wood',
-          amount: state.resources.wood?.amount || 0,
-          capacity: getCapacity(state, 'wood'),
-          rate: summary.wood?.label,
-        },
-      ],
+      total: {
+        id: 'resources-total',
+        name: 'Resources',
+        amount: state.resources.wood?.amount || 0,
+        capacity: getCapacity(state, 'wood'),
+        rate: summary.categories.wood?.label,
+      },
+      items: Object.entries(state.resources.wood?.stocks || {})
+        .filter(([k]) => k !== 'misc')
+        .map(([type, amount]) => ({
+          id: type,
+          name: titleCase(type),
+          amount,
+          rate: summary.types[type]?.label,
+        })),
     },
   ]
 
@@ -68,8 +86,9 @@ export default function ResourceSidebar() {
     <div className="border border-stroke rounded overflow-hidden bg-bg2">
       {groups.map((g) => (
         <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
-          {g.resources.map((r) => (
-            <ResourceRow key={r.id} {...r} />
+          <ResourceRow {...g.total} />
+          {g.items.map((r) => (
+            <ResourceRow key={r.id} {...r} indent />
           ))}
         </Accordion>
       ))}

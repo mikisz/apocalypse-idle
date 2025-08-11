@@ -3,11 +3,12 @@ import { getSeasonModifiers } from './time.js'
 import { getCapacity } from '../state/selectors.js'
 
 export function getProductionRates(state) {
-  const rates = { food: 0, scrap: 0, wood: 0 }
+  const rates = { food: 0, wood: 0 }
   const settlers = state.population?.settlers ?? []
   settlers.forEach((s) => {
     if (s.role === 'farming') rates.food += 1 + s.skills.farming * 0.1
-    if (s.role === 'scavenging') rates.scrap += 1 + s.skills.scavenging * 0.1
+    if (s.role === 'scavenging')
+      rates.wood += 1 + s.skills.scavenging * 0.1
   })
   const buildings = state.buildings || {}
   Object.values(buildings).forEach((b) => {
@@ -20,12 +21,18 @@ export function getProductionRates(state) {
 
 export function processTick(state, seconds = 1) {
   const rates = getProductionRates(state)
-  const resources = { ...state.resources }
+  const resources = {}
+  Object.entries(state.resources).forEach(([key, val]) => {
+    resources[key] = { ...val, stocks: { ...(val.stocks || {}) } }
+  })
   Object.entries(rates).forEach(([res, rate]) => {
     const capacity = getCapacity(state, res)
     const current = resources[res]?.amount || 0
     const nextAmount = Math.min(capacity, current + rate * seconds)
-    resources[res] = { amount: nextAmount, capacity }
+    const delta = nextAmount - current
+    const stocks = resources[res]?.stocks || {}
+    stocks.misc = (stocks.misc || 0) + delta
+    resources[res] = { amount: nextAmount, capacity, stocks }
   })
 
   const mods = getSeasonModifiers(state)
@@ -35,6 +42,7 @@ export function processTick(state, seconds = 1) {
     const count = state.buildings?.[b.id]?.count || 0
     if (count <= 0 || !b.growthTime) return
     const resId = b.resource
+    const type = b.type
     const effectiveGrowth = b.growthTime * mods.farmingSpeed
     const effectiveHarvest = b.harvestAmount * mods.farmingYield * b.yieldValue
     const group = { ...(timers[resId] || {}) }
@@ -49,7 +57,11 @@ export function processTick(state, seconds = 1) {
       const current = resources[resId]?.amount || 0
       let next = current + effectiveHarvest * count * cycles
       if (next > capacity) next = capacity
-      resources[resId] = { amount: next, capacity }
+      const gain = next - current
+      const stocks = resources[resId]?.stocks || {}
+      const subCurrent = stocks[type] || 0
+      stocks[type] = subCurrent + gain
+      resources[resId] = { amount: next, capacity, stocks }
     }
     group[b.id] = timer
     timers[resId] = group

@@ -6,9 +6,8 @@ export const defaultState = {
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: {
-    scrap: { amount: 0, capacity: 0 },
-    food: { amount: 0, capacity: 100 },
-    wood: { amount: 0, capacity: 100 },
+    food: { amount: 20, capacity: 100, stocks: { potatoes: 20 } },
+    wood: { amount: 20, capacity: 100, stocks: { wood: 20 } },
   },
   storage: {
     food: { base: 100, fromBuildings: 0 },
