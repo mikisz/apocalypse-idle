@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useGame } from '../state/useGame.js';
 import EventLog from '../components/EventLog.jsx';
 import ResourceSidebar from '../components/ResourceSidebar.jsx';
+import Accordion from '../components/Accordion.jsx';
 import {
   PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,
@@ -12,22 +12,6 @@ import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { getCapacity } from '../state/selectors.js';
 import { formatAmount, formatRate } from '../utils/format.js';
 import { demolishBuilding } from '../engine/production.js';
-
-function AccordionItem({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="border-b border-stroke">
-      <button
-        className="w-full flex items-center justify-between p-2"
-        onClick={() => setOpen(!open)}
-      >
-        <span>{title}</span>
-        <span>{open ? '-' : '+'}</span>
-      </button>
-      {open && <div className="p-2 space-y-2">{children}</div>}
-    </div>
-  );
-}
 
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
@@ -137,16 +121,16 @@ export default function BaseView() {
       </div>
       <div className="flex-1 space-y-6">
         <div className="border border-stroke rounded">
-          <AccordionItem title="Production" defaultOpen>
+          <Accordion title="Production" defaultOpen>
             {PRODUCTION_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
-          </AccordionItem>
-          <AccordionItem title="Storage">
+          </Accordion>
+          <Accordion title="Storage">
             {STORAGE_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
-          </AccordionItem>
+          </Accordion>
         </div>
         <div>
           <h2 className="font-semibold mb-2">Event Log</h2>
