@@ -2,6 +2,8 @@ import { BUILDINGS } from '../data/buildings.js'
 import { RESOURCES } from '../data/resources.js'
 import { getSeason, getSeasonMultiplier } from '../engine/time.js'
 import { formatRate } from '../utils/format.js'
+import { BALANCE } from '../data/balance.js'
+import { computeRoleBonuses } from '../engine/settlers.js'
 
 export function getCapacity(state, resourceId) {
   const base = RESOURCES[resourceId]?.baseCapacity || 0
@@ -38,4 +40,22 @@ export function getResourceRates(state) {
     }
   })
   return formatted
+}
+
+export function getFoodStats(state) {
+  const rates = getResourceRates(state)
+  const settlers = state.population?.settlers || []
+  const bonuses = computeRoleBonuses(settlers)
+  const totalFoodBonusPercent = bonuses['farming'] || 0
+  const totalFoodProdWithBonus =
+    (rates.food?.perSec || 0) * (1 + totalFoodBonusPercent / 100)
+  const living = settlers.filter((s) => !s.isDead).length
+  const totalSettlersConsumption = living * BALANCE.FOOD_CONSUMPTION_PER_SETTLER
+  const netFoodPerSec = totalFoodProdWithBonus - totalSettlersConsumption
+  return {
+    amount: state.colony?.foodStorage || 0,
+    capacity: state.colony?.foodStorageCap || 0,
+    rate: formatRate({ amountPerHarvest: netFoodPerSec, intervalSec: 1 }),
+    netFoodPerSec,
+  }
 }

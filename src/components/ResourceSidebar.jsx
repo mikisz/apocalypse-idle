@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useGame } from '../state/useGame.js'
-import { getCapacity, getResourceRates } from '../state/selectors.js'
+import { getCapacity, getResourceRates, getFoodStats } from '../state/selectors.js'
 import { formatAmount } from '../utils/format.js'
 import { RESOURCE_LIST } from '../data/resources.js'
 
@@ -44,6 +44,7 @@ export default function ResourceSidebar() {
   const rates = getResourceRates(state)
   const groups = {}
   RESOURCE_LIST.forEach((r) => {
+    if (r.category === 'food') return // aggregated separately
     const cat = r.category
     if (!groups[cat]) groups[cat] = []
     groups[cat].push({
@@ -57,11 +58,20 @@ export default function ResourceSidebar() {
   const entries = Object.entries(groups).map(([cat, items]) => ({
     title: cat.charAt(0).toUpperCase() + cat.slice(1),
     items,
-    defaultOpen: cat === 'food',
+    defaultOpen: cat === 'resources',
   }))
+  const foodStats = getFoodStats(state)
 
   return (
     <div className="border border-stroke rounded overflow-hidden bg-bg2">
+      <div className="p-2 border-b border-stroke">
+        <ResourceRow
+          name="Food"
+          amount={foodStats.amount}
+          capacity={foodStats.capacity}
+          rate={foodStats.rate}
+        />
+      </div>
       {entries.map((g) => (
         <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
           {g.items.map((r) => (
