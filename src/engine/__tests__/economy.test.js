@@ -25,4 +25,25 @@ describe('economy basics', () => {
       Math.floor(prevCost.wood * blueprint.refund),
     );
   });
+
+  test('removing last required building unassigns settlers', () => {
+    const state = clone(defaultState);
+    state.buildings.potatoField.count = 1;
+    state.population = {
+      settlers: [
+        {
+          id: 's1',
+          firstName: 'A',
+          lastName: 'B',
+          role: 'farmer',
+          skills: { farmer: { level: 3, xp: 0 } },
+        },
+      ],
+    };
+    const after = demolishBuilding(state, 'potatoField');
+    expect(after.buildings.potatoField.count).toBe(0);
+    const settler = after.population.settlers[0];
+    expect(settler.role).toBe(null);
+    expect(settler.skills.farmer.level).toBe(3);
+  });
 });

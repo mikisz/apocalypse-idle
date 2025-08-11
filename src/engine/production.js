@@ -4,7 +4,7 @@ import {
   getBuildingCost,
 } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
-import { ROLE_BY_RESOURCE } from '../data/roles.js';
+import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { BALANCE } from '../data/balance.js';
@@ -113,5 +113,19 @@ export function demolishBuilding(state, buildingId) {
     entry.amount = clampResource(entry.amount, capacity);
     if (entry.amount > 0) entry.discovered = true;
   });
-  return { ...state, resources, buildings };
+  let settlers = state.population?.settlers || [];
+  if ((buildings[buildingId]?.count || 0) <= 0) {
+    const role = BUILDING_ROLES[buildingId];
+    if (role) {
+      settlers = settlers.map((s) =>
+        s.role === role ? { ...s, role: null } : s,
+      );
+    }
+  }
+  return {
+    ...state,
+    resources,
+    buildings,
+    population: { ...state.population, settlers },
+  };
 }
