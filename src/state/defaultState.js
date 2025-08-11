@@ -1,9 +1,9 @@
 import { makeRandomSettler } from '../data/names.js'
 import { initSeasons } from '../engine/time.js'
-import { SCHEMA_VERSION } from '../engine/persistence.js'
+import { CURRENT_SAVE_VERSION } from '../engine/persistence.js'
 
 export const defaultState = {
-  schemaVersion: SCHEMA_VERSION,
+  version: CURRENT_SAVE_VERSION,
   gameTime: { seconds: 0, year: 1 },
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
