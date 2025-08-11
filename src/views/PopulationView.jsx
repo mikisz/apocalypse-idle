@@ -1,12 +1,41 @@
 import { useGame } from '../state/useGame.js'
 import { formatAge } from '../utils/format.js'
+import {
+  assignmentsSummary,
+  computeRoleBonuses,
+} from '../engine/settlers.js'
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame()
   const settlers = state.population?.settlers ?? []
+  const { assigned, living } = assignmentsSummary(settlers)
+  const bonuses = computeRoleBonuses(settlers)
+  const bonusLabels = {
+    farming: 'Food',
+    scavenging: 'Raw',
+  }
 
   return (
     <div className="p-4 space-y-4 pb-20">
+      <div className="flex flex-wrap gap-2">
+        <div className="border border-stroke rounded p-3 bg-bg2/50 text-center">
+          <div className="text-xs text-muted">Settlers</div>
+          <div className="text-lg font-semibold">
+            {assigned}/{living}
+          </div>
+        </div>
+        {Object.entries(bonusLabels).map(([role, label]) => (
+          <div
+            key={role}
+            className="border border-stroke rounded p-3 bg-bg2/50 text-center"
+          >
+            <div className="text-xs text-muted">{label} bonus</div>
+            <div className="text-lg font-semibold">
+              +{(bonuses[role] || 0).toFixed(1)}%
+            </div>
+          </div>
+        ))}
+      </div>
       {settlers.length > 0 ? (
         settlers.map((s) => {
           const { years, days } = formatAge(s.ageSeconds)
@@ -51,3 +80,4 @@ export default function PopulationView() {
     </div>
   )
 }
+
