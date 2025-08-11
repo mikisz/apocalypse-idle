@@ -4,18 +4,28 @@ import useGameLoop from '../engine/useGameLoop.js'
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
 import { processTick, applyOfflineProgress } from '../engine/production.js'
 import { defaultState } from './defaultState.js'
+import { getSeason, initSeasons } from '../engine/time.js'
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
     const loaded = loadGame()
     if (loaded) {
+      const gameTime =
+        typeof loaded.gameTime === 'number'
+          ? { seconds: loaded.gameTime }
+          : loaded.gameTime || { seconds: 0 }
+      const meta = loaded.meta || { seasons: initSeasons() }
+      const base = { ...loaded, gameTime, meta }
       const now = Date.now()
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000)
       if (elapsed > 0) {
-        const { state: progressed, gains } = applyOfflineProgress(loaded, elapsed)
+        const { state: progressed, gains } = applyOfflineProgress(base, elapsed)
         const show = Object.keys(gains).length > 0
         return {
           ...progressed,
+          gameTime: {
+            seconds: (progressed.gameTime?.seconds || 0) + elapsed,
+          },
           ui: {
             ...progressed.ui,
             offlineProgress: show ? { elapsed, gains } : null,
@@ -23,7 +33,7 @@ export function GameProvider({ children }) {
           lastSaved: now,
         }
       }
-      return { ...loaded, lastSaved: now }
+      return { ...base, lastSaved: now }
     }
     return { ...defaultState, lastSaved: Date.now() }
   })
@@ -32,7 +42,12 @@ export function GameProvider({ children }) {
   useGameLoop(() => {
     setState((prev) => {
       const afterTick = processTick(prev)
-      return { ...afterTick, gameTime: afterTick.gameTime + 1 }
+      return {
+        ...afterTick,
+        gameTime: {
+          seconds: (afterTick.gameTime?.seconds || 0) + 1,
+        },
+      }
     })
   }, 1000)
 
@@ -88,6 +103,8 @@ export function GameProvider({ children }) {
     }
   }, [])
 
+  const selectSeason = useCallback(() => getSeason(state), [state])
+
   const value = useMemo(
     () => ({
       state,
@@ -97,8 +114,9 @@ export function GameProvider({ children }) {
       setState,
       dismissOfflineModal,
       resetGame,
+      selectSeason,
     }),
-    [state, setActiveTab, toggleDrawer, setSettlerRole, dismissOfflineModal, resetGame],
+    [state, setActiveTab, toggleDrawer, setSettlerRole, dismissOfflineModal, resetGame, selectSeason],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>
