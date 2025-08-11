@@ -2,6 +2,7 @@ import { BUILDINGS, PRODUCTION_BUILDINGS } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { formatRate } from '../utils/format.js';
+import { BALANCE } from '../data/balance.js';
 
 export function getCapacity(state, resourceId) {
   const base = RESOURCES[resourceId]?.startingCapacity || 0;
@@ -15,7 +16,7 @@ export function getCapacity(state, resourceId) {
   return base + fromBuildings;
 }
 
-export function getResourceRates(state) {
+export function getResourceRates(state, includeConsumption = false) {
   const season = getSeason(state);
   const rates = {};
   PRODUCTION_BUILDINGS.forEach((b) => {
@@ -28,6 +29,13 @@ export function getResourceRates(state) {
       rates[res] = (rates[res] || 0) + perSec;
     });
   });
+
+  if (includeConsumption) {
+    const settlers = state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
+    const consumption = settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
+    rates.potatoes = (rates.potatoes || 0) - consumption;
+  }
+
   const formatted = {};
   Object.keys(RESOURCES).forEach((id) => {
     const perSec = rates[id] || 0;

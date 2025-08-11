@@ -8,6 +8,7 @@ const clone = (obj) => JSON.parse(JSON.stringify(obj));
 describe('economy basics', () => {
   test('spring potato field output', () => {
     const state = clone(defaultState);
+    state.buildings.potatoField.count = 1;
     const next = processTick(state, 1);
     const potatoes = next.resources.potatoes.amount;
     expect(potatoes).toBeCloseTo(0.375 * 1.25, 5);
