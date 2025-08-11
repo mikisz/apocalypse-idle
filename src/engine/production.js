@@ -28,7 +28,10 @@ export function processTick(state, seconds = 1) {
   Object.entries(rates).forEach(([res, rate]) => {
     const capacity = getCapacity(state, res)
     const current = resources[res]?.amount || 0
-    const nextAmount = Math.min(capacity, current + rate * seconds)
+    const nextAmount = Math.max(
+      0,
+      Math.min(capacity, current + rate * seconds),
+    )
     const delta = nextAmount - current
     const stocks = resources[res]?.stocks || {}
     stocks.misc = (stocks.misc || 0) + delta
@@ -81,4 +84,33 @@ export function applyOfflineProgress(state, elapsedSeconds) {
     if (gain > 0) gains[res] = gain
   })
   return { state: nextState, gains }
+}
+
+export function demolishBuilding(state, buildingId) {
+  const blueprint = BUILDINGS.find((b) => b.id === buildingId)
+  const count = state.buildings?.[buildingId]?.count || 0
+  if (!blueprint || count <= 0) return state
+  const refundRatio = blueprint.demolishRefundRatio ?? 0.5
+  const resources = { ...state.resources }
+  Object.entries(blueprint.cost || {}).forEach(([res, amt]) => {
+    const refund = Math.floor(amt * refundRatio)
+    const capacity = getCapacity(state, res)
+    const current = state.resources[res]?.amount || 0
+    const next = Math.min(capacity, current + refund)
+    const stocks = { ...(state.resources[res]?.stocks || {}) }
+    const key = Object.keys(stocks)[0] || res
+    stocks[key] = (stocks[key] || 0) + refund
+    resources[res] = { ...state.resources[res], amount: next, stocks }
+  })
+  const buildings = {
+    ...state.buildings,
+    [buildingId]: { ...(state.buildings[buildingId] || {}), count: count - 1 },
+  }
+  let timers = { ...state.timers }
+  if (blueprint.growthTime) {
+    const group = { ...(state.timers?.[blueprint.resource] || {}) }
+    if (count - 1 <= 0) delete group[buildingId]
+    timers = { ...state.timers, [blueprint.resource]: group }
+  }
+  return { ...state, resources, buildings, timers }
 }
