@@ -41,7 +41,8 @@ export const RESEARCH = [
     id: 'logistics1',
     name: 'Logistics I',
     type: 'efficiency',
-    shortDesc: '+5% storage capacity for RAW and CONSTRUCTION_MATERIALS.',
+    shortDesc:
+      '+5% storage capacity for raw materials and construction materials.',
     cost: { science: 35 },
     timeSec: 60,
     prereqs: ['industry1'],
@@ -91,7 +92,7 @@ export const RESEARCH = [
     name: 'Logistics II',
     type: 'efficiency',
     shortDesc:
-      'Additional +5% storage capacity for RAW and CONSTRUCTION_MATERIALS.',
+      'Additional +5% storage capacity for raw materials and construction materials.',
     cost: { science: 80 },
     timeSec: 150,
     prereqs: ['logistics1', 'industry2'],
