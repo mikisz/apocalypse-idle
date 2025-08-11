@@ -4,7 +4,7 @@ import useGameLoop from '../engine/useGameLoop.js'
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
 import { processTick, applyOfflineProgress } from '../engine/production.js'
 import { defaultState } from './defaultState.js'
-import { getSeason, getSeasonDay, initSeasons } from '../engine/time.js'
+import { getYear, initSeasons } from '../engine/time.js'
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
@@ -16,16 +16,27 @@ export function GameProvider({ children }) {
           : loaded.gameTime || { seconds: 0 }
       const meta = { seasons: initSeasons() }
       const base = { ...loaded, gameTime, meta }
+      const prevYear = gameTime.year || getYear(base)
+      gameTime.year = prevYear
       const now = Date.now()
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000)
       if (elapsed > 0) {
         const { state: progressed, gains } = applyOfflineProgress(base, elapsed)
+        const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed
+        const yearAfter = getYear({
+          ...progressed,
+          gameTime: { ...progressed.gameTime, seconds: secondsAfter },
+        })
+        let settlers = progressed.population.settlers
+        if (yearAfter > prevYear) {
+          const diff = yearAfter - prevYear
+          settlers = settlers.map((s) => ({ ...s, age: s.age + diff }))
+        }
         const show = Object.keys(gains).length > 0
         return {
           ...progressed,
-          gameTime: {
-            seconds: (progressed.gameTime?.seconds || 0) + elapsed,
-          },
+          population: { ...progressed.population, settlers },
+          gameTime: { seconds: secondsAfter, year: yearAfter },
           ui: {
             ...progressed.ui,
             offlineProgress: show ? { elapsed, gains } : null,
@@ -33,7 +44,11 @@ export function GameProvider({ children }) {
           lastSaved: now,
         }
       }
-      return { ...base, lastSaved: now }
+      return {
+        ...base,
+        gameTime: { ...gameTime, year: prevYear },
+        lastSaved: now,
+      }
     }
     return { ...defaultState, lastSaved: Date.now() }
   })
@@ -42,11 +57,22 @@ export function GameProvider({ children }) {
   useGameLoop(() => {
     setState((prev) => {
       const afterTick = processTick(prev)
+      const nextSeconds = (afterTick.gameTime?.seconds || 0) + 1
+      const computedYear = getYear({
+        ...afterTick,
+        gameTime: { ...afterTick.gameTime, seconds: nextSeconds },
+      })
+      let year = afterTick.gameTime?.year || 1
+      let settlers = afterTick.population.settlers
+      if (computedYear > year) {
+        const diff = computedYear - year
+        year = computedYear
+        settlers = settlers.map((s) => ({ ...s, age: s.age + diff }))
+      }
       return {
         ...afterTick,
-        gameTime: {
-          seconds: (afterTick.gameTime?.seconds || 0) + 1,
-        },
+        population: { ...afterTick.population, settlers },
+        gameTime: { seconds: nextSeconds, year },
       }
     })
   }, 1000)
@@ -103,9 +129,6 @@ export function GameProvider({ children }) {
     }
   }, [])
 
-  const selectSeason = useCallback(() => getSeason(state), [state])
-  const selectSeasonDay = useCallback(() => getSeasonDay(state), [state])
-
   const value = useMemo(
     () => ({
       state,
@@ -115,8 +138,6 @@ export function GameProvider({ children }) {
       setState,
       dismissOfflineModal,
       resetGame,
-      selectSeason,
-      selectSeasonDay,
     }),
     [
       state,
@@ -125,8 +146,6 @@ export function GameProvider({ children }) {
       setSettlerRole,
       dismissOfflineModal,
       resetGame,
-      selectSeason,
-      selectSeasonDay,
     ],
   )
 
