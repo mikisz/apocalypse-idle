@@ -9,7 +9,7 @@ export default function TopBar() {
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">
-      <div className="flex flex-col items-center leading-tight">
+      <div className="flex flex-col items-start leading-tight">
         <span className="text-xl">
           {season.icon} {season.label}: Day {day}
         </span>
