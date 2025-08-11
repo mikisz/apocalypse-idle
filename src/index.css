@@ -1,6 +1,13 @@
-@tailwindcss base;
-@tailwindcss components;
-@tailwindcss utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #e8edf6;
+  --color-muted: #97a3b6;
+  --color-bg: #0b0e14;
+  --color-bg2: #101522;
+  --color-panel: #151b2b;
+  --color-stroke: #232b3d;
+}
 
 :root { color-scheme: dark; }
 html, body, #root { height: 100%; }
