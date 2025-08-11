@@ -23,14 +23,7 @@ export default function PopulationView() {
             >
               {s.sex}
             </span>
-            <span>Age {s.age}</span>
-            <span className="px-2 py-0.5 rounded bg-green-700 text-white text-xs">
-              Farm {s.skills.farming}
-            </span>
-            <span className="px-2 py-0.5 rounded bg-yellow-700 text-white text-xs">
-              Scav {s.skills.scavenging}
-            </span>
-            <span>Morale {s.morale}%</span>
+            <span>Age {Math.floor((s.ageSeconds || 0) / 86400)}</span>
           </div>
           <div className="relative inline-block w-36">
             <select

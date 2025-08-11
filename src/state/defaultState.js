@@ -38,6 +38,11 @@ export const defaultState = {
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
+  colony: {
+    foodStorage: 0,
+    foodStorageCap: RESOURCES.food.baseCapacity,
+    starvationTimerSeconds: 0,
+  },
   population: { settlers: [makeRandomSettler()] },
   buildings: initBuildings(),
   timers: initTimers(),

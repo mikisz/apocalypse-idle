@@ -104,10 +104,11 @@ export function GameProvider({ children }) {
     setState((prev) => {
       const settler = prev.population.settlers.find((s) => s.id === id)
       if (!settler) return prev
+      const normalized = role === 'idle' ? null : role
       const settlers = prev.population.settlers.map((s) =>
-        s.id === id ? { ...s, role } : s,
+        s.id === id ? { ...s, role: normalized } : s,
       )
-      const entry = `${settler.firstName} ${settler.lastName} is now ${role}`
+      const entry = `${settler.firstName} ${settler.lastName} is now ${normalized}`
       const log = [entry, ...prev.log].slice(0, 100)
       return { ...prev, population: { ...prev.population, settlers }, log }
     })

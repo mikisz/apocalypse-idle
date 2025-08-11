@@ -30,9 +30,9 @@ export function makeRandomSettler({ sex } = {}) {
     firstName,
     lastName,
     sex: chosenSex,
-    age: 18,
-    role: 'idle',
-    skills: { farming: 0, scavenging: 0 },
-    morale: 50,
+    isDead: false,
+    ageSeconds: 0,
+    role: null,
+    skills: {},
   }
 }
