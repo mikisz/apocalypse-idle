@@ -1,88 +1,73 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { GameContext } from './useGame.js'
 import useGameLoop from '../engine/useGameLoop.js'
-import { tick } from '../engine/tick.js'
-import { buildingDefs, isBuildingVisible } from '../engine/mechanics.js'
+import { saveGame, loadGame } from '../engine/persistence.js'
+import { firstNames, lastNames } from '../data/names.js'
+
+function createSettler() {
+  const first = firstNames[Math.floor(Math.random() * firstNames.length)]
+  const last = lastNames[Math.floor(Math.random() * lastNames.length)]
+  const gender = Math.random() < 0.5 ? 'male' : 'female'
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    firstName: first,
+    lastName: last,
+    gender,
+    age: 18,
+    role: 'idle',
+    morale: 50,
+    skills: {},
+  }
+}
 
 const defaultState = {
-  resources: {
-    scrap: { amount: 0, capacity: 100, discovered: true },
-  },
-  buildings: {
-    scavengerHut: { count: 0 },
-  },
+  gameTime: 0,
+  ui: { activeTab: 'base', drawerOpen: false },
+  resources: { scrap: 0, food: 0 },
+  population: [createSettler()],
+  buildings: {},
   log: [],
 }
 
 export function GameProvider({ children }) {
-  const [state, setState] = useState(defaultState)
+  const [state, setState] = useState(() => loadGame() || defaultState)
 
-  // Pętla gry
-  useGameLoop((dt) => {
-    setState((prev) => tick(prev, dt))
-  }, 250)
+  // Main game loop: increment time every second
+  useGameLoop(() => {
+    setState((prev) => ({ ...prev, gameTime: prev.gameTime + 1 }))
+  }, 1000)
 
-  // Akcje
-  const addResource = useCallback((resId, amount) => {
+  // Autosave
+  useEffect(() => {
+    const id = setInterval(() => saveGame(state), 10000)
+    return () => clearInterval(id)
+  }, [state])
+
+  const setActiveTab = useCallback((tab) => {
+    setState((prev) => ({ ...prev, ui: { ...prev.ui, activeTab: tab } }))
+  }, [])
+
+  const toggleDrawer = useCallback(() => {
+    setState((prev) => ({ ...prev, ui: { ...prev.ui, drawerOpen: !prev.ui.drawerOpen } }))
+  }, [])
+
+  const setSettlerRole = useCallback((id, role) => {
     setState((prev) => {
-      const r = prev.resources[resId]
-      if (!r) return prev
-      const newAmount = Math.min(r.capacity, r.amount + amount)
-      return {
-        ...prev,
-        resources: { ...prev.resources, [resId]: { ...r, amount: newAmount } },
-      }
+      const population = prev.population.map((s) =>
+        s.id === id ? { ...s, role } : s,
+      )
+      const settler = prev.population.find((s) => s.id === id)
+      const entry = `${settler.firstName} ${settler.lastName} is now ${role}`
+      const log = [entry, ...prev.log].slice(0, 100)
+      return { ...prev, population, log }
     })
   }, [])
 
-  const canAfford = useCallback(
-    (buildingId) => {
-      const cost = buildingDefs[buildingId]?.cost || {}
-      return Object.entries(cost).every(
-        ([rid, need]) => (state.resources[rid]?.amount || 0) >= need,
-      )
-    },
-    [state],
-  )
-
-  const buyBuilding = useCallback(
-    (buildingId) => {
-      const def = buildingDefs[buildingId]
-      if (!def) return
-      if (!canAfford(buildingId)) return
-
-      setState((prev) => {
-        const newResources = { ...prev.resources }
-        for (const [rid, need] of Object.entries(def.cost)) {
-          const r = newResources[rid]
-          newResources[rid] = { ...r, amount: r.amount - need }
-        }
-        const current = prev.buildings[buildingId]?.count || 0
-        const newBuildings = {
-          ...prev.buildings,
-          [buildingId]: { count: current + 1 },
-        }
-        return {
-          ...prev,
-          resources: newResources,
-          buildings: newBuildings,
-          log: [`Zbudowano: ${def.name}`, ...prev.log].slice(0, 50),
-        }
-      })
-    },
-    [canAfford],
-  )
-
   const value = useMemo(
-    () => ({
-      state,
-      addResource,
-      buyBuilding,
-      canAfford,
-      isBuildingVisible: (bId) => isBuildingVisible(state, bId),
-    }),
-    [state, addResource, buyBuilding, canAfford],
+    () => ({ state, setActiveTab, toggleDrawer, setSettlerRole, setState }),
+    [state, setActiveTab, toggleDrawer, setSettlerRole],
   )
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>
 }
+
