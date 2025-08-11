@@ -84,7 +84,7 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
           </button>
           <div className="mt-1 space-y-1 text-xs text-red-400">
             {reasons.missingPrereqs?.length > 0 && (
-              <div>Missing: {reasons.missingPrereqs.join(', ')}</div>
+              <div>Require: {reasons.missingPrereqs.join(', ')}</div>
             )}
             {reasons.missingMilestones?.length > 0 && (
               <div>
