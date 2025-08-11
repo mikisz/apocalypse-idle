@@ -25,5 +25,5 @@ export function formatAge(ageDays = 0) {
   const totalDays = Math.floor(ageDays || 0);
   const years = Math.floor(totalDays / DAYS_PER_YEAR);
   const day = totalDays % DAYS_PER_YEAR;
-  return { years, days: day + 1 };
+  return { years, days: day };
 }
