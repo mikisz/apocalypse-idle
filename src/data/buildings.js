@@ -40,6 +40,16 @@ export const BUILDINGS = [
     description: 'Extracts stone slowly but steadily.',
   },
   {
+    id: 'school',
+    name: 'School',
+    type: 'production',
+    outputsPerSecBase: { science: 0.5 },
+    costBase: { wood: 25, scrap: 10, stone: 10 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    description: 'Provides basic education and generates science.',
+  },
+  {
     id: 'foodStorage',
     name: 'Granary',
     type: 'storage',

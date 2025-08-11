@@ -23,6 +23,12 @@ export const ROLES = {
     skill: 'Quarrying',
     resource: 'stone',
   },
+  scientist: {
+    id: 'scientist',
+    name: 'Scientist',
+    skill: 'Scientist',
+    resource: 'science',
+  },
 };
 
 export const ROLE_LIST = Object.values(ROLES);

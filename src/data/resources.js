@@ -31,6 +31,14 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 100,
   },
+  science: {
+    id: 'science',
+    name: 'Science',
+    icon: '🔬',
+    category: 'SOCIETY',
+    startingAmount: 0,
+    startingCapacity: 400,
+  },
 };
 
 export const RESOURCE_LIST = Object.values(RESOURCES);

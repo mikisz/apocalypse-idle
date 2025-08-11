@@ -3,6 +3,7 @@ import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { formatRate } from '../utils/format.js';
 import { BALANCE } from '../data/balance.js';
+import { ROLE_BY_RESOURCE } from '../data/roles.js';
 
 export function getCapacity(state, resourceId) {
   const base = RESOURCES[resourceId]?.startingCapacity || 0;
@@ -16,7 +17,11 @@ export function getCapacity(state, resourceId) {
   return base + fromBuildings;
 }
 
-export function getResourceRates(state, includeConsumption = false) {
+export function getResourceRates(
+  state,
+  includeConsumption = false,
+  roleBonuses = {},
+) {
   const season = getSeason(state);
   const rates = {};
   PRODUCTION_BUILDINGS.forEach((b) => {
@@ -25,7 +30,9 @@ export function getResourceRates(state, includeConsumption = false) {
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;
       const mult = getSeasonMultiplier(season, category);
-      const perSec = base * mult * count;
+      const role = ROLE_BY_RESOURCE[res];
+      const bonusPercent = roleBonuses[role] || 0;
+      const perSec = base * mult * count * (1 + bonusPercent / 100);
       rates[res] = (rates[res] || 0) + perSec;
     });
   });
