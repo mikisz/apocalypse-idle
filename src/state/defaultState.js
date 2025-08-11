@@ -2,7 +2,7 @@ import { makeRandomSettler } from '../data/names.js'
 import { initSeasons } from '../engine/time.js'
 
 export const defaultState = {
-  gameTime: { seconds: 0 },
+  gameTime: { seconds: 0, year: 1 },
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: {

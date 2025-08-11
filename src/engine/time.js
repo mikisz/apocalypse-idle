@@ -36,42 +36,63 @@ export function initSeasons() {
   return DEFAULT_SEASONS.map((s) => ({ ...s }))
 }
 
-export function getSeason(state) {
-  const seasons = state?.meta?.seasons || DEFAULT_SEASONS
-  const seconds = state?.gameTime?.seconds || 0
-  const total =
+function getSeasons(state) {
+  return state?.meta?.seasons || DEFAULT_SEASONS
+}
+
+function getYearDuration(seasons) {
+  return (
     seasons.reduce((sum, s) => sum + s.days * SECONDS_PER_DAY, 0) ||
     SECONDS_PER_DAY
-  let t = seconds % total
-  for (const s of seasons) {
-    const duration = s.days * SECONDS_PER_DAY
-    if (t < duration) {
-      const { id, label, icon } = s
-      return { id, label, icon }
-    }
-    t -= duration
-  }
-  return { id: 'unknown', label: 'Unknown', icon: '❔' }
+  )
 }
+
+export function getTimeBreakdown(state) {
+  const seasons = getSeasons(state)
+  const seconds = state?.gameTime?.seconds || 0
+  const yearDuration = getYearDuration(seasons)
+  const year = Math.floor(seconds / yearDuration) + 1
+  let t = seconds % yearDuration
+  for (const s of seasons) {
+    const durationSec = s.days * SECONDS_PER_DAY
+    if (t < durationSec) {
+      const dayInSeason = Math.floor(t / SECONDS_PER_DAY) + 1
+      return {
+        year,
+        season: { ...s, durationSec },
+        dayInSeason,
+        secondsInSeason: t,
+      }
+    }
+    t -= durationSec
+  }
+  return {
+    year,
+    season: { id: 'unknown', label: 'Unknown', icon: '❔', durationSec: 0, modifiers: {} },
+    dayInSeason: 1,
+    secondsInSeason: 0,
+  }
+}
+
+export function getYear(state) {
+  return getTimeBreakdown(state).year
+}
+
+export function getSeason(state) {
+  return getTimeBreakdown(state).season
+}
+
+export function getDayInSeason(state) {
+  return getTimeBreakdown(state).dayInSeason
+}
+
+// Legacy alias
+export const getSeasonDay = getDayInSeason
 
 export function getSeasonModifiers(state) {
-  const seasons = state?.meta?.seasons || DEFAULT_SEASONS
-  const current = getSeason(state)
-  const season = seasons.find((s) => s.id === current.id)
-  return season?.modifiers || { farmingSpeed: 1, farmingYield: 1 }
-}
-
-export function getSeasonDay(state) {
-  const seasons = state?.meta?.seasons || DEFAULT_SEASONS
-  const seconds = state?.gameTime?.seconds || 0
-  let t = seconds
-  for (const s of seasons) {
-    const duration = s.days * SECONDS_PER_DAY
-    if (t < duration) {
-      return Math.floor(t / SECONDS_PER_DAY) + 1
-    }
-    t -= duration
+  return getTimeBreakdown(state).season.modifiers || {
+    farmingSpeed: 1,
+    farmingYield: 1,
   }
-  return 1
 }
 
