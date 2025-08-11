@@ -22,11 +22,8 @@ export function GameProvider({ children }) {
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000)
       if (elapsed > 0) {
         const { state: progressed, gains } = applyOfflineProgress(base, elapsed)
-        const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed
-        const yearAfter = getYear({
-          ...progressed,
-          gameTime: { ...progressed.gameTime, seconds: secondsAfter },
-        })
+        const secondsAfter = progressed.gameTime?.seconds || 0
+        const yearAfter = getYear(progressed)
         let settlers = progressed.population.settlers
         if (yearAfter > prevYear) {
           const diff = yearAfter - prevYear
@@ -53,11 +50,11 @@ export function GameProvider({ children }) {
     return { ...defaultState, lastSaved: Date.now() }
   })
 
-  // Main game loop: increment time and produce resources every second
-  useGameLoop(() => {
+  // Main game loop: increment time and produce resources
+  useGameLoop((dt) => {
     setState((prev) => {
-      const afterTick = processTick(prev)
-      const nextSeconds = (afterTick.gameTime?.seconds || 0) + 1
+      const afterTick = processTick(prev, dt)
+      const nextSeconds = (afterTick.gameTime?.seconds || 0) + dt
       const computedYear = getYear({
         ...afterTick,
         gameTime: { ...afterTick.gameTime, seconds: nextSeconds },
