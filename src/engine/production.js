@@ -1,4 +1,8 @@
-import { PRODUCTION_BUILDINGS, BUILDING_MAP, getBuildingCost } from '../data/buildings.js';
+import {
+  PRODUCTION_BUILDINGS,
+  BUILDING_MAP,
+  getBuildingCost,
+} from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity } from '../state/selectors.js';
@@ -45,12 +49,16 @@ export function applyOfflineProgress(state, elapsedSeconds) {
   if (elapsedSeconds <= 0) return { state, gains: {} };
   const before = JSON.parse(JSON.stringify(state.resources));
   let current = applyProduction({ ...state }, elapsedSeconds);
-  const settlers = state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
+  const settlers =
+    state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
   if (settlers > 0) {
     const consumption =
       settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER * elapsedSeconds;
     const cap = getCapacity(current, 'potatoes');
-    const entry = current.resources.potatoes || { amount: 0, discovered: false };
+    const entry = current.resources.potatoes || {
+      amount: 0,
+      discovered: false,
+    };
     const next = clampResource(entry.amount - consumption, cap);
     current.resources.potatoes = {
       amount: next,
@@ -58,11 +66,13 @@ export function applyOfflineProgress(state, elapsedSeconds) {
     };
   }
   Object.keys(current.resources).forEach((res) => {
-    if (current.resources[res].amount > 0) current.resources[res].discovered = true;
+    if (current.resources[res].amount > 0)
+      current.resources[res].discovered = true;
   });
   const gains = {};
   Object.keys(before).forEach((res) => {
-    const gain = (current.resources[res]?.amount || 0) - (before[res]?.amount || 0);
+    const gain =
+      (current.resources[res]?.amount || 0) - (before[res]?.amount || 0);
     if (gain > 0) gains[res] = gain;
   });
   return { state: current, gains };

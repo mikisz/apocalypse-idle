@@ -1,22 +1,22 @@
-import { useGame } from '../state/useGame.js'
+import { useGame } from '../state/useGame.js';
 
 function formatTime(seconds) {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
-  const parts = []
-  if (h) parts.push(`${h}h`)
-  if (m) parts.push(`${m}m`)
-  if (s || parts.length === 0) parts.push(`${s}s`)
-  return parts.join(' ')
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const parts = [];
+  if (h) parts.push(`${h}h`);
+  if (m) parts.push(`${m}m`);
+  if (s || parts.length === 0) parts.push(`${s}s`);
+  return parts.join(' ');
 }
 
 export default function OfflineProgressModal() {
-  const { state, dismissOfflineModal } = useGame()
-  const info = state.ui.offlineProgress
-  if (!info) return null
+  const { state, dismissOfflineModal } = useGame();
+  const info = state.ui.offlineProgress;
+  if (!info) return null;
 
-  const { elapsed, gains } = info
+  const { elapsed, gains } = info;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-bg2 p-4 rounded border border-stroke max-w-sm w-full space-y-4">
@@ -37,5 +37,5 @@ export default function OfflineProgressModal() {
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -5,6 +5,5 @@ export default function EventLog({ log }) {
         <li key={i}>{entry}</li>
       ))}
     </ul>
-  )
+  );
 }
-

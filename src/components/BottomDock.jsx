@@ -1,15 +1,15 @@
-import React from 'react'
-import { useGame } from '../state/useGame.js'
+import React from 'react';
+import { useGame } from '../state/useGame.js';
 
 const tabs = [
   { id: 'base', icon: '🏠', label: 'Base' },
   { id: 'population', icon: '👥', label: 'Population' },
   { id: 'research', icon: '🧠', label: 'Research' },
   { id: 'expeditions', icon: '🗺', label: 'Expeditions' },
-]
+];
 
 export default function BottomDock() {
-  const { state, setActiveTab } = useGame()
+  const { state, setActiveTab } = useGame();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 flex border-t border-stroke bg-bg2">
@@ -27,6 +27,5 @@ export default function BottomDock() {
         </button>
       ))}
     </nav>
-  )
+  );
 }
-

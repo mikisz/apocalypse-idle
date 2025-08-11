@@ -1,25 +1,25 @@
-import { GameProvider } from './state/GameContext.jsx'
-import TopBar from './components/TopBar.jsx'
-import BottomDock from './components/BottomDock.jsx'
-import Drawer from './components/Drawer.jsx'
-import OfflineProgressModal from './components/OfflineProgressModal.jsx'
-import BaseView from './views/BaseView.jsx'
-import PopulationView from './views/PopulationView.jsx'
-import ResearchView from './views/ResearchView.jsx'
-import ExpeditionsView from './views/ExpeditionsView.jsx'
-import { useGame } from './state/useGame.js'
+import { GameProvider } from './state/GameContext.jsx';
+import TopBar from './components/TopBar.jsx';
+import BottomDock from './components/BottomDock.jsx';
+import Drawer from './components/Drawer.jsx';
+import OfflineProgressModal from './components/OfflineProgressModal.jsx';
+import BaseView from './views/BaseView.jsx';
+import PopulationView from './views/PopulationView.jsx';
+import ResearchView from './views/ResearchView.jsx';
+import ExpeditionsView from './views/ExpeditionsView.jsx';
+import { useGame } from './state/useGame.js';
 
 function ActiveView() {
-  const { state } = useGame()
+  const { state } = useGame();
   switch (state.ui.activeTab) {
     case 'population':
-      return <PopulationView />
+      return <PopulationView />;
     case 'research':
-      return <ResearchView />
+      return <ResearchView />;
     case 'expeditions':
-      return <ExpeditionsView />
+      return <ExpeditionsView />;
     default:
-      return <BaseView />
+      return <BaseView />;
   }
 }
 
@@ -36,6 +36,5 @@ export default function App() {
         <OfflineProgressModal />
       </div>
     </GameProvider>
-  )
+  );
 }
-

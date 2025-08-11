@@ -1,26 +1,23 @@
-import React, { useState } from 'react'
-import { useGame } from '../state/useGame.js'
-import { formatAge } from '../utils/format.js'
-import {
-  assignmentsSummary,
-  computeRoleBonuses,
-} from '../engine/settlers.js'
-import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js'
+import React, { useState } from 'react';
+import { useGame } from '../state/useGame.js';
+import { formatAge } from '../utils/format.js';
+import { assignmentsSummary, computeRoleBonuses } from '../engine/settlers.js';
+import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
 
 export default function PopulationView() {
-  const { state, setSettlerRole } = useGame()
-  const [onlyLiving, setOnlyLiving] = useState(true)
-  const [unassignedOnly, setUnassignedOnly] = useState(false)
-  const settlers = state.population?.settlers ?? []
+  const { state, setSettlerRole } = useGame();
+  const [onlyLiving, setOnlyLiving] = useState(true);
+  const [unassignedOnly, setUnassignedOnly] = useState(false);
+  const settlers = state.population?.settlers ?? [];
   const filtered = settlers
-    .filter((s) => (!onlyLiving || !s.isDead))
-    .filter((s) => (!unassignedOnly || s.role == null))
-  const { assigned, living } = assignmentsSummary(settlers)
-  const bonuses = computeRoleBonuses(settlers)
+    .filter((s) => !onlyLiving || !s.isDead)
+    .filter((s) => !unassignedOnly || s.role == null);
+  const { assigned, living } = assignmentsSummary(settlers);
+  const bonuses = computeRoleBonuses(settlers);
   const bonusLabels = {
     farming: 'Food',
     scavenging: 'Raw',
-  }
+  };
 
   return (
     <div className="p-4 space-y-4 pb-20">
@@ -63,13 +60,13 @@ export default function PopulationView() {
       </div>
       {filtered.length > 0 ? (
         filtered.map((s) => {
-          const { years, days } = formatAge(s.ageSeconds)
-          const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 }
-          const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level)
-          const progress = threshold > 0 ? activeSkill.xp / threshold : 0
+          const { years, days } = formatAge(s.ageSeconds);
+          const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 };
+          const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level);
+          const progress = threshold > 0 ? activeSkill.xp / threshold : 0;
           const otherSkills = Object.entries(s.skills || {}).filter(
             ([role]) => role !== s.role,
-          )
+          );
           return (
             <div
               key={s.id}
@@ -86,7 +83,9 @@ export default function PopulationView() {
                 >
                   {s.sex}
                 </span>
-                <span>Age: {years}y {days}d</span>
+                <span>
+                  Age: {years}y {days}d
+                </span>
               </div>
               <div className="relative inline-block w-36">
                 <select
@@ -124,12 +123,11 @@ export default function PopulationView() {
                 </details>
               )}
             </div>
-          )
+          );
         })
       ) : (
         <div className="text-center text-muted">No survivors</div>
       )}
     </div>
-  )
+  );
 }
-

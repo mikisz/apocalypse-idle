@@ -46,7 +46,11 @@ export default function ResourceSidebar() {
     entries.push({ title: 'Food', items: groups.FOOD, defaultOpen: true });
   }
   if (groups.RAW.length > 0) {
-    entries.push({ title: 'Raw Materials', items: groups.RAW, defaultOpen: true });
+    entries.push({
+      title: 'Raw Materials',
+      items: groups.RAW,
+      defaultOpen: true,
+    });
   }
 
   return (
