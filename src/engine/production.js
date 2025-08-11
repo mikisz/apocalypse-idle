@@ -22,6 +22,27 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   PRODUCTION_BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     if (count <= 0) return;
+    let factor = 1;
+    if (b.inputsPerSecBase) {
+      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        const need = base * count * seconds;
+        const have = resources[res]?.amount || 0;
+        const ratio = need > 0 ? have / need : 1;
+        factor = Math.min(factor, ratio);
+      });
+      factor = Math.min(1, factor);
+      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        const amt = base * count * seconds * factor;
+        const capacity = getCapacity(state, res);
+        const entry = resources[res] || { amount: 0, discovered: false };
+        const next = clampResource(entry.amount - amt, capacity);
+        resources[res] = {
+          ...entry,
+          amount: next,
+          discovered: entry.discovered || next > 0,
+        };
+      });
+    }
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;
       const mult = getSeasonMultiplier(season, category);
@@ -33,7 +54,8 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         mult *
         count *
         (1 + bonusPercent / 100 + researchBonus) *
-        seconds;
+        seconds *
+        factor;
       const capacity = getCapacity(state, res);
       const currentEntry = resources[res] || { amount: 0, discovered: false };
       const next = clampResource(currentEntry.amount + gain, capacity);

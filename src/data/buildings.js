@@ -55,6 +55,20 @@ export const BUILDINGS = [
     description: 'Provides basic education and generates science.',
   },
   {
+    id: 'woodGenerator',
+    name: 'Wood Generator',
+    type: 'production',
+    category: 'Energy',
+    outputsPerSecBase: { power: 1 },
+    inputsPerSecBase: { wood: 0.3 },
+    costBase: { wood: 50, stone: 10 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    requiresResearch: 'basicEnergy',
+    description:
+      'Burns wood to generate power. Excess power is lost if storage is full.',
+  },
+  {
     id: 'foodStorage',
     name: 'Granary',
     type: 'storage',
@@ -73,6 +87,17 @@ export const BUILDINGS = [
     refund: 0.5,
     capacityAdd: { wood: 200, stone: 80, scrap: 120 },
     description: 'Increases storage for wood, stone and scrap.',
+  },
+  {
+    id: 'battery',
+    name: 'Battery',
+    type: 'storage',
+    costBase: { wood: 40, stone: 20 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { power: 20 },
+    requiresResearch: 'basicEnergy',
+    description: 'Allows storing more generated Power.',
   },
 ];
 

@@ -50,8 +50,20 @@ export function processResearchTick(state, seconds = 1) {
   const progress = { ...state.research.progress, [current.id]: next };
   if (next >= node.timeSec) {
     const completed = [...state.research.completed, current.id];
+    let resources = { ...state.resources };
+    if (node.unlocks?.resources) {
+      node.unlocks.resources.forEach((resId) => {
+        const entry = resources[resId] || {
+          amount: 0,
+          discovered: false,
+          produced: 0,
+        };
+        resources[resId] = { ...entry, discovered: true };
+      });
+    }
     return {
       ...state,
+      resources,
       research: { current: null, completed, progress },
     };
   }
