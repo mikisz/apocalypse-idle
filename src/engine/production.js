@@ -19,7 +19,20 @@ export function getProductionRates(state) {
   return rates
 }
 
-export function processTick(state, seconds = 1) {
+export function clampResource(value, capacity) {
+  let v = Number.isFinite(value) ? value : 0
+  let c = Number.isFinite(capacity) ? capacity : 0
+  if (!Number.isFinite(value) || !Number.isFinite(capacity)) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Invalid resource numbers', value, capacity)
+    }
+  }
+  if (c < 0) c = 0
+  const result = Math.max(0, Math.min(c, v))
+  return Math.round(result * 1e6) / 1e6
+}
+
+export function applyProduction(state, seconds = 1) {
   const rates = getProductionRates(state)
   const resources = {}
   Object.entries(state.resources).forEach(([key, val]) => {
@@ -28,10 +41,11 @@ export function processTick(state, seconds = 1) {
   Object.entries(rates).forEach(([res, rate]) => {
     const capacity = getCapacity(state, res)
     const current = resources[res]?.amount || 0
-    const nextAmount = Math.max(
-      0,
-      Math.min(capacity, current + rate * seconds),
-    )
+    const safeRate = Number.isFinite(rate) ? rate : 0
+    if (safeRate !== rate && process.env.NODE_ENV !== 'production') {
+      console.warn('Invalid production rate for', res, rate)
+    }
+    const nextAmount = clampResource(current + safeRate * seconds, capacity)
     const delta = nextAmount - current
     const stocks = resources[res]?.stocks || {}
     stocks.misc = (stocks.misc || 0) + delta
@@ -49,10 +63,20 @@ export function processTick(state, seconds = 1) {
     const mods = getSeasonMultiplier(season, resId, b)
     const effectiveGrowth = b.growthTime * mods.speed
     const effectiveHarvest = b.harvestAmount * mods.yield * b.yieldValue
+    if (
+      !Number.isFinite(effectiveGrowth) ||
+      !Number.isFinite(effectiveHarvest) ||
+      effectiveGrowth <= 0
+    ) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Invalid building production for', b.id)
+      }
+      return
+    }
     const group = { ...(timers[resId] || {}) }
     let timer = (group[b.id] ?? effectiveGrowth) - seconds
     let cycles = 0
-    while (timer <= 0) {
+    while (timer < 0) {
       cycles++
       timer += effectiveGrowth
     }
@@ -60,7 +84,7 @@ export function processTick(state, seconds = 1) {
       const capacity = getCapacity(state, resId)
       const current = resources[resId]?.amount || 0
       let next = current + effectiveHarvest * count * cycles
-      if (next > capacity) next = capacity
+      next = clampResource(next, capacity)
       const gain = next - current
       const stocks = resources[resId]?.stocks || {}
       const subCurrent = stocks[type] || 0
@@ -71,20 +95,45 @@ export function processTick(state, seconds = 1) {
     timers[resId] = group
   })
 
+  return { resources, timers }
+}
+
+export function processTick(state, seconds = 1) {
+  const { resources, timers } = applyProduction(state, seconds)
   return { ...state, resources, timers }
 }
 
 export function applyOfflineProgress(state, elapsedSeconds) {
   if (elapsedSeconds <= 0) return { state, gains: {} }
-  const nextState = processTick(state, elapsedSeconds)
+  const step = 60
+  let remaining = elapsedSeconds
+  let current = {
+    ...state,
+    resources: JSON.parse(JSON.stringify(state.resources)),
+    timers: JSON.parse(JSON.stringify(state.timers || {})),
+  }
+  while (remaining > 0) {
+    const dt = Math.min(step, remaining)
+    const { resources, timers } = applyProduction(current, dt)
+    current = {
+      ...current,
+      resources,
+      timers,
+      gameTime: {
+        ...(current.gameTime || {}),
+        seconds: (current.gameTime?.seconds || 0) + dt,
+      },
+    }
+    remaining -= dt
+  }
   const gains = {}
-  Object.keys(nextState.resources).forEach((res) => {
+  Object.keys(current.resources).forEach((res) => {
     const gain =
-      (nextState.resources[res]?.amount || 0) -
+      (current.resources[res]?.amount || 0) -
       (state.resources[res]?.amount || 0)
     if (gain > 0) gains[res] = gain
   })
-  return { state: nextState, gains }
+  return { state: current, gains }
 }
 
 export function demolishBuilding(state, buildingId) {
@@ -115,3 +164,4 @@ export function demolishBuilding(state, buildingId) {
   }
   return { ...state, resources, buildings, timers }
 }
+
