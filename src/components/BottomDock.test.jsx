@@ -20,5 +20,11 @@ describe('BottomDock accessibility', () => {
     labels.forEach((name) => {
       expect(screen.getByRole('button', { name })).toBeTruthy();
     });
+
+    const baseButton = screen.getByRole('button', { name: 'Base' });
+    expect(baseButton.getAttribute('aria-current')).toBe('page');
+
+    const popButton = screen.getByRole('button', { name: 'Population' });
+    expect(popButton.hasAttribute('aria-current')).toBe(false);
   });
 });
