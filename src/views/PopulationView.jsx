@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useGame } from '../state/useGame.js'
 import { formatAge } from '../utils/format.js'
 import {
@@ -8,7 +9,12 @@ import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js'
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame()
+  const [onlyLiving, setOnlyLiving] = useState(true)
+  const [unassignedOnly, setUnassignedOnly] = useState(false)
   const settlers = state.population?.settlers ?? []
+  const filtered = settlers
+    .filter((s) => (!onlyLiving || !s.isDead))
+    .filter((s) => (!unassignedOnly || s.role == null))
   const { assigned, living } = assignmentsSummary(settlers)
   const bonuses = computeRoleBonuses(settlers)
   const bonusLabels = {
@@ -37,8 +43,26 @@ export default function PopulationView() {
           </div>
         ))}
       </div>
-      {settlers.length > 0 ? (
-        settlers.map((s) => {
+      <div className="flex flex-wrap gap-4 text-sm">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={onlyLiving}
+            onChange={(e) => setOnlyLiving(e.target.checked)}
+          />
+          Only living
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={unassignedOnly}
+            onChange={(e) => setUnassignedOnly(e.target.checked)}
+          />
+          Unassigned only
+        </label>
+      </div>
+      {filtered.length > 0 ? (
+        filtered.map((s) => {
           const { years, days } = formatAge(s.ageSeconds)
           const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 }
           const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level)
