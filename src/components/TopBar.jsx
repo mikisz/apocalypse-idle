@@ -1,15 +1,13 @@
-import { useState } from 'react'
-import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js'
-import { useGame } from '../state/useGame.js'
+import { useState } from 'react';
+import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
+import { useGame } from '../state/useGame.js';
 
 export default function TopBar() {
-  const { state, toggleDrawer } = useGame()
-  const time = getTimeBreakdown(state)
-  const modifiers = getSeasonModifiers(state)
-  const [open, setOpen] = useState(false)
-
-  const first = Object.values(modifiers)[0] || { speed: 1, yield: 1 }
-  const labels = { speed: 'Growth', yield: 'Yield' }
+  const { state, toggleDrawer } = useGame();
+  const time = getTimeBreakdown(state);
+  const modifiers = getSeasonModifiers(state);
+  const [open, setOpen] = useState(false);
+  const labels = { FOOD: 'Food', RAW: 'Raw' };
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">
@@ -22,7 +20,7 @@ export default function TopBar() {
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          {time.season.icon} {time.season.label}, Day {time.dayInSeason}
+          {time.season.icon} {time.season.label}
         </button>
         {open && (
           <div
@@ -30,9 +28,9 @@ export default function TopBar() {
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
           >
-            {Object.entries(first).map(([key, val]) => (
+            {Object.entries(modifiers).map(([key, val]) => (
               <div key={key} className="whitespace-nowrap">
-                {(labels[key] || key)} x{val.toFixed(1)}
+                {(labels[key] || key)} x{val.toFixed(2)}
               </div>
             ))}
           </div>
@@ -45,6 +43,5 @@ export default function TopBar() {
         </button>
       </div>
     </header>
-  )
+  );
 }
-

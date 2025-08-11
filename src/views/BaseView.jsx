@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import { useGame } from '../state/useGame.js'
-import EventLog from '../components/EventLog.jsx'
-import ResourceSidebar from '../components/ResourceSidebar.jsx'
+import { useState } from 'react';
+import { useGame } from '../state/useGame.js';
+import EventLog from '../components/EventLog.jsx';
+import ResourceSidebar from '../components/ResourceSidebar.jsx';
 import {
-  FOOD_BUILDINGS,
-  RESOURCE_BUILDINGS,
+  PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,
-  INDUSTRY_BUILDINGS,
   getBuildingCost,
-} from '../data/buildings.js'
-import { getSeason, getSeasonMultiplier } from '../engine/time.js'
-import { getCapacity } from '../state/selectors.js'
-import { formatRate } from '../utils/format.js'
+} from '../data/buildings.js';
+import { RESOURCES } from '../data/resources.js';
+import { getSeason, getSeasonMultiplier } from '../engine/time.js';
+import { getCapacity } from '../state/selectors.js';
+import { formatAmount, formatRate } from '../utils/format.js';
+import { demolishBuilding } from '../engine/production.js';
 
 function AccordionItem({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen)
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-stroke">
       <button
@@ -26,80 +26,50 @@ function AccordionItem({ title, children, defaultOpen = false }) {
       </button>
       {open && <div className="p-2 space-y-2">{children}</div>}
     </div>
-  )
+  );
 }
 
 function BuildingRow({ building }) {
-  const { state, setState } = useGame()
-  const count = state.buildings[building.id]?.count || 0
-  const season = getSeason(state)
-  const mods = getSeasonMultiplier(season, building)
-  const effectiveCycle = building.cycleTimeSec * mods.speed
-  const effectiveHarvest =
-    building.harvestAmount * building.outputValue * mods.yield
-  const scaledCost = getBuildingCost(building, count)
-  const costEntries = Object.entries(scaledCost)
+  const { state, setState } = useGame();
+  const count = state.buildings[building.id]?.count || 0;
+  const season = getSeason(state);
+  const scaledCost = getBuildingCost(building, count);
+  const costEntries = Object.entries(scaledCost);
   const canAfford = costEntries.every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
-  )
+  );
+  const perOutputs = Object.entries(building.outputsPerSecBase || {}).map(
+    ([res, base]) => {
+      const mult = getSeasonMultiplier(season, RESOURCES[res].category);
+      return { res, perSec: base * mult };
+    },
+  );
 
   const build = () => {
-    if (!canAfford) return
+    if (!canAfford) return;
     setState((prev) => {
-      const resources = { ...prev.resources }
+      const resources = { ...prev.resources };
       costEntries.forEach(([res, amt]) => {
-        const current = prev.resources[res]?.amount || 0
-        resources[res] = { amount: current - amt }
-      })
-      const newCount = (prev.buildings[building.id]?.count || 0) + 1
+        const current = prev.resources[res]?.amount || 0;
+        resources[res] = { amount: current - amt };
+      });
+      const newCount = count + 1;
       const buildings = {
         ...prev.buildings,
-        [building.id]: { ...(prev.buildings[building.id] || {}), count: newCount },
-      }
-      let timers = { ...prev.timers }
-      if (building.cycleTimeSec) {
-        const group = { ...(prev.timers?.[building.outputResource] || {}) }
-        group[building.id] = group[building.id] ?? effectiveCycle
-        timers = { ...prev.timers, [building.outputResource]: group }
-      }
-      // clamp resources to new capacities
+        [building.id]: { count: newCount },
+      };
       Object.keys(resources).forEach((res) => {
-        const cap = getCapacity({ ...prev, buildings }, res)
-        resources[res].amount = Math.min(cap, resources[res].amount)
-      })
-      return { ...prev, resources, buildings, timers }
-    })
-  }
+        const cap = getCapacity({ ...prev, buildings }, res);
+        resources[res].amount = Math.min(cap, resources[res].amount);
+      });
+      return { ...prev, resources, buildings };
+    });
+  };
 
   const demolish = () => {
-    if (count <= 0) return
-    setState((prev) => {
-      const resources = { ...prev.resources }
-      const prevCost = getBuildingCost(building, count - 1)
-      Object.entries(prevCost).forEach(([res, amt]) => {
-        const refund = Math.floor(amt * 0.5)
-        const current = prev.resources[res]?.amount || 0
-        resources[res] = { amount: current + refund }
-      })
-      const newCount = (prev.buildings[building.id]?.count || 0) - 1
-      const buildings = {
-        ...prev.buildings,
-        [building.id]: { ...(prev.buildings[building.id] || {}), count: newCount },
-      }
-      let timers = { ...prev.timers }
-      if (building.cycleTimeSec) {
-        const group = { ...(prev.timers?.[building.outputResource] || {}) }
-        if (newCount <= 0) delete group[building.id]
-        timers = { ...prev.timers, [building.outputResource]: group }
-      }
-      // clamp resources after capacity change
-      Object.keys(resources).forEach((res) => {
-        const cap = getCapacity({ ...prev, buildings }, res)
-        resources[res].amount = Math.min(cap, resources[res].amount)
-      })
-      return { ...prev, resources, buildings, timers }
-    })
-  }
+    if (count <= 0) return;
+    setState((prev) => demolishBuilding(prev, building.id));
+  };
 
   return (
     <div className="p-2 rounded border border-stroke bg-bg2 space-y-1">
@@ -124,27 +94,36 @@ function BuildingRow({ building }) {
           </button>
         </div>
       </div>
-      <div className="text-xs text-muted">
-        <div>Cost: {costEntries.map(([res, amt]) => `${amt} ${res}`).join(', ')}</div>
-        {building.cycleTimeSec && (
-          <div>
-            {formatRate({ amountPerHarvest: effectiveHarvest, intervalSec: effectiveCycle })}
+      <div className="text-xs text-muted space-y-1">
+        <div>{building.description}</div>
+        <div>
+          Cost:{' '}
+          {costEntries
+            .map(([res, amt]) => `${formatAmount(amt)} ${RESOURCES[res].name}`)
+            .join(', ')}
+        </div>
+        {perOutputs.map((o) => (
+          <div key={o.res}>
+            {RESOURCES[o.res].name} {formatRate(o.perSec)}
           </div>
-        )}
-        {building.addsCapacity && (
+        ))}
+        {building.capacityAdd && (
           <div>
-            {Object.entries(building.addsCapacity)
-              .map(([res, cap]) => `+${cap} ${res} cap`)
+            {Object.entries(building.capacityAdd)
+              .map(
+                ([res, cap]) =>
+                  `+${formatAmount(cap)} ${RESOURCES[res].name} cap`,
+              )
               .join(', ')}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default function BaseView() {
-  const { state } = useGame()
+  const { state } = useGame();
   return (
     <div className="p-4 space-y-6 pb-20 md:flex md:space-y-0 md:space-x-6">
       <div className="md:w-64 md:flex-shrink-0">
@@ -152,23 +131,13 @@ export default function BaseView() {
       </div>
       <div className="flex-1 space-y-6">
         <div className="border border-stroke rounded">
-          <AccordionItem title="Food" defaultOpen>
-            {FOOD_BUILDINGS.map((b) => (
-              <BuildingRow key={b.id} building={b} />
-            ))}
-          </AccordionItem>
-          <AccordionItem title="Resources">
-            {RESOURCE_BUILDINGS.map((b) => (
+          <AccordionItem title="Production" defaultOpen>
+            {PRODUCTION_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
           </AccordionItem>
           <AccordionItem title="Storage">
             {STORAGE_BUILDINGS.map((b) => (
-              <BuildingRow key={b.id} building={b} />
-            ))}
-          </AccordionItem>
-          <AccordionItem title="Industry">
-            {INDUSTRY_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
           </AccordionItem>
@@ -179,5 +148,5 @@ export default function BaseView() {
         </div>
       </div>
     </div>
-  )
+  );
 }

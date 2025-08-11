@@ -1,10 +1,10 @@
 export const RESOURCES = {
-  food: { id: 'food', name: 'Food', tier: 0, type: 'consumable', category: 'food', baseCapacity: 300, perStorage: 200, seasonalKeys: ['farmingSpeed', 'farmingYield'] },
-  wood: { id: 'wood', name: 'Wood', tier: 0, type: 'raw', category: 'resources', baseCapacity: 100, perStorage: 200, seasonalKeys: ['workSpeed', 'workYield'] },
-  plank: { id: 'plank', name: 'Planks', tier: 1, type: 'processed', category: 'resources', baseCapacity: 0, perStorage: 0, seasonalKeys: ['workSpeed', 'workYield'] },
-  scrap: { id: 'scrap', name: 'Scrap', tier: 0, type: 'raw', category: 'resources', baseCapacity: 100, perStorage: 200, seasonalKeys: ['workSpeed'] },
-  metal: { id: 'metal', name: 'Metal Bars', tier: 1, type: 'processed', category: 'resources', baseCapacity: 0, perStorage: 0, seasonalKeys: ['smeltingSpeed', 'smeltingYield'] },
-  water: { id: 'water', name: 'Water', tier: 0, type: 'consumable', category: 'food', baseCapacity: 100, perStorage: 200, seasonalKeys: ['workSpeed', 'seasonRain'] },
-}
+  potatoes: { id: 'potatoes', name: 'Potatoes', category: 'FOOD', startingAmount: 0, startingCapacity: 300 },
+  corn: { id: 'corn', name: 'Corn', category: 'FOOD', startingAmount: 0, startingCapacity: 300 },
+  rice: { id: 'rice', name: 'Rice', category: 'FOOD', startingAmount: 0, startingCapacity: 300 },
+  wood: { id: 'wood', name: 'Wood', category: 'RAW', startingAmount: 0, startingCapacity: 100 },
+  stone: { id: 'stone', name: 'Stone', category: 'RAW', startingAmount: 0, startingCapacity: 100 },
+  scrap: { id: 'scrap', name: 'Scrap', category: 'RAW', startingAmount: 0, startingCapacity: 100 },
+};
 
-export const RESOURCE_LIST = Object.values(RESOURCES)
+export const RESOURCE_LIST = Object.values(RESOURCES);
