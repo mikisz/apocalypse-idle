@@ -1,0 +1,55 @@
+import { describe, it, expect } from 'vitest';
+import { load, validateSave, CURRENT_SAVE_VERSION } from '../persistence.js';
+
+describe('persistence migrations and validation', () => {
+  it('migrates v2 saves to include new fields', () => {
+    const oldSave = {
+      version: 2,
+      resources: {},
+      buildings: {},
+      population: {},
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(2);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.ui).toEqual({
+      activeTab: 'base',
+      drawerOpen: false,
+      offlineProgress: null,
+    });
+    expect(Array.isArray(state.log)).toBe(true);
+    expect(Array.isArray(state.population.settlers)).toBe(true);
+    expect(state.research).toMatchObject({
+      current: null,
+      completed: [],
+      progress: {},
+    });
+  });
+
+  it('fails validation when essential data is missing', () => {
+    const base = {
+      version: 3,
+      resources: {},
+      buildings: {},
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [] },
+    };
+
+    const missingUi = { ...base };
+    delete missingUi.ui;
+    expect(() => validateSave(missingUi)).toThrow();
+
+    const missingLog = { ...base, log: undefined };
+    expect(() => validateSave(missingLog)).toThrow();
+
+    const missingResearch = { ...base };
+    delete missingResearch.research;
+    expect(() => validateSave(missingResearch)).toThrow();
+
+    const missingSettlers = { ...base, population: {} };
+    expect(() => validateSave(missingSettlers)).toThrow();
+  });
+});
