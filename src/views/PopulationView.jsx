@@ -2,14 +2,16 @@ import { useGame } from '../state/useGame.js'
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame()
+  const settlers = state.population?.settlers ?? []
 
   return (
     <div className="p-4 space-y-4 pb-20">
-      {state.population.settlers.map((s) => (
-        <div
-          key={s.id}
-          className="border border-stroke rounded p-3 bg-bg2/50 flex flex-col gap-2"
-        >
+      {settlers.length > 0 ? (
+        settlers.map((s) => (
+          <div
+            key={s.id}
+            className="border border-stroke rounded p-3 bg-bg2/50 flex flex-col gap-2"
+          >
           <div className="font-semibold">
             {s.firstName} {s.lastName}
           </div>
@@ -45,7 +47,10 @@ export default function PopulationView() {
             </span>
           </div>
         </div>
-      ))}
+        ))
+      ) : (
+        <div className="text-center text-muted">No survivors</div>
+      )}
     </div>
   )
 }
