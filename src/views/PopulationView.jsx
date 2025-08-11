@@ -3,6 +3,8 @@ import { useGame } from '../state/useGame.js';
 import { formatAge } from '../utils/format.js';
 import { assignmentsSummary, computeRoleBonuses } from '../engine/settlers.js';
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
+import { ROLE_LIST, SKILL_LABELS } from '../data/roles.js';
+import { RESOURCES } from '../data/resources.js';
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame();
@@ -14,10 +16,10 @@ export default function PopulationView() {
     .filter((s) => !unassignedOnly || s.role == null);
   const { assigned, living } = assignmentsSummary(settlers);
   const bonuses = computeRoleBonuses(settlers);
-  const bonusLabels = {
-    farming: 'Food',
-    scavenging: 'Raw',
-  };
+  const bonusLabels = {};
+  ROLE_LIST.forEach((r) => {
+    bonusLabels[r.id] = RESOURCES[r.resource].name;
+  });
 
   return (
     <div className="p-4 space-y-4 pb-20">
@@ -60,13 +62,17 @@ export default function PopulationView() {
       </div>
       {filtered.length > 0 ? (
         filtered.map((s) => {
-          const { years, days } = formatAge(s.ageSeconds);
+          const { years, days } = formatAge(s.ageDays);
           const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 };
           const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level);
           const progress = threshold > 0 ? activeSkill.xp / threshold : 0;
-          const otherSkills = Object.entries(s.skills || {}).filter(
-            ([role]) => role !== s.role,
-          );
+          const badges = Object.entries(s.skills || {})
+            .filter(([, skill]) => skill.level > 0)
+            .map(([role, skill]) => (
+              <span key={role} className="px-2 py-0.5 bg-bg3 rounded text-xs">
+                {SKILL_LABELS[role] || role} {skill.level}
+              </span>
+            ));
           return (
             <div
               key={s.id}
@@ -93,9 +99,12 @@ export default function PopulationView() {
                   onChange={(e) => setSettlerRole(s.id, e.target.value)}
                   className="appearance-none w-full rounded bg-gray-800 text-white px-3 py-2 pr-8 hover:bg-gray-700 focus:outline-none"
                 >
-                  <option value="idle">idle</option>
-                  <option value="farming">farming</option>
-                  <option value="scavenging">scavenging</option>
+                  <option value="idle">Idle</option>
+                  {ROLE_LIST.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
                 </select>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <span className="w-2 h-2 border-r-2 border-b-2 border-white rotate-45" />
@@ -110,18 +119,7 @@ export default function PopulationView() {
                   />
                 </div>
               </div>
-              {otherSkills.length > 0 && (
-                <details className="text-sm">
-                  <summary>Other roles</summary>
-                  <ul className="pl-4 list-disc space-y-0.5">
-                    {otherSkills.map(([role, skill]) => (
-                      <li key={role}>
-                        {role}: lvl {skill.level}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
+              <div className="flex flex-wrap gap-1">{badges}</div>
             </div>
           );
         })
