@@ -8,9 +8,9 @@ export function getCapacity(state, resourceId) {
 }
 
 export function getResourceProductionSummary(state) {
-  const summaries = {}
   const mods = getSeasonModifiers(state)
-  const grouped = {}
+  const groupedCategories = {}
+  const groupedTypes = {}
   BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0
     if (count > 0 && b.growthTime) {
@@ -18,26 +18,38 @@ export function getResourceProductionSummary(state) {
       const effectiveHarvest =
         b.harvestAmount * mods.farmingYield * b.yieldValue
       const res = b.resource
-      grouped[res] = grouped[res] || []
-      grouped[res].push({
+      groupedCategories[res] = groupedCategories[res] || []
+      groupedCategories[res].push({
+        amountPerHarvest: effectiveHarvest * count,
+        intervalSec: effectiveGrowth,
+      })
+      const type = b.type
+      groupedTypes[type] = groupedTypes[type] || []
+      groupedTypes[type].push({
         amountPerHarvest: effectiveHarvest * count,
         intervalSec: effectiveGrowth,
       })
     }
   })
-  Object.entries(grouped).forEach(([res, arr]) => {
-    if (arr.length === 1) {
-      const r = arr[0]
-      summaries[res] = { ...r, label: formatRate(r) }
-    } else if (arr.length > 1) {
-      const perSec = arr.reduce(
-        (sum, r) => sum + r.amountPerHarvest / r.intervalSec,
-        0,
-      )
-      summaries[res] = { perSec, label: `+${perSec.toFixed(2)}/s` }
-    } else {
-      summaries[res] = { perSec: 0, label: '+0/s' }
-    }
-  })
+
+  const summaries = { categories: {}, types: {} }
+  const build = (group, target) => {
+    Object.entries(group).forEach(([key, arr]) => {
+      if (arr.length === 1) {
+        const r = arr[0]
+        target[key] = { ...r, label: formatRate(r) }
+      } else if (arr.length > 1) {
+        const perSec = arr.reduce(
+          (sum, r) => sum + r.amountPerHarvest / r.intervalSec,
+          0,
+        )
+        target[key] = { perSec, label: `+${perSec.toFixed(2)}/s` }
+      } else {
+        target[key] = { perSec: 0, label: '+0/s' }
+      }
+    })
+  }
+  build(groupedCategories, summaries.categories)
+  build(groupedTypes, summaries.types)
   return summaries
 }

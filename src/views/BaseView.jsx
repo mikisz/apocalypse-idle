@@ -41,7 +41,19 @@ function BuildingRow({ building }) {
       const resources = { ...prev.resources }
       costEntries.forEach(([res, amt]) => {
         const current = prev.resources[res]?.amount || 0
-        resources[res] = { ...prev.resources[res], amount: current - amt }
+        const stocks = {
+          ...(prev.resources[res]?.stocks || {}),
+        }
+        const keys = Object.keys(stocks)
+        if (keys.length > 0) {
+          const key = keys[0]
+          stocks[key] = Math.max(0, (stocks[key] || 0) - amt)
+        }
+        resources[res] = {
+          ...prev.resources[res],
+          amount: current - amt,
+          stocks,
+        }
       })
       const newCount = (prev.buildings[building.id]?.count || 0) + 1
       const buildings = {
@@ -68,7 +80,13 @@ function BuildingRow({ building }) {
         const capacity = getCapacity(prev, res)
         const current = prev.resources[res]?.amount || 0
         const next = Math.min(capacity, current + refund)
-        resources[res] = { ...prev.resources[res], amount: next }
+        const stocks = {
+          ...(prev.resources[res]?.stocks || {}),
+        }
+        const keys = Object.keys(stocks)
+        const key = keys[0] || res
+        stocks[key] = (stocks[key] || 0) + refund
+        resources[res] = { ...prev.resources[res], amount: next, stocks }
       })
       const newCount = (prev.buildings[building.id]?.count || 0) - 1
       const buildings = {
