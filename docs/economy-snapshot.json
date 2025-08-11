@@ -1,0 +1,338 @@
+{
+  "version": "bbcec0abfb9fbb25d8a5b49d06f567ef68ca3f94",
+  "saveVersion": 2,
+  "tickSeconds": 1,
+  "seasons": {
+    "spring": {
+      "durationSec": 270,
+      "multipliers": {
+        "food": 1.375,
+        "wood": 1.375,
+        "plank": 1.375,
+        "scrap": 1.375,
+        "metal": 1,
+        "water": 1.25
+      }
+    },
+    "summer": {
+      "durationSec": 270,
+      "multipliers": {
+        "food": 1,
+        "wood": 1,
+        "plank": 1,
+        "scrap": 1,
+        "metal": 1,
+        "water": 1
+      }
+    },
+    "autumn": {
+      "durationSec": 270,
+      "multipliers": {
+        "food": 0.9090909090909091,
+        "wood": 0.9090909090909091,
+        "plank": 0.9090909090909091,
+        "scrap": 0.9090909090909091,
+        "metal": 1,
+        "water": 0.9090909090909091
+      }
+    },
+    "winter": {
+      "durationSec": 270,
+      "multipliers": {
+        "food": 0,
+        "wood": 0,
+        "plank": 0,
+        "scrap": 0,
+        "metal": 1,
+        "water": 0.5
+      }
+    }
+  },
+  "resources": [
+    {
+      "key": "food",
+      "displayName": "Food",
+      "category": "food",
+      "startingAmount": 0,
+      "startingCapacity": 300,
+      "unit": null
+    },
+    {
+      "key": "wood",
+      "displayName": "Wood",
+      "category": "resources",
+      "startingAmount": 0,
+      "startingCapacity": 100,
+      "unit": null
+    },
+    {
+      "key": "plank",
+      "displayName": "Planks",
+      "category": "resources",
+      "startingAmount": 0,
+      "startingCapacity": 0,
+      "unit": null
+    },
+    {
+      "key": "scrap",
+      "displayName": "Scrap",
+      "category": "resources",
+      "startingAmount": 0,
+      "startingCapacity": 100,
+      "unit": null
+    },
+    {
+      "key": "metal",
+      "displayName": "Metal Bars",
+      "category": "resources",
+      "startingAmount": 0,
+      "startingCapacity": 0,
+      "unit": null
+    },
+    {
+      "key": "water",
+      "displayName": "Water",
+      "category": "food",
+      "startingAmount": 0,
+      "startingCapacity": 100,
+      "unit": null
+    }
+  ],
+  "buildings": [
+    {
+      "id": "potatoField",
+      "name": "Potato Field",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 0,
+        "wood": 20,
+        "plank": 0,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "food": 0.375
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "cornField",
+      "name": "Corn Field",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 0,
+        "wood": 30,
+        "plank": 0,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "food": 0.4
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "ricePaddy",
+      "name": "Rice Paddy",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 0,
+        "wood": 15,
+        "plank": 0,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "food": 0.3333333333333333
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "loggingCamp",
+      "name": "Logging Camp",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 50,
+        "wood": 0,
+        "plank": 0,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "wood": 0.16666666666666666
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "sawmill",
+      "name": "Sawmill",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 30,
+        "wood": 40,
+        "plank": 10,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "plank": 0.25
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "scrapYard",
+      "name": "Scrap Yard",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 0,
+        "wood": 0,
+        "plank": 0,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "scrap": 0.14285714285714285
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.375,
+        "summer": 1,
+        "autumn": 0.9090909090909091,
+        "winter": 0
+      }
+    },
+    {
+      "id": "smelter",
+      "name": "Smelter",
+      "type": "production",
+      "constructionCost": {
+        "scrap": 100,
+        "wood": 50,
+        "plank": 20,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "metal": 0.1
+      },
+      "seasonalMode": "default",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      }
+    },
+    {
+      "id": "granary",
+      "name": "Granary",
+      "type": "storage",
+      "constructionCost": {
+        "scrap": 20,
+        "wood": 60,
+        "plank": 10,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {
+        "food": 200
+      },
+      "baseProductionPerSec": {},
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {}
+    },
+    {
+      "id": "warehouse",
+      "name": "Warehouse",
+      "type": "storage",
+      "constructionCost": {
+        "scrap": 30,
+        "wood": 80,
+        "plank": 20,
+        "metal": 0
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {
+        "wood": 200,
+        "scrap": 200
+      },
+      "baseProductionPerSec": {},
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {}
+    }
+  ],
+  "roles": [],
+  "formula": {
+    "order": [
+      "base",
+      "season",
+      "roles",
+      "sum",
+      "clamp"
+    ],
+    "demolitionRefund": 0.5,
+    "clampRule": "min(value, capacity) and never negative"
+  },
+  "startingState": {
+    "season": "spring",
+    "year": 1,
+    "resources": {
+      "food": 0,
+      "wood": 0,
+      "plank": 0,
+      "scrap": 0,
+      "metal": 0,
+      "water": 0
+    },
+    "buildings": {
+      "potatoField": 1,
+      "loggingCamp": 1
+    }
+  }
+}
