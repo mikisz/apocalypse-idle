@@ -5,11 +5,7 @@ import { execSync } from 'child_process';
 
 import { BUILDINGS } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
-import {
-  initSeasons,
-  SECONDS_PER_DAY,
-  getSeasonMultiplier,
-} from '../src/engine/time.js';
+import { initSeasons, getSeasonMultiplier, SEASON_DURATION } from '../src/engine/time.js';
 import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js';
 import { defaultState } from '../src/state/defaultState.js';
 import { getCapacity } from '../src/state/selectors.js';
@@ -34,20 +30,8 @@ const seasons = initSeasons();
 const resourceKeys = Object.keys(RESOURCES);
 
 function computeResourceMultiplier(resId, season) {
-  const building = BUILDINGS.find((b) => b.outputResource === resId);
-  let speedKey;
-  let yieldKey;
-  if (building) {
-    speedKey = building.seasonSpeedKey;
-    yieldKey = building.seasonYieldKey;
-  } else {
-    const keys = RESOURCES[resId]?.seasonalKeys || [];
-    speedKey = keys[0];
-    yieldKey = keys[1];
-  }
-  const speed = season.modifiers?.[speedKey] ?? 1;
-  const yieldMult = yieldKey ? (season.modifiers?.[yieldKey] ?? 1) : 1;
-  return yieldMult / speed;
+  const category = RESOURCES[resId]?.category;
+  return getSeasonMultiplier(season, category);
 }
 
 const seasonData = {};
@@ -56,7 +40,7 @@ seasons.forEach((s) => {
   resourceKeys.forEach((r) => {
     multipliers[r] = computeResourceMultiplier(r, s);
   });
-  seasonData[s.id] = { durationSec: s.days * SECONDS_PER_DAY, multipliers };
+  seasonData[s.id] = { durationSec: SEASON_DURATION, multipliers };
 });
 
 const resources = resourceKeys.map((id) => {
@@ -72,22 +56,27 @@ const resources = resourceKeys.map((id) => {
 });
 
 function buildingType(b) {
-  if (b.addsCapacity) return 'storage';
-  if (b.cycleTimeSec) return 'production';
-  return 'other';
+  return b.type || (b.capacityAdd ? 'storage' : 'other');
 }
 
 function baseProductionPerSec(b) {
-  if (!b.cycleTimeSec || !b.outputResource) return {};
-  const rate = (b.harvestAmount * b.outputValue) / b.cycleTimeSec;
-  return { [b.outputResource]: rate };
+  return { ...(b.outputsPerSecBase || {}) };
+}
+
+function getBuildingSeasonModifiers(building, season) {
+  const outputs = Object.keys(building.outputsPerSecBase || {});
+  const res = outputs[0];
+  if (!res) return { speed: 1, yield: 1 };
+  const category = RESOURCES[res]?.category;
+  const mult = getSeasonMultiplier(season, category);
+  return { speed: 1, yield: mult };
 }
 
 function buildingSeasonMultipliers(b) {
-  if (!b.cycleTimeSec) return {};
+  if (!b.outputsPerSecBase) return {};
   const result = {};
   seasons.forEach((s) => {
-    const mods = getSeasonMultiplier(s, b);
+    const mods = getBuildingSeasonModifiers(b, s);
     result[s.id] = (mods.yield ?? 1) / (mods.speed ?? 1);
   });
   return result;

@@ -1,58 +1,62 @@
 {
-  "version": "bbcec0abfb9fbb25d8a5b49d06f567ef68ca3f94",
-  "saveVersion": 2,
+  "version": "d569ef1fc8d61e5b00e36debd246dfcdfd144d7b",
+  "saveVersion": 3,
   "tickSeconds": 1,
   "seasons": {
     "spring": {
       "durationSec": 270,
       "multipliers": {
-        "food": 1.375,
-        "wood": 1.375,
-        "plank": 1.375,
-        "scrap": 1.375,
-        "metal": 1,
-        "water": 1.25
+        "potatoes": 1.25,
+        "wood": 1.1,
+        "stone": 1.1,
+        "scrap": 1.1,
+        "planks": 1,
+        "metalParts": 1,
+        "science": 1
       }
     },
     "summer": {
       "durationSec": 270,
       "multipliers": {
-        "food": 1,
+        "potatoes": 1,
         "wood": 1,
-        "plank": 1,
+        "stone": 1,
         "scrap": 1,
-        "metal": 1,
-        "water": 1
+        "planks": 1,
+        "metalParts": 1,
+        "science": 1
       }
     },
     "autumn": {
       "durationSec": 270,
       "multipliers": {
-        "food": 0.9090909090909091,
-        "wood": 0.9090909090909091,
-        "plank": 0.9090909090909091,
-        "scrap": 0.9090909090909091,
-        "metal": 1,
-        "water": 0.9090909090909091
+        "potatoes": 0.85,
+        "wood": 0.9,
+        "stone": 0.9,
+        "scrap": 0.9,
+        "planks": 1,
+        "metalParts": 1,
+        "science": 1
       }
     },
     "winter": {
       "durationSec": 270,
       "multipliers": {
-        "food": 0,
-        "wood": 0,
-        "plank": 0,
-        "scrap": 0,
-        "metal": 1,
-        "water": 0.5
+        "potatoes": 0,
+        "wood": 0.8,
+        "stone": 0.8,
+        "scrap": 0.8,
+        "planks": 1,
+        "metalParts": 1,
+        "science": 1
       }
     }
   },
   "resources": [
     {
-      "key": "food",
-      "displayName": "Food",
-      "category": "food",
+      "key": "potatoes",
+      "displayName": "Potatoes",
+      "category": "FOOD",
       "startingAmount": 0,
       "startingCapacity": 300,
       "unit": null
@@ -60,41 +64,49 @@
     {
       "key": "wood",
       "displayName": "Wood",
-      "category": "resources",
+      "category": "RAW",
       "startingAmount": 0,
       "startingCapacity": 100,
       "unit": null
     },
     {
-      "key": "plank",
-      "displayName": "Planks",
-      "category": "resources",
+      "key": "stone",
+      "displayName": "Stone",
+      "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 0,
+      "startingCapacity": 100,
       "unit": null
     },
     {
       "key": "scrap",
       "displayName": "Scrap",
-      "category": "resources",
+      "category": "RAW",
       "startingAmount": 0,
       "startingCapacity": 100,
       "unit": null
     },
     {
-      "key": "metal",
-      "displayName": "Metal Bars",
-      "category": "resources",
+      "key": "planks",
+      "displayName": "Planks",
+      "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
       "startingCapacity": 0,
       "unit": null
     },
     {
-      "key": "water",
-      "displayName": "Water",
-      "category": "food",
+      "key": "metalParts",
+      "displayName": "Metal Parts",
+      "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
-      "startingCapacity": 100,
+      "startingCapacity": 0,
+      "unit": null
+    },
+    {
+      "key": "science",
+      "displayName": "Science",
+      "category": "SOCIETY",
+      "startingAmount": 0,
+      "startingCapacity": 400,
       "unit": null
     }
   ],
@@ -103,71 +115,18 @@
       "id": "potatoField",
       "name": "Potato Field",
       "type": "production",
-      "constructionCost": {
-        "scrap": 0,
-        "wood": 20,
-        "plank": 0,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "food": 0.375
+        "potatoes": 0.375
       },
-      "seasonalMode": "default",
+      "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
-        "spring": 1.375,
+        "spring": 1.25,
         "summer": 1,
-        "autumn": 0.9090909090909091,
-        "winter": 0
-      }
-    },
-    {
-      "id": "cornField",
-      "name": "Corn Field",
-      "type": "production",
-      "constructionCost": {
-        "scrap": 0,
-        "wood": 30,
-        "plank": 0,
-        "metal": 0
-      },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
-        "food": 0.4
-      },
-      "seasonalMode": "default",
-      "seasonalCustom": null,
-      "seasonalMultipliers": {
-        "spring": 1.375,
-        "summer": 1,
-        "autumn": 0.9090909090909091,
-        "winter": 0
-      }
-    },
-    {
-      "id": "ricePaddy",
-      "name": "Rice Paddy",
-      "type": "production",
-      "constructionCost": {
-        "scrap": 0,
-        "wood": 15,
-        "plank": 0,
-        "metal": 0
-      },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
-        "food": 0.3333333333333333
-      },
-      "seasonalMode": "default",
-      "seasonalCustom": null,
-      "seasonalMultipliers": {
-        "spring": 1.375,
-        "summer": 1,
-        "autumn": 0.9090909090909091,
+        "autumn": 0.85,
         "winter": 0
       }
     },
@@ -175,90 +134,70 @@
       "id": "loggingCamp",
       "name": "Logging Camp",
       "type": "production",
-      "constructionCost": {
-        "scrap": 50,
-        "wood": 0,
-        "plank": 0,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "wood": 0.16666666666666666
+        "wood": 0.2
       },
-      "seasonalMode": "default",
+      "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
-        "spring": 1.375,
+        "spring": 1.1,
         "summer": 1,
-        "autumn": 0.9090909090909091,
-        "winter": 0
+        "autumn": 0.9,
+        "winter": 0.8
       }
     },
     {
-      "id": "sawmill",
-      "name": "Sawmill",
-      "type": "production",
-      "constructionCost": {
-        "scrap": 30,
-        "wood": 40,
-        "plank": 10,
-        "metal": 0
-      },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
-        "plank": 0.25
-      },
-      "seasonalMode": "default",
-      "seasonalCustom": null,
-      "seasonalMultipliers": {
-        "spring": 1.375,
-        "summer": 1,
-        "autumn": 0.9090909090909091,
-        "winter": 0
-      }
-    },
-    {
-      "id": "scrapYard",
+      "id": "scrapyard",
       "name": "Scrap Yard",
       "type": "production",
-      "constructionCost": {
-        "scrap": 0,
-        "wood": 0,
-        "plank": 0,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "scrap": 0.14285714285714285
+        "scrap": 0.06
       },
-      "seasonalMode": "default",
+      "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
-        "spring": 1.375,
+        "spring": 1.1,
         "summer": 1,
-        "autumn": 0.9090909090909091,
-        "winter": 0
+        "autumn": 0.9,
+        "winter": 0.8
       }
     },
     {
-      "id": "smelter",
-      "name": "Smelter",
+      "id": "quarry",
+      "name": "Quarry",
       "type": "production",
-      "constructionCost": {
-        "scrap": 100,
-        "wood": 50,
-        "plank": 20,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "metal": 0.1
+        "stone": 0.08
       },
-      "seasonalMode": "default",
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1.1,
+        "summer": 1,
+        "autumn": 0.9,
+        "winter": 0.8
+      }
+    },
+    {
+      "id": "school",
+      "name": "School",
+      "type": "production",
+      "constructionCost": {},
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "science": 0.5
+      },
+      "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
         "spring": 1,
@@ -268,39 +207,24 @@
       }
     },
     {
-      "id": "granary",
+      "id": "foodStorage",
       "name": "Granary",
       "type": "storage",
-      "constructionCost": {
-        "scrap": 20,
-        "wood": 60,
-        "plank": 10,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
-      "storageProvided": {
-        "food": 200
-      },
+      "storageProvided": {},
       "baseProductionPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {}
     },
     {
-      "id": "warehouse",
+      "id": "rawStorage",
       "name": "Warehouse",
       "type": "storage",
-      "constructionCost": {
-        "scrap": 30,
-        "wood": 80,
-        "plank": 20,
-        "metal": 0
-      },
+      "constructionCost": {},
       "demolitionRefund": 0.5,
-      "storageProvided": {
-        "wood": 200,
-        "scrap": 200
-      },
+      "storageProvided": {},
       "baseProductionPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
@@ -309,7 +233,13 @@
   ],
   "roles": [],
   "formula": {
-    "order": ["base", "season", "roles", "sum", "clamp"],
+    "order": [
+      "base",
+      "season",
+      "roles",
+      "sum",
+      "clamp"
+    ],
     "demolitionRefund": 0.5,
     "clampRule": "min(value, capacity) and never negative"
   },
@@ -317,16 +247,14 @@
     "season": "spring",
     "year": 1,
     "resources": {
-      "food": 0,
+      "potatoes": 0,
       "wood": 0,
-      "plank": 0,
+      "stone": 0,
       "scrap": 0,
-      "metal": 0,
-      "water": 0
+      "planks": 0,
+      "metalParts": 0,
+      "science": 0
     },
-    "buildings": {
-      "potatoField": 1,
-      "loggingCamp": 1
-    }
+    "buildings": {}
   }
 }
