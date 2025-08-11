@@ -17,3 +17,10 @@ export function formatRate(perSec) {
   if (!Number.isFinite(perSec)) perSec = 0;
   return `+${formatAmount(perSec)}/s`;
 }
+
+export function formatAge(ageSeconds = 0) {
+  const totalDays = Math.floor((ageSeconds || 0) / 86400);
+  const years = Math.floor(totalDays / 365);
+  const days = totalDays % 365;
+  return { years, days };
+}
