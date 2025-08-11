@@ -1,4 +1,6 @@
-export default function EventLog({ log }) {
+import React from 'react';
+
+export default function EventLog({ log = [] }) {
   return (
     <ul className="text-sm space-y-1">
       {log.map((entry, i) => (
