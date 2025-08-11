@@ -1,24 +1,8 @@
-import { useState } from 'react';
 import { useGame } from '../state/useGame.js';
+import Accordion from './Accordion.jsx';
 import { getCapacity, getResourceRates } from '../state/selectors.js';
 import { formatAmount } from '../utils/format.js';
 import { RESOURCE_LIST } from '../data/resources.js';
-
-function Accordion({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="border-b border-stroke">
-      <button
-        className="w-full flex items-center justify-between p-2"
-        onClick={() => setOpen(!open)}
-      >
-        <span>{title}</span>
-        <span>{open ? '-' : '+'}</span>
-      </button>
-      {open && <div className="p-2 space-y-2">{children}</div>}
-    </div>
-  );
-}
 
 function ResourceRow({ icon, name, amount, capacity, rate }) {
   return (
