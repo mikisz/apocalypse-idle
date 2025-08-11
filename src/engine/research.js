@@ -41,12 +41,13 @@ export function cancelResearch(state) {
   };
 }
 
-export function processResearchTick(state, seconds = 1) {
+export function processResearchTick(state, seconds = 1, roleBonuses = {}) {
   const current = state.research.current;
   if (!current) return state;
   const node = RESEARCH_MAP[current.id];
   const prev = state.research.progress[current.id] || 0;
-  const next = prev + seconds;
+  const bonusPercent = roleBonuses['scientist'] || 0;
+  const next = prev + seconds * (1 + bonusPercent / 100);
   const progress = { ...state.research.progress, [current.id]: next };
   if (next >= node.timeSec) {
     const completed = [...state.research.completed, current.id];
