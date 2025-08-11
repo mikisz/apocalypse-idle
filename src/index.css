@@ -1,0 +1,7 @@
+@tailwindcss base;
+@tailwindcss components;
+@tailwindcss utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body { @apply bg-bg text-ink antialiased; }
