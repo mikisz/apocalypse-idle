@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { GameContext } from './useGame.js';
 import useGameLoop from '../engine/useGameLoop.js';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
@@ -20,6 +26,20 @@ import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BUILDINGS } from '../data/roles.js';
 
+function mergeDeep(target, source) {
+  const out = { ...target };
+  Object.keys(source).forEach((key) => {
+    const srcVal = source[key];
+    const tgtVal = target?.[key];
+    if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
+      out[key] = mergeDeep(tgtVal || {}, srcVal);
+    } else if (srcVal !== undefined) {
+      out[key] = srcVal;
+    }
+  });
+  return out;
+}
+
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
     const loaded = loadGame();
@@ -28,10 +48,10 @@ export function GameProvider({ children }) {
         typeof loaded.gameTime === 'number'
           ? { seconds: loaded.gameTime }
           : loaded.gameTime || { seconds: 0 };
-      const meta = { seasons: initSeasons() };
-      const base = { ...loaded, gameTime, meta };
-      const prevYear = gameTime.year || getYear(base);
-      gameTime.year = prevYear;
+      const base = mergeDeep(defaultState, { ...loaded, gameTime });
+      base.meta = { ...base.meta, seasons: initSeasons() };
+      const prevYear = base.gameTime.year || getYear(base);
+      base.gameTime.year = prevYear;
       const now = Date.now();
       const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
       if (elapsed > 0) {
@@ -64,7 +84,7 @@ export function GameProvider({ children }) {
       }
       return {
         ...base,
-        gameTime: { ...gameTime, year: prevYear },
+        gameTime: { ...base.gameTime, year: prevYear },
         lastSaved: now,
       };
     }
