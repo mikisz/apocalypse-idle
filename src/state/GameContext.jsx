@@ -18,6 +18,7 @@ import {
 } from '../engine/time.js';
 import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
+import { ROLE_BUILDINGS } from '../data/roles.js';
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
@@ -154,6 +155,11 @@ export function GameProvider({ children }) {
       const settler = prev.population.settlers.find((s) => s.id === id);
       if (!settler) return prev;
       const normalized = role === 'idle' ? null : role;
+      if (normalized) {
+        const building = ROLE_BUILDINGS[normalized];
+        const count = prev.buildings?.[building]?.count || 0;
+        if (count <= 0) return prev;
+      }
       const settlers = prev.population.settlers.map((s) =>
         s.id === id ? { ...s, role: normalized } : s,
       );

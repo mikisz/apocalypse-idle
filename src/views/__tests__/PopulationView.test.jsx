@@ -17,7 +17,10 @@ describe('PopulationView', () => {
       skills: {},
     };
     const setSettlerRole = vi.fn();
-    const state = { population: { settlers: [settler] } };
+    const state = {
+      population: { settlers: [settler] },
+      buildings: { potatoField: { count: 1 } },
+    };
 
     render(
       <GameContext.Provider value={{ state, setSettlerRole }}>
