@@ -4,6 +4,7 @@ import {
   assignmentsSummary,
   computeRoleBonuses,
 } from '../engine/settlers.js'
+import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js'
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame()
@@ -39,6 +40,12 @@ export default function PopulationView() {
       {settlers.length > 0 ? (
         settlers.map((s) => {
           const { years, days } = formatAge(s.ageSeconds)
+          const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 }
+          const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level)
+          const progress = threshold > 0 ? activeSkill.xp / threshold : 0
+          const otherSkills = Object.entries(s.skills || {}).filter(
+            ([role]) => role !== s.role,
+          )
           return (
             <div
               key={s.id}
@@ -71,6 +78,27 @@ export default function PopulationView() {
                   <span className="w-2 h-2 border-r-2 border-b-2 border-white rotate-45" />
                 </span>
               </div>
+              <div className="space-y-1">
+                <div className="text-sm">Level {activeSkill.level}</div>
+                <div className="h-2 bg-stroke rounded">
+                  <div
+                    className="h-full bg-green-600 rounded"
+                    style={{ width: `${Math.min(progress, 1) * 100}%` }}
+                  />
+                </div>
+              </div>
+              {otherSkills.length > 0 && (
+                <details className="text-sm">
+                  <summary>Other roles</summary>
+                  <ul className="pl-4 list-disc space-y-0.5">
+                    {otherSkills.map(([role, skill]) => (
+                      <li key={role}>
+                        {role}: lvl {skill.level}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
             </div>
           )
         })
