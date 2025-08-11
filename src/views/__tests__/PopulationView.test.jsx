@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import PopulationView from '../PopulationView.jsx'
 import { GameContext } from '../../state/useGame.js'
+import { SETTLER_ROLES } from '../../data/roles.js'
 
 describe('PopulationView', () => {
   test('shows idle settlers and propagates role changes', () => {
@@ -28,8 +29,9 @@ describe('PopulationView', () => {
     const select = screen.getByRole('combobox')
     expect(select.value).toBe('idle')
 
-    fireEvent.change(select, { target: { value: 'farming' } })
-    expect(setSettlerRole).toHaveBeenCalledWith('s1', 'farming')
+    const role = SETTLER_ROLES[0].id
+    fireEvent.change(select, { target: { value: role } })
+    expect(setSettlerRole).toHaveBeenCalledWith('s1', role)
   })
 })
 

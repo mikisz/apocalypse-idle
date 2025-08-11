@@ -5,9 +5,10 @@ import { saveGame, loadGame, deleteSave } from '../engine/persistence.js'
 import { processTick, applyOfflineProgress } from '../engine/production.js'
 import { processSettlersTick } from '../engine/settlers.js'
 import { defaultState } from './defaultState.js'
-import { getYear, initSeasons } from '../engine/time.js'
+import { DAYS_PER_YEAR, SECONDS_PER_DAY, getYear, initSeasons } from '../engine/time.js'
 import { getResourceRates } from './selectors.js'
 import { RESOURCES } from '../data/resources.js'
+import { SETTLER_ROLE_IDS } from '../data/roles.js'
 
 export function GameProvider({ children }) {
   const [state, setState] = useState(() => {
@@ -30,9 +31,10 @@ export function GameProvider({ children }) {
         let settlers = progressed.population.settlers
         if (yearAfter > prevYear) {
           const diff = yearAfter - prevYear
+          const secondsPerYear = DAYS_PER_YEAR * SECONDS_PER_DAY
           settlers = settlers.map((s) => ({
             ...s,
-            ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
+            ageSeconds: (s.ageSeconds || 0) + diff * secondsPerYear,
           }))
         }
         const show = Object.keys(gains).length > 0
@@ -82,9 +84,10 @@ export function GameProvider({ children }) {
       if (computedYear > year) {
         const diff = computedYear - year
         year = computedYear
+        const secondsPerYear = DAYS_PER_YEAR * SECONDS_PER_DAY
         settlers = settlers.map((s) => ({
           ...s,
-          ageSeconds: (s.ageSeconds || 0) + diff * 365 * 86400,
+          ageSeconds: (s.ageSeconds || 0) + diff * secondsPerYear,
         }))
       }
       return {
@@ -133,6 +136,7 @@ export function GameProvider({ children }) {
       const settler = prev.population.settlers.find((s) => s.id === id)
       if (!settler) return prev
       const normalized = role === 'idle' ? null : role
+      if (normalized && !SETTLER_ROLE_IDS.includes(normalized)) return prev
       const settlers = prev.population.settlers.map((s) =>
         s.id === id ? { ...s, role: normalized } : s,
       )

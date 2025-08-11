@@ -1,3 +1,5 @@
+import { DAYS_PER_YEAR, SECONDS_PER_DAY } from '../engine/time.js'
+
 export const FIRST_NAMES = {
   M: [
     'James', 'John', 'Robert', 'Michael', 'William',
@@ -25,8 +27,8 @@ export function makeRandomSettler({ sex } = {}) {
   const firstPool = FIRST_NAMES[chosenSex]
   const firstName = firstPool[Math.floor(Math.random() * firstPool.length)]
   const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)]
-  const baseAge = 18 * 365 * 86400
-  const randomDays = Math.floor(Math.random() * 365) * 86400
+  const baseAge = 18 * DAYS_PER_YEAR * SECONDS_PER_DAY
+  const randomDays = Math.floor(Math.random() * DAYS_PER_YEAR) * SECONDS_PER_DAY
   return {
     id: globalThis.crypto?.randomUUID
       ? globalThis.crypto.randomUUID()

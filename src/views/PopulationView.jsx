@@ -6,6 +6,7 @@ import {
   computeRoleBonuses,
 } from '../engine/settlers.js'
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js'
+import { SETTLER_ROLES } from '../data/roles.js'
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame()
@@ -17,10 +18,9 @@ export default function PopulationView() {
     .filter((s) => (!unassignedOnly || s.role == null))
   const { assigned, living } = assignmentsSummary(settlers)
   const bonuses = computeRoleBonuses(settlers)
-  const bonusLabels = {
-    farming: 'Food',
-    scavenging: 'Raw',
-  }
+  const bonusLabels = Object.fromEntries(
+    SETTLER_ROLES.map((r) => [r.id, r.label]),
+  )
 
   return (
     <div className="p-4 space-y-4 pb-20">
@@ -95,8 +95,11 @@ export default function PopulationView() {
                   className="appearance-none w-full rounded bg-gray-800 text-white px-3 py-2 pr-8 hover:bg-gray-700 focus:outline-none"
                 >
                   <option value="idle">idle</option>
-                  <option value="farming">farming</option>
-                  <option value="scavenging">scavenging</option>
+                  {SETTLER_ROLES.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.id}
+                    </option>
+                  ))}
                 </select>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <span className="w-2 h-2 border-r-2 border-b-2 border-white rotate-45" />
