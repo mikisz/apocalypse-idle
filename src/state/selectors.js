@@ -68,7 +68,11 @@ export function getResourceRates(
     if (b.outputsPerSecBase) {
       Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
         const category = RESOURCES[res].category;
-        const mult = getSeasonMultiplier(season, category);
+        let mult;
+        if (b.seasonProfile === 'constant') mult = 1;
+        else if (typeof b.seasonProfile === 'object')
+          mult = b.seasonProfile[season.id] ?? 1;
+        else mult = getSeasonMultiplier(season, category);
         const role = ROLE_BY_RESOURCE[res];
         const bonusPercent = roleBonuses[role] || 0;
         const researchBonus = getResearchOutputBonus(state, res);

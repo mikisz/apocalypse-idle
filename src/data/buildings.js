@@ -13,6 +13,20 @@ export const BUILDINGS = [
     description: 'Reliable staple crop. Strongly affected by seasons.',
   },
   {
+    id: 'huntersHut',
+    name: "Hunter's Hut",
+    type: 'production',
+    category: 'Food',
+    requiresResearch: 'hunting1',
+    outputsPerSecBase: { meat: 0.15 },
+    costBase: { wood: 25, scrap: 10, stone: 5 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    seasonProfile: { spring: 1.1, summer: 1.0, autumn: 0.9, winter: 0.8 },
+    description:
+      "Hunts for meat year-round; less affected by seasons than crops.",
+  },
+  {
     id: 'loggingCamp',
     name: 'Logging Camp',
     type: 'production',
@@ -129,7 +143,7 @@ export const BUILDINGS = [
     costBase: { wood: 20, scrap: 5, stone: 5 },
     costGrowth: 1.15,
     refund: 0.5,
-    capacityAdd: { potatoes: 300 },
+    capacityAdd: { potatoes: 300, meat: 150 },
     description: 'Increases storage for harvested crops.',
   },
   {

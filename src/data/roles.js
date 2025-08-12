@@ -6,6 +6,13 @@ export const ROLES = {
     resource: 'potatoes',
     building: 'potatoField',
   },
+  hunter: {
+    id: 'hunter',
+    name: 'Hunter',
+    skill: 'Hunting',
+    resource: 'meat',
+    building: 'huntersHut',
+  },
   woodcutter: {
     id: 'woodcutter',
     name: 'Woodcutter',

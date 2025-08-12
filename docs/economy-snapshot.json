@@ -1,7 +1,5 @@
 {
-
-  "version": "817ab1aa9f0ca61c503b8319294da30152cc6ca2",
-
+  "version": "d629efd05cef0f54ca35588548e81176bf7098b3",
   "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
@@ -9,6 +7,7 @@
       "durationSec": 270,
       "multipliers": {
         "potatoes": 1.25,
+        "meat": 1.25,
         "wood": 1.1,
         "stone": 1.1,
         "scrap": 1.1,
@@ -26,6 +25,7 @@
       "durationSec": 270,
       "multipliers": {
         "potatoes": 1,
+        "meat": 1,
         "wood": 1,
         "stone": 1,
         "scrap": 1,
@@ -43,6 +43,7 @@
       "durationSec": 270,
       "multipliers": {
         "potatoes": 0.85,
+        "meat": 0.85,
         "wood": 0.9,
         "stone": 0.9,
         "scrap": 0.9,
@@ -60,6 +61,7 @@
       "durationSec": 270,
       "multipliers": {
         "potatoes": 0,
+        "meat": 0,
         "wood": 0.8,
         "stone": 0.8,
         "scrap": 0.8,
@@ -85,6 +87,18 @@
       "origin": {
         "file": "resources.js",
         "path": "RESOURCES.potatoes"
+      }
+    },
+    {
+      "key": "meat",
+      "displayName": "Meat",
+      "category": "FOOD",
+      "startingAmount": 0,
+      "startingCapacity": 300,
+      "unit": "",
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.meat"
       }
     },
     {
@@ -200,6 +214,34 @@
       }
     },
     {
+      "id": "huntersHut",
+      "name": "Hunter's Hut",
+      "type": "production",
+      "cost": {
+        "wood": 25,
+        "scrap": 10,
+        "stone": 5
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
+        "meat": 0.15
+      },
+      "inputsPerSec": {},
+      "requiresResearch": "hunting1",
+      "seasonMults": {
+        "spring": 1.1,
+        "summer": 1,
+        "autumn": 0.9,
+        "winter": 0.8
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[1]"
+      }
+    },
+    {
       "id": "loggingCamp",
       "name": "Logging Camp",
       "type": "production",
@@ -222,7 +264,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[1]"
+        "path": "BUILDINGS[2]"
       }
     },
     {
@@ -248,7 +290,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[2]"
+        "path": "BUILDINGS[3]"
       }
     },
     {
@@ -275,7 +317,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[3]"
+        "path": "BUILDINGS[4]"
       }
     },
     {
@@ -305,7 +347,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[4]"
+        "path": "BUILDINGS[5]"
       }
     },
     {
@@ -336,7 +378,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[5]"
+        "path": "BUILDINGS[6]"
       }
     },
     {
@@ -364,7 +406,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[6]"
+        "path": "BUILDINGS[7]"
       }
     },
     {
@@ -393,7 +435,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[7]"
+        "path": "BUILDINGS[8]"
       }
     },
     {
@@ -418,7 +460,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[8]"
+        "path": "BUILDINGS[9]"
       }
     },
     {
@@ -446,7 +488,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[9]"
+        "path": "BUILDINGS[10]"
       }
     },
     {
@@ -461,7 +503,8 @@
       "costGrowth": 1.15,
       "refund": 0.5,
       "storage": {
-        "potatoes": 300
+        "potatoes": 300,
+        "meat": 150
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -474,7 +517,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[10]"
+        "path": "BUILDINGS[11]"
       }
     },
     {
@@ -504,7 +547,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[11]"
+        "path": "BUILDINGS[12]"
       }
     },
     {
@@ -533,7 +576,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[12]"
+        "path": "BUILDINGS[13]"
       }
     },
     {
@@ -560,7 +603,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[13]"
+        "path": "BUILDINGS[14]"
       }
     }
   ],
@@ -620,6 +663,28 @@
       }
     },
     {
+      "id": "hunting1",
+      "name": "Hunting I",
+      "scienceCost": 35,
+      "timeSec": 45,
+      "prereqs": [],
+      "milestones": null,
+      "unlocks": {
+        "resources": [
+          "meat"
+        ],
+        "buildings": [
+          "huntersHut"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[2]"
+      }
+    },
+    {
       "id": "radio",
       "name": "Radio",
       "scienceCost": 120,
@@ -639,7 +704,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[2]"
+        "path": "RESEARCH[3]"
       }
     },
     {
@@ -665,7 +730,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[3]"
+        "path": "RESEARCH[4]"
       }
     },
     {
@@ -691,7 +756,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[4]"
+        "path": "RESEARCH[5]"
       }
     },
     {
@@ -722,7 +787,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[5]"
+        "path": "RESEARCH[6]"
       }
     },
     {
@@ -749,7 +814,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[6]"
+        "path": "RESEARCH[7]"
       }
     },
     {
@@ -776,7 +841,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[7]"
+        "path": "RESEARCH[8]"
       }
     },
     {
@@ -803,7 +868,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[8]"
+        "path": "RESEARCH[9]"
       }
     },
     {
@@ -835,7 +900,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[9]"
+        "path": "RESEARCH[10]"
       }
     }
   ],
@@ -849,6 +914,17 @@
       "origin": {
         "file": "roles.js",
         "path": "ROLES.farmer"
+      }
+    },
+    {
+      "id": "hunter",
+      "name": "Hunter",
+      "skill": "Hunting",
+      "resource": "meat",
+      "building": "huntersHut",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.hunter"
       }
     },
     {
@@ -953,6 +1029,10 @@
   },
   "startingResources": {
     "potatoes": {
+      "amount": 0,
+      "capacity": 300
+    },
+    "meat": {
       "amount": 0,
       "capacity": 300
     },

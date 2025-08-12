@@ -82,11 +82,16 @@ function clean(obj) {
 }
 
 function buildingSeasonMultipliers(b) {
-  const resKey = Object.keys(b.outputsPerSecBase || {})[0];
-  const cat = resKey ? RESOURCES[resKey]?.category : null;
   const result = {};
   seasons.forEach((s) => {
-    result[s.id] = cat ? getSeasonMultiplier(s, cat) : 1;
+    if (b.seasonProfile === 'constant') result[s.id] = 1;
+    else if (typeof b.seasonProfile === 'object')
+      result[s.id] = b.seasonProfile[s.id] ?? 1;
+    else {
+      const resKey = Object.keys(b.outputsPerSecBase || {})[0];
+      const cat = resKey ? RESOURCES[resKey]?.category : null;
+      result[s.id] = cat ? getSeasonMultiplier(s, cat) : 1;
+    }
   });
   return result;
 }
