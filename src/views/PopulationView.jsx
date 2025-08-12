@@ -7,6 +7,11 @@ import { ROLE_LIST, SKILL_LABELS } from '../data/roles.js';
 import { RESOURCES } from '../data/resources.js';
 import { getSettlerCapacity } from '../state/selectors.js';
 
+const BONUS_LABELS = ROLE_LIST.reduce((acc, r) => {
+  acc[r.id] = RESOURCES[r.resource].name;
+  return acc;
+}, {});
+
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame();
   const [onlyLiving, setOnlyLiving] = useState(true);
@@ -21,10 +26,6 @@ export default function PopulationView() {
   const living = settlers.filter((s) => !s.isDead).length;
   const capacity = getSettlerCapacity(state);
   const bonuses = computeRoleBonuses(settlers);
-  const bonusLabels = {};
-  ROLE_LIST.forEach((r) => {
-    bonusLabels[r.id] = RESOURCES[r.resource].name;
-  });
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-4 pb-20">
@@ -35,7 +36,7 @@ export default function PopulationView() {
             {living}/{capacity}
           </div>
         </div>
-        {Object.entries(bonusLabels).map(([role, label]) => (
+        {Object.entries(BONUS_LABELS).map(([role, label]) => (
           <div
             key={role}
             className="border border-stroke rounded p-3 bg-bg2/50 text-center"

@@ -3,12 +3,13 @@ import type { JSX } from 'react';
 import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
 import { useGame } from '../state/useGame.js';
 
+const CATEGORY_LABELS: Record<string, string> = { FOOD: 'Food', RAW: 'Raw' };
+
 export default function TopBar(): JSX.Element {
   const { state, toggleDrawer } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   const time = getTimeBreakdown(state);
   const modifiers: Record<string, number> = getSeasonModifiers(state);
   const [open, setOpen] = useState<boolean>(false);
-  const labels: Record<string, string> = { FOOD: 'Food', RAW: 'Raw' };
   const settlers = state.population?.settlers || [];
   const avgHappiness =
     settlers.length > 0
@@ -42,7 +43,7 @@ export default function TopBar(): JSX.Element {
           >
             {Object.entries(modifiers).map(([key, val]) => (
               <div key={key} className="whitespace-nowrap">
-                {labels[key] || key} x{val.toFixed(2)}
+                {CATEGORY_LABELS[key] || key} x{val.toFixed(2)}
               </div>
             ))}
           </div>

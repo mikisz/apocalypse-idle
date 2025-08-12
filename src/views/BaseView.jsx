@@ -16,6 +16,16 @@ import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
 import { RESEARCH_MAP } from '../data/research.js';
 
+const GROUP_ORDER = [
+  'Food',
+  'Raw Materials',
+  'Construction Materials',
+  'Science',
+  'Energy',
+  'Settlement',
+  'Utilities',
+];
+
 function BuildingRow({ building, completedResearch }) {
   const { state, setState } = useGame();
   const count = state.buildings[building.id]?.count || 0;
@@ -193,15 +203,6 @@ export default function BaseView() {
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
   });
-  const GROUP_ORDER = [
-    'Food',
-    'Raw Materials',
-    'Construction Materials',
-    'Science',
-    'Energy',
-    'Settlement',
-    'Utilities',
-  ];
   const prodGroupKeys = [
     ...GROUP_ORDER.filter((g) => prodGroups[g]),
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
