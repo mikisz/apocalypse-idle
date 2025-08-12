@@ -8,7 +8,7 @@ import { RESOURCES } from '../data/resources.js';
 import { getSettlerCapacity } from '../state/selectors.js';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Accordion from '@/components/Accordion.jsx';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectTrigger,
@@ -65,7 +65,7 @@ export default function PopulationView() {
       </div>
       <div className="flex flex-wrap items-center gap-4 text-sm">
         <div className="flex items-center gap-2">
-          <Switch
+          <Checkbox
             id="onlyLiving"
             checked={onlyLiving}
             onCheckedChange={setOnlyLiving}
@@ -73,7 +73,7 @@ export default function PopulationView() {
           <label htmlFor="onlyLiving">Only living</label>
         </div>
         <div className="flex items-center gap-2">
-          <Switch
+          <Checkbox
             id="unassignedOnly"
             checked={unassignedOnly}
             onCheckedChange={setUnassignedOnly}
