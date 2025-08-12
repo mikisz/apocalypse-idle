@@ -151,13 +151,12 @@ export default function ResearchTree({ onStart }) {
         {RESEARCH_ROWS.map((nodes, idx) => (
           <div key={idx} className="flex gap-8 justify-center">
             {nodes.map((node) => {
-              const { status, reasons } = evaluate(node, state);
+              const { status } = evaluate(node, state);
               return (
                 <ResearchNode
                   key={node.id}
                   node={node}
                   status={status}
-                  reasons={reasons}
                   onStart={onStart}
                   ref={(el) => (nodeRefs.current[node.id] = el)}
                 />

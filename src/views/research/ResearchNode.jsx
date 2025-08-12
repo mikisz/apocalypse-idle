@@ -1,12 +1,16 @@
 import React, { forwardRef } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
 import { formatAmount } from '../../utils/format.js';
 import { formatTime } from '../../utils/time.js';
 import { Button } from '@/components/Button';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip';
 
 function buildTooltip(node) {
   const lines = [];
@@ -63,7 +67,7 @@ function buildTooltip(node) {
   return lines.join('\n');
 }
 
-const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
+const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
   const tooltip = buildTooltip(node);
   const cost = node.cost?.science || 0;
   return (
@@ -71,9 +75,9 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
       <TooltipTrigger asChild>
         <div
           ref={ref}
-          className={`relative w-64 p-3 border rounded bg-card text-sm flex flex-col gap-1 ${
+          className={`relative w-64 p-3 border rounded bg-card text-sm flex flex-col gap-2 ${
             status === 'completed'
-              ? 'opacity-80 border-green-600'
+              ? 'opacity-80 border-border text-muted-foreground'
               : status === 'inProgress'
                 ? 'border-blue-500'
                 : status === 'available'
@@ -81,14 +85,18 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
                   : 'opacity-50 border-border'
           }`}
         >
-          <div className="font-semibold text-base">{node.name}</div>
-          <div className="text-muted-foreground">{node.shortDesc}</div>
-          <div className="flex items-center gap-1">
-            <span>{RESOURCES.science.icon}</span>
-            <span>{formatAmount(cost)}</span>
+          <div className="flex items-center gap-1 font-semibold text-base">
+            {node.name}
+            <Info className="w-4 h-4" />
           </div>
-          <div className="text-xs text-muted-foreground">
-            Research time: {formatTime(node.timeSec)}
+          <div className="text-muted-foreground">{node.shortDesc}</div>
+          <div className="flex items-center gap-4 text-xs">
+            <span className="flex items-center gap-1">
+              {RESOURCES.science.icon} {formatAmount(cost)}
+            </span>
+            <span className="flex items-center gap-1">
+              🕐 {formatTime(node.timeSec)}
+            </span>
           </div>
           {status === 'available' && (
             <Button
@@ -105,19 +113,6 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
               <Button variant="outline" size="sm" disabled>
                 Locked
               </Button>
-              <div className="mt-1 space-y-1 text-xs text-red-400">
-                {reasons.missingPrereqs?.length > 0 && (
-                  <div>Require: {reasons.missingPrereqs.join(', ')}</div>
-                )}
-                {reasons.missingMilestones?.length > 0 && (
-                  <div>
-                    {reasons.missingMilestones.map((m) => `${m}`).join(', ')}
-                  </div>
-                )}
-                {reasons.needScience > 0 && (
-                  <div>Need {formatAmount(reasons.needScience)} more</div>
-                )}
-              </div>
             </div>
           )}
           {status === 'inProgress' && (
@@ -127,7 +122,7 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
             </div>
           )}
           {status === 'completed' && (
-            <span className="absolute top-1 right-1 text-green-500">
+            <span className="absolute top-1 right-1 text-white">
               <Check className="w-4 h-4" />
             </span>
           )}

@@ -9,6 +9,7 @@ export default function GameAccordion({
   children,
   defaultOpen = false,
   action,
+  contentClassName,
 }) {
   return (
     <Accordion
@@ -29,7 +30,9 @@ export default function GameAccordion({
           {action && <div className="ml-2">{action}</div>}
         </AccordionPrimitive.Header>
         <AccordionContent>
-          <div className="p-2 space-y-2">{children}</div>
+          <div className={cn('p-2 space-y-2', contentClassName)}>
+            {children}
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

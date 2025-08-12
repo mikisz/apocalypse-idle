@@ -85,11 +85,11 @@ export default function BuildingRow({ building, completedResearch }) {
       : null;
 
   return (
-    <div className="p-2 rounded border border-border bg-card space-y-1">
+    <div className="p-4 rounded-lg border border-border bg-card space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span>
-            {building.name}{' '}
+          <span className="text-lg font-semibold">{building.name}</span>
+          <span className="text-sm text-muted-foreground">
             {building.maxCount != null
               ? `${count}/${building.maxCount}`
               : `(${count})`}
@@ -133,33 +133,40 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
       </div>
-      <div className="text-xs muted-foreground space-y-1">
+      <div className="space-y-2 text-sm">
         <div>{building.description}</div>
-        <div>
-          Cost:{' '}
-          {costEntries
-            .map(([res, amt]) => `${formatAmount(amt)} ${RESOURCES[res].name}`)
-            .join(', ')}
+        <div className="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <div className="font-medium">Cost:</div>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {costEntries.map(([res, amt]) => (
+                <span key={res} className="flex items-center gap-1">
+                  {RESOURCES[res].icon} {formatAmount(amt)}{' '}
+                  {RESOURCES[res].name}
+                </span>
+              ))}
+            </div>
+          </div>
+          {perOutputs.length > 0 && (
+            <div>
+              <div className="font-medium">Produces:</div>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {perOutputs.map((o) => (
+                  <span key={o.res} className="flex items-center gap-1">
+                    {RESOURCES[o.res].icon} {formatPerSec(o.perSec, o.res)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        {!unlocked && building.requiresResearch && (
-          <div className="text-red-400">
-            Requires:{' '}
-            {RESEARCH_MAP[building.requiresResearch]?.name ||
-              building.requiresResearch}
-          </div>
-        )}
-        {perOutputs.map((o) => (
-          <div key={`out-${o.res}`}>
-            Produces: {formatPerSec(o.perSec, o.res)}
-          </div>
-        ))}
         {perInputs.map((i) => (
-          <div key={`in-${i.res}`}>
+          <div key={`in-${i.res}`} className="text-xs">
             Consumes: {formatPerSec(-i.perSec, i.res)}
           </div>
         ))}
         {building.capacityAdd && (
-          <div>
+          <div className="text-xs">
             {Object.entries(building.capacityAdd)
               .map(
                 ([res, cap]) =>
@@ -168,10 +175,19 @@ export default function BuildingRow({ building, completedResearch }) {
               .join(', ')}
           </div>
         )}
-        {building.maxCount != null && <div>Max: {building.maxCount}</div>}
+        {!unlocked && building.requiresResearch && (
+          <div className="text-xs text-red-400">
+            Requires:{' '}
+            {RESEARCH_MAP[building.requiresResearch]?.name ||
+              building.requiresResearch}
+          </div>
+        )}
+        {building.maxCount != null && (
+          <div className="text-xs">Max: {building.maxCount}</div>
+        )}
         {building.outputsPerSecBase?.power &&
           getCapacity(state, 'power') <= 0 && (
-            <div>No Power storage. Excess is lost.</div>
+            <div className="text-xs">No Power storage. Excess is lost.</div>
           )}
       </div>
     </div>
