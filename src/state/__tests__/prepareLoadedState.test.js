@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { prepareLoadedState } from '../GameContext.jsx';
+import { prepareLoadedState } from '../prepareLoadedState.ts';
 import { defaultState } from '../defaultState.js';
 
 // Test that offline gains produce log entries

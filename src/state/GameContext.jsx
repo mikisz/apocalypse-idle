@@ -1,114 +1,16 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useMemo, useState } from 'react';
 import { GameContext } from './useGame.ts';
-import useGameLoop from '../engine/useGameLoop.ts';
-import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
-import { processTick, applyOfflineProgress } from '../engine/production.js';
-import { processSettlersTick, computeRoleBonuses } from '../engine/settlers.js';
-import {
-  startResearch,
-  cancelResearch,
-  processResearchTick,
-} from '../engine/research.js';
+import { loadGame } from '../engine/persistence.js';
 import { defaultState } from './defaultState.js';
-import {
-  getYear,
-  initSeasons,
-  SECONDS_PER_DAY,
-  DAYS_PER_YEAR,
-} from '../engine/time.js';
-import { getResourceRates } from './selectors.js';
-import { RESOURCES } from '../data/resources.js';
-import { ROLE_BUILDINGS } from '../data/roles.js';
-import { createLogEntry } from '../utils/log.js';
-import { updateRadio } from '../engine/radio.js';
-import { formatAmount } from '../utils/format.js';
-import { buildInitialPowerTypeOrder } from '../engine/power.js';
-
-/* eslint-disable-next-line react-refresh/only-export-components */
-export function prepareLoadedState(loaded) {
-  const cloned = structuredClone(loaded || {});
-  const gameTime =
-    typeof cloned.gameTime === 'number'
-      ? { seconds: cloned.gameTime }
-      : cloned.gameTime || { seconds: 0 };
-  const base = structuredClone(defaultState);
-  base.version = cloned.version ?? base.version;
-  base.gameTime = { ...base.gameTime, ...gameTime };
-  base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
-  base.ui = { ...base.ui, ...cloned.ui };
-  base.resources = { ...base.resources, ...cloned.resources };
-  base.buildings = { ...base.buildings, ...cloned.buildings };
-  base.powerTypeOrder = buildInitialPowerTypeOrder(cloned.powerTypeOrder || []);
-  base.research = { ...base.research, ...cloned.research };
-  base.population = { ...base.population, ...cloned.population };
-  if (Array.isArray(cloned.population?.settlers)) {
-    base.population.settlers = cloned.population.settlers.map((s) => ({
-      ...s,
-    }));
-  }
-  base.colony = { ...base.colony, ...cloned.colony };
-  if (Array.isArray(cloned.log)) {
-    base.log = [...cloned.log];
-  }
-  base.lastSaved = cloned.lastSaved ?? base.lastSaved;
-  const prevYear = base.gameTime.year || getYear(base);
-  base.gameTime.year = prevYear;
-  const now = Date.now();
-  const elapsed = Math.floor((now - (cloned.lastSaved || now)) / 1000);
-  if (elapsed > 0) {
-    const bonuses = computeRoleBonuses(base.population?.settlers || []);
-    const { state: progressed, gains } = applyOfflineProgress(
-      base,
-      elapsed,
-      bonuses,
-    );
-    const offlineLogs = Object.entries(gains).map(([res, amt]) =>
-      createLogEntry(
-        `Gained ${formatAmount(amt)} ${RESOURCES[res].name} while offline`,
-        now,
-      ),
-    );
-    const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
-    const yearAfter = getYear({
-      ...progressed,
-      gameTime: { ...progressed.gameTime, seconds: secondsAfter },
-    });
-    const settlers = progressed.population.settlers.map((s) => ({
-      ...s,
-      ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
-    }));
-    const show = Object.keys(gains).length > 0;
-    const log = [...offlineLogs, ...(progressed.log || [])].slice(0, 100);
-    return {
-      ...progressed,
-      population: { ...progressed.population, settlers },
-      gameTime: { seconds: secondsAfter, year: yearAfter },
-      ui: {
-        ...progressed.ui,
-        offlineProgress: show ? { elapsed, gains } : null,
-      },
-      log,
-      lastSaved: now,
-    };
-  }
-  return {
-    ...base,
-    gameTime: { ...base.gameTime, year: prevYear },
-    lastSaved: now,
-  };
-}
+import { prepareLoadedState } from './prepareLoadedState.ts';
+import useGameTick from './hooks/useGameTick.ts';
+import useAutosave from './hooks/useAutosave.ts';
+import useGameActions from './hooks/useGameActions.ts';
 
 export function GameProvider({ children }) {
   const { state: loaded, error: loadErr } = loadGame();
   const [state, setState] = useState(() => {
     if (loadErr) {
-      // If there is a loading error – log and fall back to the default state
       console.warn('[loadGame] error:', loadErr);
     }
     return loaded
@@ -117,176 +19,14 @@ export function GameProvider({ children }) {
   });
   const [loadError, setLoadError] = useState(!!loadErr);
 
-  // Main game loop: increment time and produce resources
-  useGameLoop((dt) => {
-    setState((prev) => {
-      const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
-      const productionBonuses = { ...roleBonuses };
-      delete productionBonuses.farmer;
-      const afterTick = processTick(prev, dt, productionBonuses);
-      const withResearch = processResearchTick(afterTick, dt, roleBonuses);
-      const rates = getResourceRates(withResearch);
-      let totalFoodProdBase = 0;
-      Object.keys(RESOURCES).forEach((id) => {
-        if (RESOURCES[id].category === 'FOOD') {
-          totalFoodProdBase += rates[id]?.perSec || 0;
-        }
-      });
-      const bonusFoodPerSec =
-        totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
-      const { state: settlersProcessed, telemetry } = processSettlersTick(
-        withResearch,
-        dt,
-        bonusFoodPerSec,
-        Math.random,
-        roleBonuses,
-      );
-      const { candidate, radioTimer } = updateRadio(settlersProcessed, dt);
-      const nextSeconds = (settlersProcessed.gameTime?.seconds || 0) + dt;
-      const computedYear = getYear({
-        ...settlersProcessed,
-        gameTime: { ...settlersProcessed.gameTime, seconds: nextSeconds },
-      });
-      let year = settlersProcessed.gameTime?.year || 1;
-      let settlers = settlersProcessed.population.settlers;
-      if (computedYear > year) {
-        const diff = computedYear - year;
-        year = computedYear;
-        settlers = settlers.map((s) => ({
-          ...s,
-          ageDays: (s.ageDays || 0) + diff * DAYS_PER_YEAR,
-        }));
-      }
-      return {
-        ...settlersProcessed,
-        population: { ...settlersProcessed.population, settlers, candidate },
-        colony: { ...settlersProcessed.colony, radioTimer },
-        gameTime: { seconds: nextSeconds, year },
-        meta: {
-          ...settlersProcessed.meta,
-          telemetry: {
-            ...settlersProcessed.meta?.telemetry,
-            settlers: telemetry,
-          },
-        },
-      };
-    });
-  }, 1000);
+  useGameTick(setState);
+  useAutosave(state, setState);
 
-  // Autosave interval and on unload
-  const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
-
-  useEffect(() => {
-    const save = () => {
-      setState(() => saveGame(stateRef.current));
-    };
-    const id = setInterval(save, 10000);
-    window.addEventListener('beforeunload', save);
-    return () => {
-      clearInterval(id);
-      window.removeEventListener('beforeunload', save);
-    };
-  }, []);
-
-  const setActiveTab = useCallback((tab) => {
-    setState((prev) => ({ ...prev, ui: { ...prev.ui, activeTab: tab } }));
-  }, []);
-
-  const toggleDrawer = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      ui: { ...prev.ui, drawerOpen: !prev.ui.drawerOpen },
-    }));
-  }, []);
-
-  const setSettlerRole = useCallback((id, role) => {
-    setState((prev) => {
-      const settler = prev.population.settlers.find((s) => s.id === id);
-      if (!settler) return prev;
-      const normalized = role === 'idle' ? null : role;
-      if (normalized) {
-        const building = ROLE_BUILDINGS[normalized];
-        const count = prev.buildings?.[building]?.count || 0;
-        if (count <= 0) return prev;
-      }
-      const settlers = prev.population.settlers.map((s) =>
-        s.id === id ? { ...s, role: normalized } : s,
-      );
-      const roleName = normalized ?? 'idle';
-      const entry = createLogEntry(
-        `${settler.firstName} ${settler.lastName} is now ${roleName}`,
-      );
-      const log = [entry, ...prev.log].slice(0, 100);
-      return { ...prev, population: { ...prev.population, settlers }, log };
-    });
-  }, []);
-
-  const beginResearch = useCallback((id) => {
-    setState((prev) => startResearch(prev, id));
-  }, []);
-
-  const abortResearch = useCallback(() => {
-    setState((prev) => cancelResearch(prev));
-  }, []);
-
-  const dismissOfflineModal = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      ui: { ...prev.ui, offlineProgress: null },
-    }));
-  }, []);
-
-  const retryLoad = useCallback(() => {
-    const { state: loaded, error } = loadGame();
-    if (error) {
-      setLoadError(true);
-      return;
-    }
-    setLoadError(false);
-    if (loaded) {
-      setState(prepareLoadedState(loaded));
-    }
-  }, []);
-
-  const resetGame = useCallback(() => {
-    if (window.confirm('Reset colony? This will wipe your save.')) {
-      deleteSave();
-      const fresh = { ...defaultState, lastSaved: Date.now() };
-      setState(fresh);
-      saveGame(fresh);
-      setLoadError(false);
-    }
-  }, []);
+  const actions = useGameActions(setState, setLoadError);
 
   const value = useMemo(
-    () => ({
-      state,
-      setActiveTab,
-      toggleDrawer,
-      setSettlerRole,
-      beginResearch,
-      abortResearch,
-      setState,
-      dismissOfflineModal,
-      resetGame,
-      loadError,
-      retryLoad,
-    }),
-    [
-      state,
-      setActiveTab,
-      toggleDrawer,
-      setSettlerRole,
-      beginResearch,
-      abortResearch,
-      dismissOfflineModal,
-      resetGame,
-      loadError,
-      retryLoad,
-    ],
+    () => ({ state, setState, loadError, ...actions }),
+    [state, actions, loadError],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
