@@ -2,16 +2,16 @@
 
 ## Economy Reporter
 
-Generate a markdown economy report:
+Generate the combined economy report (including payback-time sections):
 
 ```
-npm run eco:report
+npm run report:economy
 ```
 
-Generate JSON output with custom options:
+Run the reporter directly with custom options:
 
 ```
-npm run eco:report -- --season=winter --weights=wood=1,stone=1.2 --format=json --out=economy.json
+node --loader ts-node/esm src/dev/economyReporter.ts --season=winter --weights=wood=1,stone=1.2 --format=json --out=economy.json
 ```
 
 Flags:

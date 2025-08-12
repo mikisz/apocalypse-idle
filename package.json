@@ -13,9 +13,7 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "report:economy": "node scripts/generate-economy-report.mjs",
-    "typecheck": "tsc --noEmit",
-    "eco:report": "ts-node --esm src/dev/economyReporter.ts --format=md > economy-report.md",
-    "eco:report:json": "ts-node --esm src/dev/economyReporter.ts --format=json > economy-report.json"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",

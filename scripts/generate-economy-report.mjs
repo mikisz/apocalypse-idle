@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { execSync } from 'child_process';
+import { register } from 'node:module';
 
 import { BUILDINGS, getBuildingCost } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
@@ -24,6 +25,7 @@ import { defaultState } from '../src/state/defaultState.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
+register('ts-node/esm', pathToFileURL(repoRoot + '/'));
 
 function getCommitInfo() {
   try {
@@ -279,6 +281,16 @@ md += `- ROLE_BONUS_PER_SETTLER(level): level<=10 -> 0.1*level; else 1 + 0.05*(l
 md += `- SHELTER_MAX = ${SHELTER_MAX} (source: settlement.js:SHELTER_MAX)\n`;
 md += `- SHELTER_COST_GROWTH = ${SHELTER_COST_GROWTH} (source: settlement.js:SHELTER_COST_GROWTH)\n`;
 md += `- RADIO_BASE_SECONDS = ${RADIO_BASE_SECONDS} (source: settlement.js:RADIO_BASE_SECONDS)\n`;
+
+const { parseArgs, generateReport } = await import('../src/dev/economyReporter.ts');
+const paybackOpts = parseArgs([]);
+const paybackRaw = generateReport(paybackOpts);
+const paybackSection = paybackRaw
+  .replace(/^# Economy Report\n\n?/, '')
+  .replace(/^##/gm, '###')
+  .trimStart();
+md += '\n## 9) Payback Times\n';
+md += paybackSection;
 
 fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);
 
