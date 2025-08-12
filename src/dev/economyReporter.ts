@@ -1,4 +1,5 @@
-import fs from 'fs';
+import * as fs from 'fs';
+import { pathToFileURL } from 'url';
 import { BUILDINGS } from '../data/buildings.js';
 import { SEASONS } from '../engine/time.js';
 import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
@@ -9,7 +10,7 @@ import {
   valueWeightedStream,
 } from './economyMath.ts';
 
-interface Options {
+export interface Options {
   season: 'average' | 'winter' | 'spring' | 'summer' | 'autumn' | 'all';
   weights: ResourceMap;
   targets: number[];
@@ -45,8 +46,7 @@ const DEFAULT_THRESHOLDS = {
   },
 };
 
-function parseArgs(): Options {
-  const args = process.argv.slice(2);
+export function parseArgs(args = process.argv.slice(2)): Options {
   const opts: Options = {
     season: 'average',
     weights: { ...DEFAULT_WEIGHTS },
@@ -74,7 +74,10 @@ function parseArgs(): Options {
         }
         break;
       case '--targets':
-        opts.targets = value.split(',').map((v) => Number(v.trim())).filter((n) => !isNaN(n));
+        opts.targets = value
+          .split(',')
+          .map((v) => Number(v.trim()))
+          .filter((n) => !isNaN(n));
         break;
       case '--format':
         opts.format = value as any;
@@ -116,8 +119,7 @@ function formatNumber(n: number, locale: string): string {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(n);
 }
 
-function main() {
-  const opts = parseArgs();
+export function generateReport(opts: Options): string {
   const seasons = buildSeasonRecord();
   const buildings: BuildingData[] = BUILDINGS as any;
 
@@ -187,9 +189,10 @@ function main() {
     if (b.type === 'production' || b.type === 'processing') {
       const th = b.type === 'processing' ? opts.thresholds.converters : opts.thresholds.generators;
       for (const target of opts.targets) {
-        const value = opts.season === 'all'
-          ? (pbt[target] as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season]
-          : (pbt[target] as number);
+        const value =
+          opts.season === 'all'
+            ? (pbt[target] as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season]
+            : (pbt[target] as number);
         if (!isFinite(value)) continue;
         const window = th[`pbt${target}`];
         if (!window) continue;
@@ -220,9 +223,7 @@ function main() {
       storage: storageRows,
       outliers,
     };
-    const outStr = JSON.stringify(json, null, 2);
-    if (opts.out) fs.writeFileSync(opts.out, outStr); else console.log(outStr);
-    return;
+    return JSON.stringify(json, null, 2);
   }
 
   // Markdown or CSV
@@ -281,7 +282,9 @@ function main() {
         for (const t of opts.targets) {
           const v = row.pbt[t];
           if (typeof v === 'object') {
-            const val = (v as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season];
+            const val = (v as Record<string, number>)[
+              opts.season === 'all' ? 'average' : opts.season
+            ];
             pbtVals.push(formatNumber(val, opts.locale));
           } else {
             pbtVals.push(formatNumber(v as number, opts.locale));
@@ -329,14 +332,25 @@ function main() {
       const pbtVals: string[] = [];
       for (const t of opts.targets) {
         const v = row.pbt[t];
-        const val = typeof v === 'object' ? (v as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season] : (v as number);
+        const val =
+          typeof v === 'object'
+            ? (v as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season]
+            : (v as number);
         pbtVals.push(String(val));
       }
-      outStr += [row.id, row.category, row.type, row.growth, ...pbtVals, JSON.stringify(row.outputs), JSON.stringify(row.inputs)].join(',') + '\n';
+      outStr += [
+        row.id,
+        row.category,
+        row.type,
+        row.growth,
+        ...pbtVals,
+        JSON.stringify(row.outputs),
+        JSON.stringify(row.inputs),
+      ].join(',') + '\n';
     }
   }
 
-  if (opts.out) fs.writeFileSync(opts.out, outStr); else console.log(outStr);
+  return outStr;
 }
 
 function formatJSON(obj: any): string {
@@ -345,4 +359,13 @@ function formatJSON(obj: any): string {
   return keys.map((k) => `${k}:${obj[k]}`).join(',');
 }
 
-main();
+export function main(args = process.argv.slice(2)) {
+  const opts = parseArgs(args);
+  const outStr = generateReport(opts);
+  if (opts.out) fs.writeFileSync(opts.out, outStr);
+  else console.log(outStr);
+}
+
+if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) {
+  main();
+}
