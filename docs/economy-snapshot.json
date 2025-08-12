@@ -1,5 +1,7 @@
 {
-  "version": "8c7304eda7c13985bd2fbb4bf829d7118c52c925",
+
+  "version": "817ab1aa9f0ca61c503b8319294da30152cc6ca2",
+
   "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
@@ -14,6 +16,10 @@
         "metalParts": 1,
         "science": 1,
         "power": 1
+      },
+      "origin": {
+        "file": "time.js",
+        "path": "SEASONS[0]"
       }
     },
     "summer": {
@@ -27,6 +33,10 @@
         "metalParts": 1,
         "science": 1,
         "power": 1
+      },
+      "origin": {
+        "file": "time.js",
+        "path": "SEASONS[1]"
       }
     },
     "autumn": {
@@ -40,6 +50,10 @@
         "metalParts": 1,
         "science": 1,
         "power": 1
+      },
+      "origin": {
+        "file": "time.js",
+        "path": "SEASONS[2]"
       }
     },
     "winter": {
@@ -53,6 +67,10 @@
         "metalParts": 1,
         "science": 1,
         "power": 1
+      },
+      "origin": {
+        "file": "time.js",
+        "path": "SEASONS[3]"
       }
     }
   },
@@ -63,7 +81,11 @@
       "category": "FOOD",
       "startingAmount": 0,
       "startingCapacity": 300,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.potatoes"
+      }
     },
     {
       "key": "wood",
@@ -71,7 +93,11 @@
       "category": "RAW",
       "startingAmount": 0,
       "startingCapacity": 100,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.wood"
+      }
     },
     {
       "key": "stone",
@@ -79,7 +105,11 @@
       "category": "RAW",
       "startingAmount": 0,
       "startingCapacity": 100,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.stone"
+      }
     },
     {
       "key": "scrap",
@@ -87,7 +117,11 @@
       "category": "RAW",
       "startingAmount": 0,
       "startingCapacity": 100,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.scrap"
+      }
     },
     {
       "key": "planks",
@@ -95,7 +129,11 @@
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
       "startingCapacity": 50,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.planks"
+      }
     },
     {
       "key": "metalParts",
@@ -103,7 +141,11 @@
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
       "startingCapacity": 20,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.metalParts"
+      }
     },
     {
       "key": "science",
@@ -111,7 +153,11 @@
       "category": "SOCIETY",
       "startingAmount": 0,
       "startingCapacity": 400,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.science"
+      }
     },
     {
       "key": "power",
@@ -119,7 +165,11 @@
       "category": "ENERGY",
       "startingAmount": 0,
       "startingCapacity": 2,
-      "unit": null
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.power"
+      }
     }
   ],
   "buildings": [
@@ -127,277 +177,391 @@
       "id": "potatoField",
       "name": "Potato Field",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 15
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "potatoes": 0.375
       },
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
         "spring": 1.25,
         "summer": 1,
         "autumn": 0.85,
         "winter": 0
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[0]"
       }
     },
     {
       "id": "loggingCamp",
       "name": "Logging Camp",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "scrap": 15
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "wood": 0.25
       },
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
         "spring": 1.1,
         "summer": 1,
         "autumn": 0.9,
         "winter": 0.8
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[1]"
       }
     },
     {
       "id": "scrapyard",
       "name": "Scrap Yard",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 12
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "scrap": 0.08
       },
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
         "spring": 1.1,
         "summer": 1,
         "autumn": 0.9,
         "winter": 0.8
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[2]"
       }
     },
     {
       "id": "quarry",
       "name": "Quarry",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 20,
         "scrap": 5
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "stone": 0.08
       },
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
         "spring": 1.1,
         "summer": 1,
         "autumn": 0.9,
         "winter": 0.8
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[3]"
       }
     },
     {
       "id": "sawmill",
       "name": "Sawmill",
       "type": "processing",
-      "constructionCost": {
+      "cost": {
         "wood": 40,
         "scrap": 15,
         "stone": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "planks": 0.5
       },
-      "baseInputsPerSec": {
+      "inputsPerSec": {
         "wood": 0.8
       },
-      "seasonalMultipliers": {
+      "requiresResearch": "industry1",
+      "seasonMults": {
         "spring": 1,
         "summer": 1,
         "autumn": 1,
         "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[4]"
       }
     },
     {
       "id": "metalWorkshop",
       "name": "Metal Workshop",
       "type": "processing",
-      "constructionCost": {
+      "cost": {
         "wood": 30,
         "scrap": 30,
         "stone": 10,
         "planks": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "metalParts": 0.4
       },
-      "baseInputsPerSec": {
+      "inputsPerSec": {
         "scrap": 0.4
       },
-      "seasonalMultipliers": {
+      "requiresResearch": "industry1",
+      "seasonMults": {
         "spring": 1,
         "summer": 1,
         "autumn": 1,
         "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[5]"
       }
     },
     {
       "id": "school",
       "name": "School",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 25,
         "scrap": 10,
         "stone": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "science": 0.5
       },
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
         "spring": 1,
         "summer": 1,
         "autumn": 1,
         "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[6]"
       }
     },
     {
       "id": "woodGenerator",
       "name": "Wood Generator",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 50,
         "stone": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
         "power": 1
       },
-      "baseInputsPerSec": {
+      "inputsPerSec": {
         "wood": 0.25
       },
-      "seasonalMultipliers": {
+      "requiresResearch": "basicEnergy",
+      "seasonMults": {
         "spring": 1,
         "summer": 1,
         "autumn": 1,
         "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[7]"
       }
     },
     {
       "id": "shelter",
       "name": "Shelter",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 30,
         "scrap": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {}
+      "costGrowth": 1.8,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[8]"
+      }
     },
     {
       "id": "radio",
       "name": "Radio",
       "type": "production",
-      "constructionCost": {
+      "cost": {
         "wood": 80,
         "scrap": 40,
         "stone": 20
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {},
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {
+      "costGrowth": 1,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {},
+      "inputsPerSec": {
         "power": 0.1
       },
-      "seasonalMultipliers": {}
+      "requiresResearch": "radio",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[9]"
+      }
     },
     {
       "id": "foodStorage",
       "name": "Granary",
       "type": "storage",
-      "constructionCost": {
+      "cost": {
         "wood": 20,
         "scrap": 5,
         "stone": 5
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
         "potatoes": 300
       },
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {}
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[10]"
+      }
     },
     {
       "id": "rawStorage",
       "name": "Warehouse",
       "type": "storage",
-      "constructionCost": {
+      "cost": {
         "wood": 25,
         "scrap": 10,
         "stone": 10
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
         "wood": 200,
         "stone": 80,
         "scrap": 120
       },
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {}
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[11]"
+      }
     },
     {
       "id": "materialsDepot",
       "name": "Materials Depot",
       "type": "storage",
-      "constructionCost": {
+      "cost": {
         "wood": 25,
         "scrap": 10,
         "stone": 5
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
         "planks": 150,
         "metalParts": 60
       },
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {}
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "industry1",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[12]"
+      }
     },
     {
       "id": "battery",
       "name": "Battery",
       "type": "storage",
-      "constructionCost": {
+      "cost": {
         "wood": 40,
         "stone": 20
       },
-      "demolitionRefund": 0.5,
-      "storageProvided": {
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
         "power": 40
       },
-      "baseProductionPerSec": {},
-      "baseInputsPerSec": {},
-      "seasonalMultipliers": {}
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "basicEnergy",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[13]"
+      }
     }
   ],
   "research": [
@@ -409,6 +573,7 @@
       "prereqs": [
         "industry1"
       ],
+      "milestones": null,
       "unlocks": {
         "resources": [
           "power"
@@ -421,7 +586,11 @@
           "Energy"
         ]
       },
-      "effects": []
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[0]"
+      }
     },
     {
       "id": "industry1",
@@ -429,7 +598,12 @@
       "scienceCost": 60,
       "timeSec": 90,
       "prereqs": [],
+      "milestones": null,
       "unlocks": {
+        "resources": [
+          "planks",
+          "metalParts"
+        ],
         "buildings": [
           "sawmill",
           "metalWorkshop",
@@ -437,13 +611,13 @@
         ],
         "categories": [
           "CONSTRUCTION_MATERIALS"
-        ],
-        "resources": [
-          "planks",
-          "metalParts"
         ]
       },
-      "effects": []
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[1]"
+      }
     },
     {
       "id": "radio",
@@ -454,12 +628,19 @@
         "industry1",
         "basicEnergy"
       ],
+      "milestones": null,
       "unlocks": {
+        "resources": [],
         "buildings": [
           "radio"
-        ]
+        ],
+        "categories": []
       },
-      "effects": []
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[2]"
+      }
     },
     {
       "id": "woodworking1",
@@ -469,13 +650,23 @@
       "prereqs": [
         "industry1"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "WOOD",
           "percent": 0.05,
           "type": "output"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[3]"
+      }
     },
     {
       "id": "salvaging1",
@@ -485,13 +676,23 @@
       "prereqs": [
         "industry1"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "SCRAP",
           "percent": 0.05,
           "type": "output"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[4]"
+      }
     },
     {
       "id": "logistics1",
@@ -501,6 +702,12 @@
       "prereqs": [
         "industry1"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "RAW",
@@ -512,7 +719,11 @@
           "percent": 0.05,
           "type": "storage"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[5]"
+      }
     },
     {
       "id": "industry2",
@@ -522,12 +733,24 @@
       "prereqs": [
         "industry1"
       ],
+      "milestones": {
+        "produced": {
+          "planks": 50,
+          "metalParts": 30
+        }
+      },
       "unlocks": {
+        "resources": [],
         "buildings": [
           "toolsmithy"
-        ]
+        ],
+        "categories": []
       },
-      "effects": []
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[6]"
+      }
     },
     {
       "id": "woodworking2",
@@ -538,13 +761,23 @@
         "woodworking1",
         "industry2"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "WOOD",
           "percent": 0.05,
           "type": "output"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[7]"
+      }
     },
     {
       "id": "salvaging2",
@@ -555,13 +788,23 @@
         "salvaging1",
         "industry2"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "SCRAP",
           "percent": 0.05,
           "type": "output"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[8]"
+      }
     },
     {
       "id": "logistics2",
@@ -572,6 +815,12 @@
         "logistics1",
         "industry2"
       ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
       "effects": [
         {
           "category": "RAW",
@@ -583,39 +832,68 @@
           "percent": 0.05,
           "type": "storage"
         }
-      ]
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[9]"
+      }
     }
   ],
   "roles": [
     {
       "id": "farmer",
       "name": "Farmer",
+      "skill": "Farming",
       "resource": "potatoes",
-      "building": "potatoField"
+      "building": "potatoField",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.farmer"
+      }
     },
     {
       "id": "woodcutter",
       "name": "Woodcutter",
+      "skill": "Woodcutting",
       "resource": "wood",
-      "building": "loggingCamp"
+      "building": "loggingCamp",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.woodcutter"
+      }
     },
     {
       "id": "scavenger",
       "name": "Scavenger",
+      "skill": "Scavenging",
       "resource": "scrap",
-      "building": "scrapyard"
+      "building": "scrapyard",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.scavenger"
+      }
     },
     {
       "id": "quarryWorker",
       "name": "Quarry Worker",
+      "skill": "Quarrying",
       "resource": "stone",
-      "building": "quarry"
+      "building": "quarry",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.quarryWorker"
+      }
     },
     {
       "id": "scientist",
       "name": "Scientist",
+      "skill": "Scientist",
       "resource": "science",
-      "building": "school"
+      "building": "school",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.scientist"
+      }
     }
   ],
   "formula": {
@@ -626,8 +904,48 @@
       "sum",
       "clamp"
     ],
-    "demolitionRefund": 0.5,
-    "clampRule": "min(value, capacity) and never negative"
+    "rulesOrigins": {
+      "getBuildingCost": {
+        "file": "buildings.js",
+        "path": "getBuildingCost()"
+      },
+      "refund": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[].refund"
+      },
+      "clamp": {
+        "file": "production.js",
+        "path": "clampResource()"
+      },
+      "tickSeconds": {
+        "file": "balance.js",
+        "path": "BALANCE.TICK_SECONDS"
+      },
+      "foodConsumption": {
+        "file": "balance.js",
+        "path": "BALANCE.FOOD_CONSUMPTION_PER_SETTLER"
+      },
+      "starvationTimer": {
+        "file": "balance.js",
+        "path": "BALANCE.STARVATION_DEATH_TIMER_SECONDS"
+      },
+      "roleBonusFn": {
+        "file": "balance.js",
+        "path": "ROLE_BONUS_PER_SETTLER"
+      },
+      "shelterMax": {
+        "file": "settlement.js",
+        "path": "SHELTER_MAX"
+      },
+      "shelterCostGrowth": {
+        "file": "settlement.js",
+        "path": "SHELTER_COST_GROWTH"
+      },
+      "radioBaseSeconds": {
+        "file": "settlement.js",
+        "path": "RADIO_BASE_SECONDS"
+      }
+    }
   },
   "startingState": {
     "season": "spring",
@@ -669,6 +987,7 @@
   },
   "startingBuildings": {
     "potatoField": 2,
-    "loggingCamp": 1
+    "loggingCamp": 1,
+    "shelter": 1
   }
 }
