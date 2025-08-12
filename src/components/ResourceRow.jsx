@@ -11,7 +11,7 @@ export default function ResourceRow({
   tooltip,
 }) {
   const content = (
-    <div className="flex items-center justify-between text-sm tabular-nums">
+    <li className="flex items-center justify-between text-sm tabular-nums">
       <span className="flex items-center gap-1">
         {icon && <span>{icon}</span>}
         <span>{name}</span>
@@ -23,7 +23,7 @@ export default function ResourceRow({
         </span>
         {rate != null && <span className="text-xs text-muted">{rate}</span>}
       </span>
-    </div>
+    </li>
   );
 
   if (!tooltip) return content;

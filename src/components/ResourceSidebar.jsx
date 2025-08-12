@@ -41,9 +41,11 @@ export default function ResourceSidebar() {
           </Accordion>
         ) : (
           <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
-            {g.items.map((r) => (
-              <ResourceRow key={r.id} {...r} />
-            ))}
+            <ul className="space-y-1">
+              {g.items.map((r) => (
+                <ResourceRow key={r.id} {...r} />
+              ))}
+            </ul>
             {g.title === 'Energy' && (
               <div className="pt-2 text-right">
                 <Button
