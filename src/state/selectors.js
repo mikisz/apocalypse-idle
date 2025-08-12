@@ -35,6 +35,7 @@ export function getResourceRates(
   PRODUCTION_BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     if (count <= 0) return;
+    if (!b.outputsPerSecBase) return;
     let factor = 1;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
