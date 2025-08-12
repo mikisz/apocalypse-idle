@@ -6,6 +6,13 @@ import {
   getPoweredConsumerTypeIds,
 } from '../engine/power.js';
 import { Button } from './Button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from './ui/dialog';
 
 export default function PowerPriorityModal({ onClose }) {
   const { state, setState } = useGame();
@@ -43,9 +50,11 @@ export default function PowerPriorityModal({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card p-4 rounded shadow max-w-md w-full">
-        <h2 className="text-lg mb-2 text-left">Power Priorities</h2>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Power Priorities</DialogTitle>
+        </DialogHeader>
         <div className="text-center text-xs text-muted">TOP PRIORITY</div>
         <ul className="mt-2 space-y-1 max-h-64 overflow-y-auto">
           {order.map((id, idx) => {
@@ -88,15 +97,15 @@ export default function PowerPriorityModal({ onClose }) {
           })}
         </ul>
         <div className="text-center text-xs text-muted mt-2">LOW PRIORITY</div>
-        <div className="mt-4 flex justify-end gap-2">
+        <DialogFooter className="mt-4 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onClose}>
             Cancel
           </Button>
           <Button variant="outline" size="sm" onClick={save}>
             Save
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

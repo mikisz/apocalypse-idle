@@ -4,6 +4,13 @@ import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
 import { Button } from './Button';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from './ui/card';
 
 interface Skill {
   level: number;
@@ -52,21 +59,25 @@ export default function CandidateBox(): JSX.Element | null {
     .join(', ');
 
   return (
-    <div className="p-4 border border-border bg-card rounded space-y-2">
-      <div className="font-semibold">A new settler has arrived!</div>
-      <div className="text-sm">
-        {candidate.firstName} {candidate.lastName} •{' '}
-        {candidate.sex === 'M' ? 'Male' : 'Female'} • Age {candidate.age}
-      </div>
-      <div className="text-xs text-muted">{skills || 'No skills'}</div>
-      <div className="space-x-2">
-        <Button variant="outline" size="sm" onClick={accept}>
-          Accept
-        </Button>
-        <Button variant="outline" size="sm" onClick={reject}>
-          Reject
-        </Button>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>A new settler has arrived!</CardTitle>
+        <CardDescription>
+          {candidate.firstName} {candidate.lastName} •{' '}
+          {candidate.sex === 'M' ? 'Male' : 'Female'} • Age {candidate.age}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <div className="text-xs text-muted">{skills || 'No skills'}</div>
+        <div className="space-x-2">
+          <Button variant="outline" size="sm" onClick={accept}>
+            Accept
+          </Button>
+          <Button variant="outline" size="sm" onClick={reject}>
+            Reject
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
