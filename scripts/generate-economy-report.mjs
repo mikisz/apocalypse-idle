@@ -287,9 +287,8 @@ const paybackOpts = parseArgs([]);
 const paybackRaw = generateReport(paybackOpts);
 const paybackSection = paybackRaw
   .replace(/^# Economy Report\n\n?/, '')
-  .replace(/^##/gm, '###')
   .trimStart();
-md += '\n## 9) Payback Times\n';
+md += '\n';
 md += paybackSection;
 
 fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);
