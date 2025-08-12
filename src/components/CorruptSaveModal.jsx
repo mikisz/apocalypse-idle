@@ -1,4 +1,5 @@
 import { useGame } from '../state/useGame.ts';
+import { Button } from './Button';
 
 export default function CorruptSaveModal() {
   const { loadError, retryLoad, resetGame } = useGame();
@@ -9,18 +10,12 @@ export default function CorruptSaveModal() {
         <h2 className="font-semibold text-lg">Save Load Failed</h2>
         <p>Your save data appears corrupted.</p>
         <div className="flex justify-end gap-2">
-          <button
-            className="px-4 py-2 rounded border border-stroke"
-            onClick={retryLoad}
-          >
+          <Button variant="outline" onClick={retryLoad}>
             Retry
-          </button>
-          <button
-            className="px-4 py-2 rounded border border-stroke"
-            onClick={resetGame}
-          >
+          </Button>
+          <Button variant="outline" onClick={resetGame}>
             Reset
-          </button>
+          </Button>
         </div>
       </div>
     </div>

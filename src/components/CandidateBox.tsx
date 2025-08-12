@@ -3,6 +3,7 @@ import { useGame } from '../state/useGame.ts';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
+import { Button } from './Button';
 
 interface Skill {
   level: number;
@@ -57,18 +58,12 @@ export default function CandidateBox(): JSX.Element | null {
       </div>
       <div className="text-xs text-muted">{skills || 'No skills'}</div>
       <div className="space-x-2">
-        <button
-          className="px-2 py-1 border border-stroke rounded"
-          onClick={accept}
-        >
+        <Button variant="outline" size="sm" onClick={accept}>
           Accept
-        </button>
-        <button
-          className="px-2 py-1 border border-stroke rounded"
-          onClick={reject}
-        >
+        </Button>
+        <Button variant="outline" size="sm" onClick={reject}>
           Reject
-        </button>
+        </Button>
       </div>
     </div>
   );
