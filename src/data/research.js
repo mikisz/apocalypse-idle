@@ -5,15 +5,15 @@ export const RESEARCH = [
     type: 'unlock',
     shortDesc:
       'Learn the fundamentals of generating and storing electrical power.',
-    cost: { science: 20 },
-    timeSec: 120,
-    prereqs: [],
+    cost: { science: 50 },
+    timeSec: 90,
+    prereqs: ['industry1'],
     unlocks: {
       resources: ['power'],
       buildings: ['woodGenerator', 'battery'],
       categories: ['Energy'],
     },
-    row: 0,
+    row: 1,
     effects: [],
   },
   {
