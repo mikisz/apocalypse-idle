@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { GameContext } from './useGame.js';
+import { GameContext } from './useGame.ts';
 import useGameLoop from '../engine/useGameLoop.ts';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
 import { processTick, applyOfflineProgress } from '../engine/production.js';

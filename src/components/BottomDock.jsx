@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 
 const tabs = [
   { id: 'base', icon: '🏠', label: 'Base' },

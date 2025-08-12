@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
@@ -17,13 +17,12 @@ interface Candidate {
 }
 
 export default function CandidateBox(): JSX.Element | null {
-  const { state, setState } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const { state, setState } = useGame();
   const candidate: Candidate | null = state.population?.candidate ?? null;
   if (!candidate) return null;
 
   const accept = (): void => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState((prev: any) => {
+    setState((prev) => {
       const settlers = [
         ...prev.population.settlers,
         candidateToSettler(candidate),
@@ -37,8 +36,7 @@ export default function CandidateBox(): JSX.Element | null {
   };
 
   const reject = (): void => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState((prev: any) => ({
+    setState((prev) => ({
       ...prev,
       population: { ...prev.population, candidate: null },
       colony: { ...prev.colony, radioTimer: RADIO_BASE_SECONDS },

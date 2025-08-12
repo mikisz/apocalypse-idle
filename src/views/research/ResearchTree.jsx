@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { RESEARCH, RESEARCH_MAP } from '../../data/research.js';
 import ResearchNode from './ResearchNode.jsx';
-import { useGame } from '../../state/useGame.js';
+import { useGame } from '../../state/useGame.ts';
 import { RESOURCES } from '../../data/resources.js';
 
 function evaluate(node, state) {

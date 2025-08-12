@@ -1,4 +1,4 @@
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 import ResearchTree from './research/ResearchTree.jsx';
 import { RESEARCH_MAP } from '../data/research.js';
 import { formatTime } from '../utils/time.js';
@@ -11,9 +11,7 @@ export default function ResearchView() {
   const remaining = node ? Math.max(node.timeSec - progress, 0) : 0;
   const pct = node ? Math.min(progress / node.timeSec, 1) : 0;
   return (
-
     <div className="p-4 pb-20 space-y-4 h-full flex flex-col">
-
       <div className="border border-stroke rounded p-4 bg-bg2/50">
         {current && node ? (
           <div className="space-y-2">

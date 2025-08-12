@@ -1,6 +1,6 @@
 import React from 'react';
 import { BUILDINGS } from '../data/buildings.js';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 
 export default function PowerPriorityModal({ onClose }) {
   const { state } = useGame();

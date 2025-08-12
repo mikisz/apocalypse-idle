@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 
 export default function TopBar(): JSX.Element {
-  const { state, toggleDrawer } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const { state, toggleDrawer } = useGame();
   const time = getTimeBreakdown(state);
   const modifiers: Record<string, number> = getSeasonModifiers(state);
   const [open, setOpen] = useState<boolean>(false);
@@ -13,8 +13,11 @@ export default function TopBar(): JSX.Element {
   const avgHappiness =
     settlers.length > 0
       ? Math.round(
-          settlers.reduce((sum, s) => sum + (s.happiness || 0), 0) /
-            settlers.length,
+          settlers.reduce(
+            (sum: number, s: { happiness?: number }) =>
+              sum + (s.happiness || 0),
+            0,
+          ) / settlers.length,
         )
       : 0;
 

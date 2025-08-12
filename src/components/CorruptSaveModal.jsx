@@ -1,4 +1,4 @@
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 
 export default function CorruptSaveModal() {
   const { loadError, retryLoad, resetGame } = useGame();
