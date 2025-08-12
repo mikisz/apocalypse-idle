@@ -6,6 +6,7 @@ import { execSync } from 'child_process';
 import { BUILDINGS, getBuildingCost } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
 import { RESEARCH } from '../src/data/research.js';
+import { ROLE_LIST } from '../src/data/roles.js';
 import {
   initSeasons,
   getSeasonMultiplier,
@@ -56,7 +57,7 @@ const resources = resourceKeys.map((id) => {
     category: r.category,
     startingAmount: defaultState.resources[id]?.amount ?? 0,
     startingCapacity: getCapacity(defaultState, id),
-    unit: null,
+    unit: r.unit ?? null,
   };
 });
 
@@ -96,26 +97,36 @@ const buildings = BUILDINGS.map((b) => ({
   name: b.name,
   type: buildingType(b),
   constructionCost: getBuildingCost(b, 0),
-  demolitionRefund: 0.5,
-  storageProvided: { ...(b.addsCapacity || {}) },
+  demolitionRefund: b.refund ?? 0,
+  storageProvided: { ...(b.capacityAdd || {}) },
   baseProductionPerSec: baseProductionPerSec(b),
   baseInputsPerSec: baseInputsPerSec(b),
-  seasonalMode: b.cycleTimeSec ? 'default' : 'ignore',
-  seasonalCustom: null,
   seasonalMultipliers: buildingSeasonMultipliers(b),
 }));
-
-const roles = [];
+const roles = ROLE_LIST.map((r) => ({
+  id: r.id,
+  name: r.name,
+  resource: r.resource,
+  building: r.building,
+}));
 
 const research = RESEARCH.map((r) => ({
   id: r.id,
   name: r.name,
-  cost: r.cost,
+  scienceCost: r.cost?.science ?? 0,
   timeSec: r.timeSec,
   prereqs: r.prereqs,
   ...(r.unlocks ? { unlocks: r.unlocks } : {}),
   ...(r.effects ? { effects: r.effects } : {}),
 }));
+
+const startingResources = Object.fromEntries(
+  resources.map((r) => [r.key, { amount: r.startingAmount, capacity: r.startingCapacity }]),
+);
+
+const startingBuildings = Object.fromEntries(
+  Object.entries(defaultState.buildings).map(([id, info]) => [id, info.count || 0]),
+);
 
 const snapshot = {
   version: commitHash,
@@ -134,16 +145,9 @@ const snapshot = {
   startingState: {
     season: seasons[0].id,
     year: 1,
-    resources: Object.fromEntries(
-      resources.map((r) => [r.key, r.startingAmount]),
-    ),
-    buildings: Object.fromEntries(
-      BUILDINGS.filter((b) => b.startsWithCount > 0).map((b) => [
-        b.id,
-        b.startsWithCount,
-      ]),
-    ),
   },
+  startingResources,
+  startingBuildings,
 };
 
 fs.mkdirSync(path.join(repoRoot, 'docs'), { recursive: true });
@@ -153,14 +157,14 @@ fs.writeFileSync(
 );
 
 function formatCost(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v);
+  const entries = Object.entries(obj || {}).filter(([, v]) => v != null);
   return entries.length
     ? entries.map(([k, v]) => `${k}: ${v}`).join(', ')
     : '-';
 }
 
 function formatObj(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v);
+  const entries = Object.entries(obj || {}).filter(([, v]) => v != null);
   return entries.length
     ? entries
         .map(([k, v]) => `${k}: ${Number(v.toFixed ? v.toFixed(3) : v)}`)
@@ -172,15 +176,29 @@ function formatArray(arr) {
   return arr && arr.length ? arr.join(', ') : '-';
 }
 
-function formatUnlocks(unlocks) {
-  if (!unlocks) return '-';
+function formatEffects(effects) {
+  if (!effects || effects.length === 0) return '-';
+  return effects
+    .map((e) => {
+      const parts = [];
+      if (e.resource) parts.push(`resource=${e.resource}`);
+      if (e.category) parts.push(`category=${e.category}`);
+      if (e.percent != null) parts.push(`percent=${(e.percent * 100).toFixed(1)}%`);
+      if (e.type) parts.push(`type=${e.type}`);
+      return `{ ${parts.join(', ')} }`;
+    })
+    .join(', ');
+}
+
+function formatUnlocks(unlocks, effects) {
   const parts = [];
-  if (unlocks.resources?.length)
+  if (unlocks?.resources?.length)
     parts.push(`resources: ${unlocks.resources.join(', ')}`);
-  if (unlocks.buildings?.length)
+  if (unlocks?.buildings?.length)
     parts.push(`buildings: ${unlocks.buildings.join(', ')}`);
-  if (unlocks.categories?.length)
+  if (unlocks?.categories?.length)
     parts.push(`categories: ${unlocks.categories.join(', ')}`);
+  if (effects?.length) parts.push(`effects: ${formatEffects(effects)}`);
   return parts.join('; ') || '-';
 }
 
@@ -199,9 +217,9 @@ resources.forEach((r) => {
   md += `| ${r.key} | ${r.displayName} | ${r.category} | ${r.startingAmount} | ${r.startingCapacity} | ${r.unit ?? ''} |\n`;
 });
 md +=
-  '\nGlobal rules: resources cannot go negative; amounts are clamped to capacity.\n\n';
+  '\n';
 
-md += '## 3) Seasons and Global Modifiers\n';
+md += '## 3) Seasons\n';
 md += '| season | duration (sec) |';
 resourceKeys.forEach((r) => (md += ` ${r} |`));
 md += '\n| - | - |';
@@ -220,8 +238,7 @@ md += '## 4) Buildings\n';
 md +=
   '| id | name | type | cost | refund | storage | base prod/s | inputs per sec | season mults |\n';
 md += '| - | - | - | - | - | - | - | - | - |\n';
-BUILDINGS.forEach((b, idx) => {
-  const row = buildings[idx];
+buildings.forEach((row) => {
   md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.baseInputsPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
 });
 md += '\n';
@@ -229,39 +246,35 @@ md += '## 5) Research\n';
 md += '| id | name | science cost | time (sec) | prereqs | unlocks |\n';
 md += '| - | - | - | - | - | - |\n';
 research.forEach((r) => {
-  md += `| ${r.id} | ${r.name} | ${r.cost.science ?? '-'} | ${r.timeSec} | ${formatArray(r.prereqs)} | ${formatUnlocks(r.unlocks)} |\n`;
+  md += `| ${r.id} | ${r.name} | ${r.scienceCost} | ${r.timeSec} | ${formatArray(r.prereqs)} | ${formatUnlocks(r.unlocks, r.effects)} |\n`;
 });
 md += '\n';
+md += '## 6) Roles\n';
+if (roles.length) {
+  md += '| id | name | resource | building |\n';
+  md += '| - | - | - | - |\n';
+  roles.forEach((r) => {
+    md += `| ${r.id} | ${r.name} | ${r.resource} | ${r.building} |\n`;
+  });
+  md += '\n';
+} else {
+  md += 'No role-based modifiers defined.\n\n';
+}
 
-md += '## 6) Population and Roles\n';
-md += 'No role-based production modifiers in effect.\n\n';
-
-md += '## 7) Production Math (Exact Formula)\n';
-md += 'Per building per tick:\n\n';
-md += '`effectiveCycle = cycleTimeSec * seasonSpeed`\n\n';
-md += '`effectiveHarvest = harvestAmount * outputValue * seasonYield`\n\n';
-md += '`cycles = floor((elapsed + timer) / effectiveCycle)`\n\n';
-md += '`production = effectiveHarvest * count * cycles`\n\n';
-md +=
-  'Sum production for each resource across buildings, then `clampResource(value, capacity)` where values below 0 become 0 and above capacity become capacity.\n\n';
-md += 'Offline progress is applied in 60-second chunks.\n\n';
-
-md += '## 8) Costs, Refunds, and Edge Rules\n';
-md +=
-  'Building costs scale by `cost * 1.15^count`, rounded up. Demolition refunds 50% of the previous cost (floored) and adds back resources subject to capacity. Resource values are rounded to 6 decimals in clamping and cannot be negative.\n\n';
-
-md += '## 9) Starting State\n';
-md += `Starting season: ${seasons[0].id}, Year: 1.\n\n`;
+md += '## 7) Starting State\n';
+md += `Starting season: ${snapshot.startingState.season}, Year: ${snapshot.startingState.year}.\n\n`;
 md += '### Resources\n';
 md += '| resource | amount | capacity |\n| - | - | - |\n';
-resources.forEach((r) => {
-  md += `| ${r.key} | ${r.startingAmount} | ${r.startingCapacity} |\n`;
+Object.entries(startingResources).forEach(([key, val]) => {
+  md += `| ${key} | ${val.amount} | ${val.capacity} |\n`;
 });
 md += '\n### Buildings\n';
 md += '| building | count |\n| - | - |\n';
-BUILDINGS.filter((b) => b.startsWithCount > 0).forEach((b) => {
-  md += `| ${b.id} | ${b.startsWithCount} |\n`;
-});
+Object.entries(startingBuildings)
+  .filter(([, count]) => count > 0)
+  .forEach(([id, count]) => {
+    md += `| ${id} | ${count} |\n`;
+  });
 md += '\n';
 
 fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);
