@@ -2,7 +2,7 @@
 
 ## 1) Overview
 
-Economy generated from commit **7ea0c7c0394116ca3127c3ac4b1b08d0c37c6374** on 2025-08-12 02:34:02 +0200. Save version: **5**.
+Economy generated from commit **070053a8d44126fb5c270ff654c22f892f457044** on 2025-08-12 02:38:49 +0200. Save version: **5**.
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -52,7 +52,7 @@ Global rules: resources cannot go negative; amounts are clamped to capacity.
 
 | id           | name           | science cost | time (sec) | prereqs                 | unlocks                                                                                                              |
 | ------------ | -------------- | ------------ | ---------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| basicEnergy  | Basic Energy   | 20           | 120        | -                       | resources: power; buildings: woodGenerator, battery; categories: Energy                                              |
+| basicEnergy  | Basic Energy   | 50           | 90         | industry1               | resources: power; buildings: woodGenerator, battery; categories: Energy                                              |
 | industry1    | Industry I     | 40           | 60         | -                       | resources: planks, metalParts; buildings: sawmill, metalWorkshop, materialsDepot; categories: CONSTRUCTION_MATERIALS |
 | radio        | Radio          | 80           | 120        | industry1               | buildings: radio                                                                                                     |
 | woodworking1 | Woodworking I  | 30           | 45         | industry1               | -                                                                                                                    |

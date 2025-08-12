@@ -1,5 +1,5 @@
 {
-  "version": "7ea0c7c0394116ca3127c3ac4b1b08d0c37c6374",
+  "version": "070053a8d44126fb5c270ff654c22f892f457044",
   "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
@@ -422,10 +422,10 @@
       "id": "basicEnergy",
       "name": "Basic Energy",
       "cost": {
-        "science": 20
+        "science": 50
       },
-      "timeSec": 120,
-      "prereqs": [],
+      "timeSec": 90,
+      "prereqs": ["industry1"],
       "unlocks": {
         "resources": ["power"],
         "buildings": ["woodGenerator", "battery"],
