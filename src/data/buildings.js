@@ -7,8 +7,8 @@ export const BUILDINGS = [
     type: 'production',
     category: 'Food',
     outputsPerSecBase: { potatoes: 0.375 },
-    costBase: { wood: 15 },
-    costGrowth: 1.15,
+    costBase: { wood: 17 }, // changed: 15→17
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     description: 'Reliable staple crop. Strongly affected by seasons.',
   },
@@ -18,11 +18,11 @@ export const BUILDINGS = [
     type: 'production',
     category: 'Food',
     requiresResearch: 'hunting1',
-    outputsPerSecBase: { meat: 0.15 },
+    outputsPerSecBase: { meat: 0.19 }, // changed: 0.15→0.19
     costBase: { wood: 25, scrap: 10, stone: 5 },
     costGrowth: 1.15,
     refund: 0.5,
-    seasonProfile: { spring: 1.1, summer: 1.0, autumn: 0.9, winter: 0.8 },
+    seasonProfile: { spring: 1.1, summer: 1.0, autumn: 0.9, winter: 0.6 }, // changed: winter 0.8→0.6
     description:
       'Hunts for meat year-round; less affected by seasons than crops.',
   },
@@ -31,9 +31,9 @@ export const BUILDINGS = [
     name: 'Logging Camp',
     type: 'production',
     category: 'Raw Materials',
-    outputsPerSecBase: { wood: 0.25 },
+    outputsPerSecBase: { wood: 0.3 }, // changed: 0.25→0.3
     costBase: { scrap: 15 },
-    costGrowth: 1.15,
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     description: 'Steady wood income. Slight weather impact.',
   },
@@ -44,7 +44,7 @@ export const BUILDINGS = [
     category: 'Raw Materials',
     outputsPerSecBase: { scrap: 0.08 },
     costBase: { wood: 12 },
-    costGrowth: 1.15,
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     description: 'Collects scrap from nearby ruins.',
   },
@@ -53,9 +53,9 @@ export const BUILDINGS = [
     name: 'Quarry',
     type: 'production',
     category: 'Raw Materials',
-    outputsPerSecBase: { stone: 0.08 },
+    outputsPerSecBase: { stone: 0.104 }, // changed: 0.08→0.104
     costBase: { wood: 20, scrap: 5 },
-    costGrowth: 1.15,
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     description: 'Extracts stone slowly but steadily.',
   },
@@ -67,8 +67,8 @@ export const BUILDINGS = [
     requiresResearch: 'industry1',
     inputsPerSecBase: { wood: 0.8 },
     outputsPerSecBase: { planks: 0.5 },
-    costBase: { wood: 40, scrap: 15, stone: 10 },
-    costGrowth: 1.15,
+    costBase: { wood: 48, scrap: 18, stone: 12 }, // changed: wood 40→48, scrap 15→18, stone 10→12
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     seasonProfile: 'constant',
     description: 'Converts wood into planks.',
@@ -82,7 +82,7 @@ export const BUILDINGS = [
     inputsPerSecBase: { scrap: 0.4 },
     outputsPerSecBase: { metalParts: 0.4 },
     costBase: { wood: 30, scrap: 30, stone: 10, planks: 10 },
-    costGrowth: 1.15,
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     seasonProfile: 'constant',
     description: 'Processes scrap into metal parts.',
@@ -92,9 +92,9 @@ export const BUILDINGS = [
     name: 'School',
     type: 'production',
     category: 'Science',
-    outputsPerSecBase: { science: 0.5 },
-    costBase: { wood: 25, scrap: 10, stone: 10 },
-    costGrowth: 1.15,
+    outputsPerSecBase: { science: 0.45 }, // changed: 0.5→0.45
+    costBase: { wood: 30, scrap: 12, stone: 12 }, // changed: wood 25→30, scrap 10→12, stone 10→12
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     description: 'Provides basic education and generates science.',
   },
@@ -106,7 +106,7 @@ export const BUILDINGS = [
     outputsPerSecBase: { power: 1 },
     inputsPerSecBase: { wood: 0.25 },
     costBase: { wood: 50, stone: 10 },
-    costGrowth: 1.15,
+    costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     requiresResearch: 'basicEnergy',
     description:
@@ -131,7 +131,7 @@ export const BUILDINGS = [
     requiresResearch: 'radio',
     requiresPower: true,
     inputsPerSecBase: { power: 0.1 },
-    costBase: { wood: 80, scrap: 40, stone: 20 },
+    costBase: { wood: 80, scrap: 40, stone: 20, planks: 20 }, // changed: +planks 20
     costGrowth: 1,
     refund: 0.5,
     maxCount: 1,
@@ -142,7 +142,7 @@ export const BUILDINGS = [
     name: 'Granary',
     type: 'storage',
     costBase: { wood: 20, scrap: 5, stone: 5 },
-    costGrowth: 1.15,
+    costGrowth: 1.2, // changed: 1.15→1.2
     refund: 0.5,
     capacityAdd: { potatoes: 300, meat: 150 },
     description: 'Increases storage for harvested crops.',
@@ -152,9 +152,9 @@ export const BUILDINGS = [
     name: 'Warehouse',
     type: 'storage',
     costBase: { wood: 25, scrap: 10, stone: 10 },
-    costGrowth: 1.15,
+    costGrowth: 1.2, // changed: 1.15→1.2
     refund: 0.5,
-    capacityAdd: { wood: 200, stone: 80, scrap: 120 },
+    capacityAdd: { wood: 200, stone: 80, scrap: 90 }, // changed: scrap 120→90
     description: 'Increases storage for wood, stone and scrap.',
   },
   {
@@ -163,9 +163,9 @@ export const BUILDINGS = [
     type: 'storage',
     requiresResearch: 'industry1',
     costBase: { wood: 25, scrap: 10, stone: 5 },
-    costGrowth: 1.15,
+    costGrowth: 1.2, // changed: 1.15→1.2
     refund: 0.5,
-    capacityAdd: { planks: 150, metalParts: 60 },
+    capacityAdd: { planks: 300, metalParts: 240 }, // changed: planks 150→300, metalParts 60→240
     description: 'Stores processed construction materials.',
   },
   {
@@ -173,9 +173,9 @@ export const BUILDINGS = [
     name: 'Battery',
     type: 'storage',
     costBase: { wood: 40, stone: 20 },
-    costGrowth: 1.15,
+    costGrowth: 1.2, // changed: 1.15→1.2
     refund: 0.5,
-    capacityAdd: { power: 40 },
+    capacityAdd: { power: 600 }, // changed: 40→600
     requiresResearch: 'basicEnergy',
     description: 'Allows storing more generated Power.',
   },

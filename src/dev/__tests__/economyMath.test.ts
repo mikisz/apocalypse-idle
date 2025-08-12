@@ -45,7 +45,7 @@ describe('economyMath helpers', () => {
     );
     const huntersHut = BUILDINGS.find((b) => b.id === 'huntersHut');
     expect(huntersHut).toBeDefined();
-    expect(seasonMultiplier(huntersHut!, 'winter', seasons)).toBeCloseTo(0.8);
+    expect(seasonMultiplier(huntersHut!, 'winter', seasons)).toBeCloseTo(0.6); // changed: 0.8→0.6
   });
 
   it('seasonMultiplier constant profile returns 1', () => {

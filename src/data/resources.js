@@ -5,7 +5,7 @@ export const RESOURCES = {
     icon: '🥔',
     category: 'FOOD',
     startingAmount: 0,
-    startingCapacity: 300,
+    startingCapacity: 450, // changed: 300→450
   },
   meat: {
     id: 'meat',
@@ -13,7 +13,7 @@ export const RESOURCES = {
     icon: '🍖',
     category: 'FOOD',
     startingAmount: 0,
-    startingCapacity: 300,
+    startingCapacity: 150, // changed: 300→150
     unit: '',
   },
   wood: {
@@ -22,7 +22,7 @@ export const RESOURCES = {
     icon: '🪵',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 100,
+    startingCapacity: 150, // changed: 100→150
   },
   stone: {
     id: 'stone',
@@ -30,7 +30,7 @@ export const RESOURCES = {
     icon: '🪨',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 100,
+    startingCapacity: 80, // changed: 100→80
   },
   scrap: {
     id: 'scrap',
@@ -38,7 +38,7 @@ export const RESOURCES = {
     icon: '♻️',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 100,
+    startingCapacity: 80, // changed: 100→80
   },
   planks: {
     id: 'planks',

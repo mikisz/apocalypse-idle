@@ -13,8 +13,8 @@ export function XP_TIME_TO_NEXT_LEVEL_SECONDS(level) {
 }
 
 export function ROLE_BONUS_PER_SETTLER(level) {
-  if (level <= 10) return 0.1 * level;
-  return 1.0 + 0.05 * (level - 10);
+  if (level <= 10) return 0.02 * level; // changed: 0.1*level→0.02*level
+  return 0.2 + 0.01 * (level - 10); // changed: 1+0.05*(level-10)→0.2+0.01*(level-10)
 }
 
 export function FOOD_VARIETY_BONUS(count) {
