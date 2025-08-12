@@ -7,7 +7,7 @@ import {
   getSettlerCapacity,
 } from '../state/selectors.js';
 import { computeRoleBonuses } from '../engine/settlers.js';
-import { formatAmount } from '../utils/format.js';
+import { formatAmount, formatRate } from '../utils/format.js';
 import { RESOURCE_LIST } from '../data/resources.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 
@@ -18,14 +18,15 @@ function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
       title={tooltip}
     >
       <span className="flex items-center gap-1">
-        <span>{icon}</span>
+        {icon && <span>{icon}</span>}
         <span>{name}</span>
       </span>
       <span className="flex flex-col items-end">
         <span>
-          {formatAmount(amount)} / {formatAmount(capacity)}
+          {formatAmount(amount)}
+          {capacity != null && ` / ${formatAmount(capacity)}`}
         </span>
-        <span className="text-xs text-muted">{rate}</span>
+        {rate != null && <span className="text-xs text-muted">{rate}</span>}
       </span>
     </div>
   );
@@ -34,8 +35,10 @@ function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
 export default function ResourceSidebar() {
   const { state } = useGame();
   const roleBonuses = computeRoleBonuses(state.population?.settlers || []);
-  const rates = getResourceRates(state, true, roleBonuses);
+  const netRates = getResourceRates(state, true, roleBonuses);
+  const prodRates = getResourceRates(state, false, roleBonuses);
   const groups = {};
+  const foodIds = [];
   const CATEGORY_LABELS = {
     FOOD: 'Food',
     RAW: 'Raw Materials',
@@ -50,8 +53,10 @@ export default function ResourceSidebar() {
     )
       return;
     const amount = state.resources[r.id]?.amount || 0;
-    const capacity = getCapacity(state, r.id);
-    const rateInfo = rates[r.id];
+    const isFood = r.category === 'FOOD';
+    const capacity = isFood ? null : getCapacity(state, r.id);
+    if (isFood) foodIds.push(r.id);
+    const rateInfo = (isFood ? prodRates : netRates)[r.id];
     const discovered = state.resources[r.id]?.discovered;
     if (rateInfo.perSec !== 0 || amount > 0 || discovered) {
       if (!groups[r.category]) groups[r.category] = [];
@@ -69,6 +74,28 @@ export default function ResourceSidebar() {
       });
     }
   });
+
+  if (groups.FOOD) {
+    const totalAmount = foodIds.reduce(
+      (sum, id) => sum + (state.resources[id]?.amount || 0),
+      0,
+    );
+    const totalCapacity =
+      state.foodPool?.capacity ?? getCapacity(state, 'potatoes');
+    const totalNetRate = foodIds.reduce(
+      (sum, id) => sum + (netRates[id]?.perSec || 0),
+      0,
+    );
+    const totalRow = {
+      id: 'food-total',
+      name: 'Total',
+      amount: state.foodPool?.amount ?? totalAmount,
+      capacity: totalCapacity,
+      rate: formatRate(totalNetRate),
+    };
+    groups.FOOD = [totalRow, ...groups.FOOD];
+  }
+
   const entries = Object.entries(groups).map(([cat, items]) => ({
     title: CATEGORY_LABELS[cat] || cat,
     items,
