@@ -86,9 +86,12 @@ export default function ResourceSidebar() {
   else if (ratio > 0.8) color = 'text-yellow-400';
   const radioCount = state.buildings?.radio?.count || 0;
   const candidatePending = !!state.population?.candidate;
-  let radioLine = 'Radio: not built';
+  const hasRadioResearch = (state.research.completed || []).includes('radio');
+  let radioLine = hasRadioResearch
+    ? 'Radio: not built'
+    : 'Radio research not complete';
   let progress = 0;
-  if (radioCount > 0) {
+  if (hasRadioResearch && radioCount > 0) {
     const powered = (state.resources.power?.amount || 0) > 0;
     if (candidatePending) {
       radioLine = 'A settler is waiting for your decision';
@@ -99,28 +102,33 @@ export default function ResourceSidebar() {
       const mm = String(Math.floor(timer / 60)).padStart(2, '0');
       const ss = String(Math.floor(timer % 60)).padStart(2, '0');
       radioLine = `Next settler in: ${mm}:${ss}`;
-      progress = Math.max(0, Math.min(1, (RADIO_BASE_SECONDS - timer) / RADIO_BASE_SECONDS));
+      progress = Math.max(
+        0,
+        Math.min(1, (RADIO_BASE_SECONDS - timer) / RADIO_BASE_SECONDS),
+      );
     }
   }
 
   const rendered = [];
   entries.forEach((g) => {
     rendered.push(g);
-    if (g.title === 'Science') rendered.push({ title: 'Settlers', settlers: true });
+    if (g.title === 'Science')
+      rendered.push({ title: 'Settlers', settlers: true });
   });
   if (!rendered.some((e) => e.title === 'Settlers'))
     rendered.push({ title: 'Settlers', settlers: true });
 
   return (
     <div className="border border-stroke rounded overflow-hidden bg-bg2">
-      {rendered.map((g) => (
+      {rendered.map((g) =>
         g.settlers ? (
           <Accordion key={g.title} title={g.title} defaultOpen>
             <div className={`text-sm mb-1 ${color}`}>
               Settlers {total}/{capacity}
             </div>
             <div className="text-xs text-muted mb-1">{radioLine}</div>
-            {radioCount > 0 && !candidatePending &&
+            {radioCount > 0 &&
+              !candidatePending &&
               (state.resources.power?.amount || 0) > 0 && (
                 <div className="h-2 bg-stroke rounded mb-1">
                   <div
@@ -136,15 +144,21 @@ export default function ResourceSidebar() {
                 .map(([id, sk]) => `${SKILL_LABELS[id] || id} ${sk.level}`)
                 .join(', ');
               return (
-                <div key={s.id} className="flex justify-between items-center text-sm">
+                <div
+                  key={s.id}
+                  className="flex justify-between items-center text-sm"
+                >
                   <span>
-                    {s.firstName} {s.lastName} • {age} • {skillStr || 'No skills'}
+                    {s.firstName} {s.lastName} • {age} •{' '}
+                    {skillStr || 'No skills'}
                   </span>
                   <button
                     className="px-1 border border-stroke rounded text-xs disabled:opacity-50"
                     onClick={() =>
                       setState((prev) => {
-                        const list = prev.population.settlers.filter((x) => x.id !== s.id);
+                        const list = prev.population.settlers.filter(
+                          (x) => x.id !== s.id,
+                        );
                         return {
                           ...prev,
                           population: { ...prev.population, settlers: list },
@@ -165,8 +179,8 @@ export default function ResourceSidebar() {
               <ResourceRow key={r.id} {...r} />
             ))}
           </Accordion>
-        )
-      ))}
+        ),
+      )}
     </div>
   );
 }

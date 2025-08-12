@@ -34,6 +34,18 @@ export const RESEARCH = [
     effects: [],
   },
   {
+    id: 'radio',
+    name: 'Radio',
+    type: 'unlock',
+    shortDesc: 'Unlocks radio broadcasts to attract settlers.',
+    cost: { science: 80 },
+    timeSec: 120,
+    prereqs: ['industry1'],
+    unlocks: { buildings: ['radio'] },
+    row: 1,
+    effects: [],
+  },
+  {
     id: 'woodworking1',
     name: 'Woodworking I',
     type: 'efficiency',
