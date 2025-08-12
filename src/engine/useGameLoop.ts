@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 
 // Simple game loop using setInterval; dt in seconds
-export default function useGameLoop(callback, intervalMs = 1000) {
-  const lastRef = useRef(performance.now());
-  const callbackRef = useRef(callback);
+export default function useGameLoop(
+  callback: (_dt: number) => void,
+  intervalMs: number = 1000,
+): void {
+  const lastRef = useRef<number>(performance.now());
+  const callbackRef = useRef<(_dt: number) => void>(callback);
 
   useEffect(() => {
     callbackRef.current = callback;

@@ -1,16 +1,29 @@
-import React from 'react';
+import type { JSX } from 'react';
 import { useGame } from '../state/useGame.js';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
 
-export default function CandidateBox() {
-  const { state, setState } = useGame();
-  const candidate = state.population?.candidate;
+interface Skill {
+  level: number;
+}
+
+interface Candidate {
+  firstName: string;
+  lastName: string;
+  sex: 'M' | 'F';
+  age: number;
+  skills?: Record<string, Skill>;
+}
+
+export default function CandidateBox(): JSX.Element | null {
+  const { state, setState } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const candidate: Candidate | null = state.population?.candidate ?? null;
   if (!candidate) return null;
 
-  const accept = () => {
-    setState((prev) => {
+  const accept = (): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setState((prev: any) => {
       const settlers = [
         ...prev.population.settlers,
         candidateToSettler(candidate),
@@ -23,8 +36,9 @@ export default function CandidateBox() {
     });
   };
 
-  const reject = () => {
-    setState((prev) => ({
+  const reject = (): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setState((prev: any) => ({
       ...prev,
       population: { ...prev.population, candidate: null },
       colony: { ...prev.colony, radioTimer: RADIO_BASE_SECONDS },

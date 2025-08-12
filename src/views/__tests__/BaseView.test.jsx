@@ -4,7 +4,7 @@ import { useGame } from '../../state/useGame.js';
 import EventLog from '../../components/EventLog.jsx';
 import ResourceSidebar from '../../components/ResourceSidebar.jsx';
 import Accordion from '../../components/Accordion.jsx';
-import CandidateBox from '../../components/CandidateBox.jsx';
+import CandidateBox from '../../components/CandidateBox.tsx';
 import {
   PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,

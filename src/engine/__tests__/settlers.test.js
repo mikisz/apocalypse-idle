@@ -36,11 +36,7 @@ describe('settlers tick', () => {
     const bonusFoodPerSec =
       totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
 
-    const { state: final } = processSettlersTick(
-      afterTick,
-      1,
-      bonusFoodPerSec,
-    );
+    const { state: final } = processSettlersTick(afterTick, 1, bonusFoodPerSec);
 
     const expected =
       afterTick.resources.potatoes.amount +

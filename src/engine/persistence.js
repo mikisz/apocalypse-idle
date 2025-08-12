@@ -194,8 +194,7 @@ export function save(state) {
 }
 
 export function load(raw) {
-  const save =
-    typeof raw === 'string' ? JSON.parse(raw) : structuredClone(raw);
+  const save = typeof raw === 'string' ? JSON.parse(raw) : structuredClone(raw);
   save.version = save.version ?? save.schemaVersion ?? 1;
   validateSave(save);
   const start = save.version;
