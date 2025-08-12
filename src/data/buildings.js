@@ -114,6 +114,7 @@ export const BUILDINGS = [
     name: 'Radio',
     type: 'production',
     category: 'Utilities',
+    requiresResearch: 'radio',
     inputsPerSecBase: { power: 0.1 },
     costBase: { wood: 80, scrap: 40, stone: 20 },
     costGrowth: 1,

@@ -1,6 +1,6 @@
 {
-  "version": "c165a592774acdbc653d9db413b42c1a1d032d6f",
-  "saveVersion": 4,
+  "version": "7ea0c7c0394116ca3127c3ac4b1b08d0c37c6374",
+  "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
     "spring": {
@@ -315,6 +315,41 @@
       }
     },
     {
+      "id": "shelter",
+      "name": "Shelter",
+      "type": "production",
+      "constructionCost": {
+        "wood": 30,
+        "scrap": 10
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {},
+      "baseInputsPerSec": {},
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {}
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "type": "production",
+      "constructionCost": {
+        "wood": 80,
+        "scrap": 40,
+        "stone": 20
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {},
+      "baseInputsPerSec": {
+        "power": 0.1
+      },
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {}
+    },
+    {
       "id": "foodStorage",
       "name": "Granary",
       "type": "storage",
@@ -408,7 +443,21 @@
       "prereqs": [],
       "unlocks": {
         "buildings": ["sawmill", "metalWorkshop", "materialsDepot"],
-        "categories": ["CONSTRUCTION_MATERIALS"]
+        "categories": ["CONSTRUCTION_MATERIALS"],
+        "resources": ["planks", "metalParts"]
+      },
+      "effects": []
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "cost": {
+        "science": 80
+      },
+      "timeSec": 120,
+      "prereqs": ["industry1"],
+      "unlocks": {
+        "buildings": ["radio"]
       },
       "effects": []
     },
@@ -534,13 +583,7 @@
   ],
   "roles": [],
   "formula": {
-    "order": [
-      "base",
-      "season",
-      "roles",
-      "sum",
-      "clamp"
-    ],
+    "order": ["base", "season", "roles", "sum", "clamp"],
     "demolitionRefund": 0.5,
     "clampRule": "min(value, capacity) and never negative"
   },

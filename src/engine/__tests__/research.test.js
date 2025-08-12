@@ -4,6 +4,7 @@ import {
   processResearchTick,
   cancelResearch,
 } from '../research.js';
+import { RESEARCH_MAP } from '../../data/research.js';
 import { defaultState } from '../../state/defaultState.js';
 import { getResearchOutputBonus } from '../../state/selectors.js';
 import { computeRoleBonuses } from '../settlers.js';
@@ -57,5 +58,16 @@ describe('research engine', () => {
     expect(s.research.current).not.toBe(null);
     s = processResearchTick(s, 1, bonuses);
     expect(s.research.current).toBe(null);
+  });
+
+  it('unlocks radio after industry research', () => {
+    const state = clone(defaultState);
+    state.resources.science.amount = 200;
+    let s = startResearch(state, 'industry1');
+    s = processResearchTick(s, RESEARCH_MAP['industry1'].timeSec);
+    s = startResearch(s, 'radio');
+    expect(s.research.current.id).toBe('radio');
+    s = processResearchTick(s, RESEARCH_MAP['radio'].timeSec);
+    expect(s.research.completed).toContain('radio');
   });
 });
