@@ -37,7 +37,7 @@ export const RESOURCES = {
     icon: '\u{1F332}',
     category: 'CONSTRUCTION_MATERIALS',
     startingAmount: 0,
-    startingCapacity: 0,
+    startingCapacity: 50,
   },
   metalParts: {
     id: 'metalParts',
@@ -45,7 +45,7 @@ export const RESOURCES = {
     icon: '\u2699\uFE0F',
     category: 'CONSTRUCTION_MATERIALS',
     startingAmount: 0,
-    startingCapacity: 0,
+    startingCapacity: 20,
   },
   science: {
     id: 'science',

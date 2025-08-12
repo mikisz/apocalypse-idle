@@ -1,5 +1,5 @@
 {
-  "version": "965f8303e7488ace47c19773059d713a040dfacc",
+  "version": "c165a592774acdbc653d9db413b42c1a1d032d6f",
   "saveVersion": 4,
   "tickSeconds": 1,
   "seasons": {
@@ -94,7 +94,7 @@
       "displayName": "Planks",
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
-      "startingCapacity": 0,
+      "startingCapacity": 50,
       "unit": null
     },
     {
@@ -102,7 +102,7 @@
       "displayName": "Metal Parts",
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
-      "startingCapacity": 0,
+      "startingCapacity": 20,
       "unit": null
     },
     {
@@ -213,6 +213,59 @@
       }
     },
     {
+      "id": "sawmill",
+      "name": "Sawmill",
+      "type": "processing",
+      "constructionCost": {
+        "wood": 40,
+        "scrap": 15,
+        "stone": 10
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "planks": 0.5
+      },
+      "baseInputsPerSec": {
+        "wood": 1
+      },
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      }
+    },
+    {
+      "id": "metalWorkshop",
+      "name": "Metal Workshop",
+      "type": "processing",
+      "constructionCost": {
+        "wood": 30,
+        "scrap": 30,
+        "stone": 10,
+        "planks": 10
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {
+        "metalParts": 0.4
+      },
+      "baseInputsPerSec": {
+        "scrap": 1
+      },
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      }
+    },
+    {
       "id": "school",
       "name": "School",
       "type": "production",
@@ -296,6 +349,23 @@
       "seasonalMultipliers": {}
     },
     {
+      "id": "materialsDepot",
+      "name": "Materials Depot",
+      "type": "storage",
+      "constructionCost": {
+        "wood": 25,
+        "scrap": 10,
+        "stone": 5
+      },
+      "demolitionRefund": 0.5,
+      "storageProvided": {},
+      "baseProductionPerSec": {},
+      "baseInputsPerSec": {},
+      "seasonalMode": "ignore",
+      "seasonalCustom": null,
+      "seasonalMultipliers": {}
+    },
+    {
       "id": "battery",
       "name": "Battery",
       "type": "storage",
@@ -314,7 +384,13 @@
   ],
   "roles": [],
   "formula": {
-    "order": ["base", "season", "roles", "sum", "clamp"],
+    "order": [
+      "base",
+      "season",
+      "roles",
+      "sum",
+      "clamp"
+    ],
     "demolitionRefund": 0.5,
     "clampRule": "min(value, capacity) and never negative"
   },

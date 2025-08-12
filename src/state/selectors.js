@@ -31,17 +31,31 @@ export function getResourceRates(
     if (count <= 0) return;
     let factor = 1;
     if (b.inputsPerSecBase) {
-      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-        const need = base * count;
-        const have = state.resources[res]?.amount || 0;
-        const ratio = need > 0 ? have / need : 1;
-        factor = Math.min(factor, ratio);
-      });
-      factor = Math.min(1, factor);
-      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-        const amt = base * count * factor;
-        rates[res] = (rates[res] || 0) - amt;
-      });
+      if (b.type === 'processing') {
+        const canRun = Object.entries(b.inputsPerSecBase).every(([res, base]) => {
+          const need = base * count;
+          const have = state.resources[res]?.amount || 0;
+          return have >= need;
+        });
+        if (!canRun) return;
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const amt = base * count;
+          rates[res] = (rates[res] || 0) - amt;
+        });
+        factor = 1;
+      } else {
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const need = base * count;
+          const have = state.resources[res]?.amount || 0;
+          const ratio = need > 0 ? have / need : 1;
+          factor = Math.min(factor, ratio);
+        });
+        factor = Math.min(1, factor);
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const amt = base * count * factor;
+          rates[res] = (rates[res] || 0) - amt;
+        });
+      }
     }
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;

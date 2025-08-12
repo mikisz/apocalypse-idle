@@ -44,6 +44,34 @@ export const BUILDINGS = [
     description: 'Extracts stone slowly but steadily.',
   },
   {
+    id: 'sawmill',
+    name: 'Sawmill',
+    type: 'processing',
+    category: 'Production',
+    requiresResearch: 'industry1',
+    inputsPerSecBase: { wood: 1 },
+    outputsPerSecBase: { planks: 0.5 },
+    costBase: { wood: 40, scrap: 15, stone: 10 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    seasonProfile: 'constant',
+    description: 'Converts wood into planks.',
+  },
+  {
+    id: 'metalWorkshop',
+    name: 'Metal Workshop',
+    type: 'processing',
+    category: 'Production',
+    requiresResearch: 'industry1',
+    inputsPerSecBase: { scrap: 1 },
+    outputsPerSecBase: { metalParts: 0.4 },
+    costBase: { wood: 30, scrap: 30, stone: 10, planks: 10 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    seasonProfile: 'constant',
+    description: 'Processes scrap into metal parts.',
+  },
+  {
     id: 'school',
     name: 'School',
     type: 'production',
@@ -89,6 +117,17 @@ export const BUILDINGS = [
     description: 'Increases storage for wood, stone and scrap.',
   },
   {
+    id: 'materialsDepot',
+    name: 'Materials Depot',
+    type: 'storage',
+    requiresResearch: 'industry1',
+    costBase: { wood: 25, scrap: 10, stone: 5 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { planks: 150, metalParts: 60 },
+    description: 'Stores processed construction materials.',
+  },
+  {
     id: 'battery',
     name: 'Battery',
     type: 'storage',
@@ -103,7 +142,7 @@ export const BUILDINGS = [
 
 export const BUILDING_MAP = Object.fromEntries(BUILDINGS.map((b) => [b.id, b]));
 export const PRODUCTION_BUILDINGS = BUILDINGS.filter(
-  (b) => b.type === 'production',
+  (b) => b.type === 'production' || b.type === 'processing',
 );
 export const STORAGE_BUILDINGS = BUILDINGS.filter((b) => b.type === 'storage');
 

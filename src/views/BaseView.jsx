@@ -13,6 +13,7 @@ import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { getCapacity } from '../state/selectors.js';
 import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
+import { RESEARCH_MAP } from '../data/research.js';
 
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
@@ -20,6 +21,10 @@ function BuildingRow({ building }) {
   const season = getSeason(state);
   const scaledCost = getBuildingCost(building, count);
   const costEntries = Object.entries(scaledCost);
+  const completedResearch = state.research.completed || [];
+  const unlocked =
+    !building.requiresResearch ||
+    completedResearch.includes(building.requiresResearch);
   const canAfford = costEntries.every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
   );
@@ -34,17 +39,17 @@ function BuildingRow({ building }) {
   );
 
   const formatPerSec = (perSec, res) => {
-    const sign = perSec >= 0 ? '+' : '';
-    return `${sign}${formatAmount(perSec)} ${RESOURCES[res].name}/s`;
+    const sign = perSec >= 0 ? '+' : '-';
+    return `${sign}${Math.abs(perSec).toFixed(2)} ${RESOURCES[res].name}/s`;
   };
 
   const build = () => {
-    if (!canAfford) return;
+    if (!canAfford || !unlocked) return;
     setState((prev) => {
       const resources = { ...prev.resources };
-      costEntries.forEach(([res, amt]) => {
-        const currentEntry = resources[res] || { amount: 0, discovered: false };
-        const next = currentEntry.amount - amt;
+          costEntries.forEach(([res, amt]) => {
+            const currentEntry = resources[res] || { amount: 0, discovered: false };
+            const next = currentEntry.amount - amt;
         resources[res] = {
           amount: next,
           discovered: currentEntry.discovered || next > 0,
@@ -80,7 +85,7 @@ function BuildingRow({ building }) {
           <button
             className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
             onClick={build}
-            disabled={!canAfford}
+            disabled={!canAfford || !unlocked}
           >
             Build
           </button>
@@ -93,19 +98,24 @@ function BuildingRow({ building }) {
           </button>
         </div>
       </div>
-      <div className="text-xs text-muted space-y-1">
-        <div>{building.description}</div>
-        <div>
-          Cost:{' '}
-          {costEntries
-            .map(([res, amt]) => `${formatAmount(amt)} ${RESOURCES[res].name}`)
-            .join(', ')}
-        </div>
-        {perOutputs.map((o) => (
-          <div key={`out-${o.res}`}>
-            Produces: {formatPerSec(o.perSec, o.res)}
+        <div className="text-xs text-muted space-y-1">
+          <div>{building.description}</div>
+          <div>
+            Cost:{' '}
+            {costEntries
+              .map(([res, amt]) => `${formatAmount(amt)} ${RESOURCES[res].name}`)
+              .join(', ')}
           </div>
-        ))}
+          {!unlocked && building.requiresResearch && (
+            <div className="text-red-400">
+              Requires: {RESEARCH_MAP[building.requiresResearch]?.name || building.requiresResearch}
+            </div>
+          )}
+          {perOutputs.map((o) => (
+            <div key={`out-${o.res}`}>
+              Produces: {formatPerSec(o.perSec, o.res)}
+            </div>
+          ))}
         {perInputs.map((i) => (
           <div key={`in-${i.res}`}>
             Consumes: {formatPerSec(-i.perSec, i.res)}
@@ -133,10 +143,7 @@ function BuildingRow({ building }) {
 export default function BaseView() {
   const { state } = useGame();
   const prodGroups = {};
-  const completedResearch = state.research.completed || [];
   PRODUCTION_BUILDINGS.forEach((b) => {
-    if (b.requiresResearch && !completedResearch.includes(b.requiresResearch))
-      return;
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
@@ -161,11 +168,7 @@ export default function BaseView() {
             </Accordion>
           ))}
           <Accordion title="Storage">
-            {STORAGE_BUILDINGS.filter(
-              (b) =>
-                !b.requiresResearch ||
-                completedResearch.includes(b.requiresResearch),
-            ).map((b) => (
+            {STORAGE_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
           </Accordion>

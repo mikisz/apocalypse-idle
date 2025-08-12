@@ -26,6 +26,26 @@ describe('economy basics', () => {
     );
   });
 
+  test('sawmill processes wood into planks when inputs available', () => {
+    const state = clone(defaultState);
+    state.resources.wood.amount = 10;
+    state.buildings.loggingCamp.count = 0;
+    state.buildings.sawmill = { count: 1 };
+    const next = processTick(state, 1);
+    expect(next.resources.wood.amount).toBeCloseTo(9, 5);
+    expect(next.resources.planks.amount).toBeCloseTo(0.5, 5);
+  });
+
+  test('sawmill halts without enough wood', () => {
+    const state = clone(defaultState);
+    state.resources.wood.amount = 0.5;
+    state.buildings.loggingCamp.count = 0;
+    state.buildings.sawmill = { count: 1 };
+    const next = processTick(state, 1);
+    expect(next.resources.wood.amount).toBeCloseTo(0.5, 5);
+    expect(next.resources.planks.amount).toBeCloseTo(0, 5);
+  });
+
   test('removing last required building unassigns settlers', () => {
     const state = clone(defaultState);
     state.buildings.potatoField.count = 1;

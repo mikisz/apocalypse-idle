@@ -24,24 +24,45 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     if (count <= 0) return;
     let factor = 1;
     if (b.inputsPerSecBase) {
-      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-        const need = base * count * seconds;
-        const have = resources[res]?.amount || 0;
-        const ratio = need > 0 ? have / need : 1;
-        factor = Math.min(factor, ratio);
-      });
-      factor = Math.min(1, factor);
-      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-        const amt = base * count * seconds * factor;
-        const capacity = getCapacity(state, res);
-        const entry = resources[res] || { amount: 0, discovered: false };
-        const next = clampResource(entry.amount - amt, capacity);
-        resources[res] = {
-          ...entry,
-          amount: next,
-          discovered: entry.discovered || next > 0,
-        };
-      });
+      if (b.type === 'processing') {
+        const canRun = Object.entries(b.inputsPerSecBase).every(([res, base]) => {
+          const need = base * count * seconds;
+          const have = resources[res]?.amount || 0;
+          return have >= need;
+        });
+        if (!canRun) return;
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const amt = base * count * seconds;
+          const capacity = getCapacity(state, res);
+          const entry = resources[res] || { amount: 0, discovered: false };
+          const next = clampResource(entry.amount - amt, capacity);
+          resources[res] = {
+            ...entry,
+            amount: next,
+            discovered: entry.discovered || next > 0,
+          };
+        });
+        factor = 1;
+      } else {
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const need = base * count * seconds;
+          const have = resources[res]?.amount || 0;
+          const ratio = need > 0 ? have / need : 1;
+          factor = Math.min(factor, ratio);
+        });
+        factor = Math.min(1, factor);
+        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+          const amt = base * count * seconds * factor;
+          const capacity = getCapacity(state, res);
+          const entry = resources[res] || { amount: 0, discovered: false };
+          const next = clampResource(entry.amount - amt, capacity);
+          resources[res] = {
+            ...entry,
+            amount: next,
+            discovered: entry.discovered || next > 0,
+          };
+        });
+      }
     }
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       const category = RESOURCES[res].category;
