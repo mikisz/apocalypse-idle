@@ -1,12 +1,7 @@
 import { useGame } from '../state/useGame.js';
 import ResearchTree from './research/ResearchTree.jsx';
 import { RESEARCH_MAP } from '../data/research.js';
-
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
+import { formatTime } from '../utils/time.js';
 
 export default function ResearchView() {
   const { state, beginResearch, abortResearch } = useGame();

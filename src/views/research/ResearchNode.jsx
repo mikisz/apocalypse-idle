@@ -3,12 +3,7 @@ import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
 import { formatAmount } from '../../utils/format.js';
-
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
+import { formatTime } from '../../utils/time.js';
 
 function buildTooltip(node) {
   const lines = [];
