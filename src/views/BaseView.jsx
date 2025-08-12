@@ -169,6 +169,16 @@ function BuildingRow({ building, completedResearch }) {
   );
 }
 
+export const GROUP_ORDER = [
+  'Food',
+  'Raw Materials',
+  'Construction Materials',
+  'Science',
+  'Energy',
+  'Settlement',
+  'Utilities',
+];
+
 export default function BaseView() {
   const { state } = useGame();
   const completedResearch = state.research.completed || [];
@@ -193,15 +203,6 @@ export default function BaseView() {
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
   });
-  const GROUP_ORDER = [
-    'Food',
-    'Raw Materials',
-    'Construction Materials',
-    'Science',
-    'Energy',
-    'Settlement',
-    'Utilities',
-  ];
   const prodGroupKeys = [
     ...GROUP_ORDER.filter((g) => prodGroups[g]),
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
