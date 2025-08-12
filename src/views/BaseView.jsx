@@ -14,6 +14,7 @@ import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { getCapacity } from '../state/selectors.js';
 import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
+import { RESEARCH_MAP } from '../data/research.js';
 
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
@@ -22,6 +23,10 @@ function BuildingRow({ building }) {
   const season = getSeason(state);
   const scaledCost = getBuildingCost(building, count);
   const costEntries = Object.entries(scaledCost);
+  const completedResearch = state.research.completed || [];
+  const unlocked =
+    !building.requiresResearch ||
+    completedResearch.includes(building.requiresResearch);
   const canAfford = costEntries.every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
   );
@@ -36,12 +41,12 @@ function BuildingRow({ building }) {
   );
 
   const formatPerSec = (perSec, res) => {
-    const sign = perSec >= 0 ? '+' : '';
-    return `${sign}${formatAmount(perSec)} ${RESOURCES[res].name}/s`;
+    const sign = perSec >= 0 ? '+' : '-';
+    return `${sign}${Math.abs(perSec).toFixed(2)} ${RESOURCES[res].name}/s`;
   };
 
   const build = () => {
-    if (!canAfford || atMax) return;
+    if (!canAfford || !unlocked || atMax) return;
     setState((prev) => {
       const resources = { ...prev.resources };
       costEntries.forEach(([res, amt]) => {
@@ -83,8 +88,17 @@ function BuildingRow({ building }) {
           <button
             className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
             onClick={build}
-            disabled={!canAfford || atMax}
-            title={atMax ? `Max ${building.maxCount}` : undefined}
+            disabled={!canAfford || !unlocked || atMax}
+            title={
+              !unlocked
+                ? `Requires: ${
+                    RESEARCH_MAP[building.requiresResearch]?.name ||
+                    building.requiresResearch
+                  }`
+                : atMax
+                ? `Max ${building.maxCount}`
+                : undefined
+            }
           >
             Build
           </button>
@@ -105,6 +119,13 @@ function BuildingRow({ building }) {
             .map(([res, amt]) => `${formatAmount(amt)} ${RESOURCES[res].name}`)
             .join(', ')}
         </div>
+        {!unlocked && building.requiresResearch && (
+          <div className="text-red-400">
+            Requires:{' '}
+            {RESEARCH_MAP[building.requiresResearch]?.name ||
+              building.requiresResearch}
+          </div>
+        )}
         {perOutputs.map((o) => (
           <div key={`out-${o.res}`}>
             Produces: {formatPerSec(o.perSec, o.res)}
@@ -138,15 +159,19 @@ function BuildingRow({ building }) {
 export default function BaseView() {
   const { state } = useGame();
   const prodGroups = {};
-  const completedResearch = state.research.completed || [];
   PRODUCTION_BUILDINGS.forEach((b) => {
-    if (b.requiresResearch && !completedResearch.includes(b.requiresResearch))
-      return;
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
   });
-  const GROUP_ORDER = ['Food', 'Production', 'Science', 'Energy', 'Settlement', 'Utilities'];
+  const GROUP_ORDER = [
+    'Food',
+    'Production',
+    'Science',
+    'Energy',
+    'Settlement',
+    'Utilities',
+  ];
   const prodGroupKeys = [
     ...GROUP_ORDER.filter((g) => prodGroups[g]),
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
@@ -167,11 +192,7 @@ export default function BaseView() {
             </Accordion>
           ))}
           <Accordion title="Storage">
-            {STORAGE_BUILDINGS.filter(
-              (b) =>
-                !b.requiresResearch ||
-                completedResearch.includes(b.requiresResearch),
-            ).map((b) => (
+            {STORAGE_BUILDINGS.map((b) => (
               <BuildingRow key={b.id} building={b} />
             ))}
           </Accordion>

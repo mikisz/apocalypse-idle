@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
+import { BUILDING_MAP } from '../../data/buildings.js';
 import { formatAmount } from '../../utils/format.js';
 
 function formatTime(seconds) {
@@ -12,14 +13,18 @@ function formatTime(seconds) {
 function buildTooltip(node) {
   const lines = [];
   if (node.unlocks?.buildings?.length) {
-    const names = node.unlocks.buildings.map((b) => b).join(', ');
+    const names = node.unlocks.buildings
+      .map((b) => BUILDING_MAP[b]?.name || b)
+      .join(', ');
     lines.push(`New buildings: ${names}`);
   }
   if (node.unlocks?.categories?.length) {
     lines.push(`New resource category: ${node.unlocks.categories.join(', ')}`);
   }
   if (node.unlocks?.resources?.length) {
-    const names = node.unlocks.resources.map((r) => r).join(', ');
+    const names = node.unlocks.resources
+      .map((r) => RESOURCES[r]?.name || r)
+      .join(', ');
     lines.push(`New resources: ${names}`);
   }
   const effs = Array.isArray(node.effects)

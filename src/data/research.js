@@ -28,6 +28,7 @@ export const RESEARCH = [
     unlocks: {
       buildings: ['sawmill', 'metalWorkshop', 'materialsDepot'],
       categories: ['CONSTRUCTION_MATERIALS'],
+      resources: ['planks', 'metalParts'],
     },
     row: 0,
     effects: [],
