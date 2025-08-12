@@ -1,5 +1,5 @@
 {
-  "version": "4fe4a75ff117d80df4c6437ccd2de54590ccf272",
+  "version": "5e5a6b7d1786bbde7e8dafea4711f644f2d09a5b",
   "saveVersion": 6,
   "tickSeconds": 1,
   "seasons": {
@@ -82,7 +82,7 @@
       "displayName": "Potatoes",
       "category": "FOOD",
       "startingAmount": 0,
-      "startingCapacity": 300,
+      "startingCapacity": 450,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -94,7 +94,7 @@
       "displayName": "Meat",
       "category": "FOOD",
       "startingAmount": 0,
-      "startingCapacity": 300,
+      "startingCapacity": 150,
       "unit": "",
       "origin": {
         "file": "resources.js",
@@ -106,7 +106,7 @@
       "displayName": "Wood",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 100,
+      "startingCapacity": 150,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -118,7 +118,7 @@
       "displayName": "Stone",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 100,
+      "startingCapacity": 80,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -130,7 +130,7 @@
       "displayName": "Scrap",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 100,
+      "startingCapacity": 80,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -192,9 +192,9 @@
       "name": "Potato Field",
       "type": "production",
       "cost": {
-        "wood": 15
+        "wood": 17
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -226,7 +226,7 @@
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "meat": 0.15
+        "meat": 0.19
       },
       "inputsPerSec": {},
       "requiresResearch": "hunting1",
@@ -234,7 +234,7 @@
         "spring": 1.1,
         "summer": 1,
         "autumn": 0.9,
-        "winter": 0.8
+        "winter": 0.6
       },
       "origin": {
         "file": "buildings.js",
@@ -248,11 +248,11 @@
       "cost": {
         "scrap": 15
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "wood": 0.25
+        "wood": 0.3
       },
       "inputsPerSec": {},
       "requiresResearch": "",
@@ -274,7 +274,7 @@
       "cost": {
         "wood": 12
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -301,11 +301,11 @@
         "wood": 20,
         "scrap": 5
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "stone": 0.08
+        "stone": 0.104
       },
       "inputsPerSec": {},
       "requiresResearch": "",
@@ -325,11 +325,11 @@
       "name": "Sawmill",
       "type": "processing",
       "cost": {
-        "wood": 40,
-        "scrap": 15,
-        "stone": 10
+        "wood": 48,
+        "scrap": 18,
+        "stone": 12
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -360,7 +360,7 @@
         "stone": 10,
         "planks": 10
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -386,15 +386,15 @@
       "name": "School",
       "type": "production",
       "cost": {
-        "wood": 25,
-        "scrap": 10,
-        "stone": 10
+        "wood": 30,
+        "scrap": 12,
+        "stone": 12
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "science": 0.5
+        "science": 0.45
       },
       "inputsPerSec": {},
       "requiresResearch": "",
@@ -417,7 +417,7 @@
         "wood": 50,
         "stone": 10
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.13,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -470,7 +470,8 @@
       "cost": {
         "wood": 80,
         "scrap": 40,
-        "stone": 20
+        "stone": 20,
+        "planks": 20
       },
       "costGrowth": 1,
       "refund": 0.5,
@@ -500,7 +501,7 @@
         "scrap": 5,
         "stone": 5
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.2,
       "refund": 0.5,
       "storage": {
         "potatoes": 300,
@@ -529,12 +530,12 @@
         "scrap": 10,
         "stone": 10
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.2,
       "refund": 0.5,
       "storage": {
         "wood": 200,
         "stone": 80,
-        "scrap": 120
+        "scrap": 90
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -559,11 +560,11 @@
         "scrap": 10,
         "stone": 5
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.2,
       "refund": 0.5,
       "storage": {
-        "planks": 150,
-        "metalParts": 60
+        "planks": 300,
+        "metalParts": 240
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -587,10 +588,10 @@
         "wood": 40,
         "stone": 20
       },
-      "costGrowth": 1.15,
+      "costGrowth": 1.2,
       "refund": 0.5,
       "storage": {
-        "power": 40
+        "power": 600
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -665,8 +666,8 @@
     {
       "id": "hunting1",
       "name": "Hunting I",
-      "scienceCost": 35,
-      "timeSec": 45,
+      "scienceCost": 50,
+      "timeSec": 90,
       "prereqs": [],
       "milestones": null,
       "unlocks": {
@@ -687,8 +688,8 @@
     {
       "id": "radio",
       "name": "Radio",
-      "scienceCost": 120,
-      "timeSec": 180,
+      "scienceCost": 150,
+      "timeSec": 240,
       "prereqs": [
         "industry1",
         "basicEnergy"
@@ -710,8 +711,8 @@
     {
       "id": "woodworking1",
       "name": "Woodworking I",
-      "scienceCost": 50,
-      "timeSec": 70,
+      "scienceCost": 60,
+      "timeSec": 90,
       "prereqs": [
         "industry1"
       ],
@@ -736,8 +737,8 @@
     {
       "id": "salvaging1",
       "name": "Salvaging I",
-      "scienceCost": 50,
-      "timeSec": 70,
+      "scienceCost": 60,
+      "timeSec": 90,
       "prereqs": [
         "industry1"
       ],
@@ -820,8 +821,8 @@
     {
       "id": "woodworking2",
       "name": "Woodworking II",
-      "scienceCost": 110,
-      "timeSec": 180,
+      "scienceCost": 140,
+      "timeSec": 240,
       "prereqs": [
         "woodworking1",
         "industry2"
@@ -847,8 +848,8 @@
     {
       "id": "salvaging2",
       "name": "Salvaging II",
-      "scienceCost": 110,
-      "timeSec": 180,
+      "scienceCost": 140,
+      "timeSec": 240,
       "prereqs": [
         "salvaging1",
         "industry2"
@@ -874,8 +875,8 @@
     {
       "id": "logistics2",
       "name": "Logistics II",
-      "scienceCost": 120,
-      "timeSec": 210,
+      "scienceCost": 150,
+      "timeSec": 270,
       "prereqs": [
         "logistics1",
         "industry2"
@@ -901,6 +902,58 @@
       "origin": {
         "file": "research.js",
         "path": "RESEARCH[10]"
+      }
+    },
+    {
+      "id": "hunting2",
+      "name": "Hunting II",
+      "scienceCost": 130,
+      "timeSec": 240,
+      "prereqs": [
+        "hunting1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
+      "effects": [
+        {
+          "category": "FOOD",
+          "percent": 0.1,
+          "type": "output"
+        }
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[11]"
+      }
+    },
+    {
+      "id": "industryProduction",
+      "name": "Industry Production",
+      "scienceCost": 130,
+      "timeSec": 240,
+      "prereqs": [
+        "industry1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
+      "effects": [
+        {
+          "category": "CONSTRUCTION_MATERIALS",
+          "percent": 0.1,
+          "type": "output"
+        }
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[12]"
       }
     }
   ],
@@ -1030,23 +1083,23 @@
   "startingResources": {
     "potatoes": {
       "amount": 0,
-      "capacity": 300
+      "capacity": 450
     },
     "meat": {
       "amount": 0,
-      "capacity": 300
+      "capacity": 150
     },
     "wood": {
       "amount": 0,
-      "capacity": 100
+      "capacity": 150
     },
     "stone": {
       "amount": 0,
-      "capacity": 100
+      "capacity": 80
     },
     "scrap": {
       "amount": 0,
-      "capacity": 100
+      "capacity": 80
     },
     "planks": {
       "amount": 0,
