@@ -183,9 +183,7 @@ export default function BaseView() {
   });
   const GROUP_ORDER = [
     'Food',
-    'Wood',
-    'Scrap',
-    'Stone',
+    'Raw Materials',
     'Construction Materials',
     'Science',
     'Energy',
