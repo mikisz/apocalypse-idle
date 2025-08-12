@@ -1,8 +1,9 @@
 import { createLogEntry } from '../utils/log.js';
+import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 
 const STORAGE_KEY = 'apocalypse-idle-save';
 
-export const CURRENT_SAVE_VERSION = 4;
+export const CURRENT_SAVE_VERSION = 5;
 
 export const migrations = [
   {
@@ -82,6 +83,25 @@ export const migrations = [
       return save;
     },
   },
+  {
+    from: 4,
+    to: 5,
+    up(save) {
+      if (!save.population || typeof save.population !== 'object') {
+        save.population = { settlers: [], candidate: null };
+      } else {
+        if (!Array.isArray(save.population.settlers))
+          save.population.settlers = [];
+        if (!('candidate' in save.population)) save.population.candidate = null;
+      }
+      if (!save.colony || typeof save.colony !== 'object') {
+        save.colony = { radioTimer: RADIO_BASE_SECONDS };
+      } else if (typeof save.colony.radioTimer !== 'number') {
+        save.colony.radioTimer = RADIO_BASE_SECONDS;
+      }
+      return save;
+    },
+  },
 ];
 
 export function applyMigrations(save) {
@@ -156,6 +176,12 @@ export function validateSave(obj) {
       throw new Error('Invalid save: missing settlers');
     if (!Array.isArray(obj.population.settlers))
       throw new Error('Invalid save: settlers must be array');
+    if (obj.version >= 5) {
+      if (!('candidate' in obj.population))
+        throw new Error('Invalid save: missing candidate');
+      if (!('colony' in obj) || typeof obj.colony !== 'object')
+        throw new Error('Invalid save: missing colony');
+    }
   }
   return true;
 }

@@ -5,6 +5,7 @@ import { getSeason, getSeasonMultiplier } from '../engine/time.js';
 import { formatRate } from '../utils/format.js';
 import { BALANCE } from '../data/balance.js';
 import { ROLE_BY_RESOURCE } from '../data/roles.js';
+import { SHELTER_MAX } from '../data/settlement.js';
 
 export function getCapacity(state, resourceId) {
   const base = RESOURCES[resourceId]?.startingCapacity || 0;
@@ -17,6 +18,11 @@ export function getCapacity(state, resourceId) {
   });
   const bonus = getResearchStorageBonus(state, resourceId);
   return Math.floor((base + fromBuildings) * (1 + bonus));
+}
+
+export function getSettlerCapacity(state) {
+  const count = state.buildings?.shelter?.count || 0;
+  return Math.min(count, SHELTER_MAX);
 }
 
 export function getResourceRates(
