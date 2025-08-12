@@ -1,3 +1,5 @@
+import { SHELTER_COST_GROWTH, SHELTER_MAX } from './settlement.js';
+
 export const BUILDINGS = [
   {
     id: 'potatoField',
@@ -67,6 +69,29 @@ export const BUILDINGS = [
     requiresResearch: 'basicEnergy',
     description:
       'Burns wood to generate power. Excess power is lost if storage is full.',
+  },
+  {
+    id: 'shelter',
+    name: 'Shelter',
+    type: 'production',
+    category: 'Settlement',
+    costBase: { wood: 30, scrap: 10 },
+    costGrowth: SHELTER_COST_GROWTH,
+    refund: 0.5,
+    maxCount: SHELTER_MAX,
+    description: 'Houses one settler. Max: 5',
+  },
+  {
+    id: 'radio',
+    name: 'Radio',
+    type: 'production',
+    category: 'Utilities',
+    inputsPerSecBase: { power: 0.1 },
+    costBase: { wood: 80, scrap: 40, stone: 20 },
+    costGrowth: 1,
+    refund: 0.5,
+    maxCount: 1,
+    description: 'Requires power to operate. Attracts settlers over time.',
   },
   {
     id: 'foodStorage',
