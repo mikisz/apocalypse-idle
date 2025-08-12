@@ -16,14 +16,13 @@ import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
 import { RESEARCH_MAP } from '../data/research.js';
 
-function BuildingRow({ building }) {
+function BuildingRow({ building, completedResearch }) {
   const { state, setState } = useGame();
   const count = state.buildings[building.id]?.count || 0;
   const atMax = building.maxCount != null && count >= building.maxCount;
   const season = getSeason(state);
   const scaledCost = getBuildingCost(building, count);
   const costEntries = Object.entries(scaledCost);
-  const completedResearch = state.research.completed || [];
   const unlocked =
     !building.requiresResearch ||
     completedResearch.includes(building.requiresResearch);
@@ -158,8 +157,24 @@ function BuildingRow({ building }) {
 
 export default function BaseView() {
   const { state } = useGame();
+  const completedResearch = state.research.completed || [];
+
+  const prodBuildings = PRODUCTION_BUILDINGS.filter(
+    (b) =>
+      !b.requiresResearch ||
+      completedResearch.includes(b.requiresResearch) ||
+      (state.buildings[b.id]?.count || 0) > 0,
+  );
+
+  const storageBuildings = STORAGE_BUILDINGS.filter(
+    (b) =>
+      !b.requiresResearch ||
+      completedResearch.includes(b.requiresResearch) ||
+      (state.buildings[b.id]?.count || 0) > 0,
+  );
+
   const prodGroups = {};
-  PRODUCTION_BUILDINGS.forEach((b) => {
+  prodBuildings.forEach((b) => {
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
@@ -187,13 +202,21 @@ export default function BaseView() {
           {prodGroupKeys.map((key) => (
             <Accordion key={key} title={key} defaultOpen>
               {prodGroups[key].map((b) => (
-                <BuildingRow key={b.id} building={b} />
+                <BuildingRow
+                  key={b.id}
+                  building={b}
+                  completedResearch={completedResearch}
+                />
               ))}
             </Accordion>
           ))}
           <Accordion title="Storage">
-            {STORAGE_BUILDINGS.map((b) => (
-              <BuildingRow key={b.id} building={b} />
+            {storageBuildings.map((b) => (
+              <BuildingRow
+                key={b.id}
+                building={b}
+                completedResearch={completedResearch}
+              />
             ))}
           </Accordion>
         </div>
