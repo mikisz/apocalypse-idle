@@ -1,6 +1,9 @@
 import { createLogEntry } from '../utils/log.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 
+const structuredClone =
+  globalThis.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));
+
 const STORAGE_KEY = 'apocalypse-idle-save';
 
 export const CURRENT_SAVE_VERSION = 5;
@@ -192,7 +195,7 @@ export function save(state) {
 
 export function load(raw) {
   const save =
-    typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw));
+    typeof raw === 'string' ? JSON.parse(raw) : structuredClone(raw);
   save.version = save.version ?? save.schemaVersion ?? 1;
   validateSave(save);
   const start = save.version;

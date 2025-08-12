@@ -11,6 +11,9 @@ import { BALANCE } from '../data/balance.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { generateCandidate } from './candidates.js';
 
+const structuredClone =
+  globalThis.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));
+
 export function clampResource(value, capacity) {
   let v = Number.isFinite(value) ? value : 0;
   const c = Number.isFinite(capacity) ? Math.max(0, capacity) : 0;
@@ -104,7 +107,7 @@ export function processTick(state, seconds = 1, roleBonuses = {}) {
 
 export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
   if (elapsedSeconds <= 0) return { state, gains: {} };
-  const before = JSON.parse(JSON.stringify(state.resources));
+  const before = structuredClone(state.resources);
   let current = applyProduction({ ...state }, elapsedSeconds, roleBonuses);
   const settlers =
     state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
