@@ -3,7 +3,7 @@ import { processTick, demolishBuilding } from '../production.js';
 import { defaultState } from '../../state/defaultState.js';
 import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
 
-const clone = (obj) => JSON.parse(JSON.stringify(obj));
+const clone = (obj) => structuredClone(obj);
 
 describe('economy basics', () => {
   test('spring potato field output', () => {

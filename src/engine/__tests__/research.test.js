@@ -10,7 +10,7 @@ import { getResearchOutputBonus } from '../../state/selectors.js';
 import { computeRoleBonuses } from '../settlers.js';
 
 function clone(obj) {
-  return JSON.parse(JSON.stringify(obj));
+  return structuredClone(obj);
 }
 
 describe('research engine', () => {

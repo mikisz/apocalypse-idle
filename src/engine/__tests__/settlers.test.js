@@ -6,7 +6,7 @@ import { defaultState } from '../../state/defaultState.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BALANCE } from '../../data/balance.js';
 
-const clone = (obj) => JSON.parse(JSON.stringify(obj));
+const clone = (obj) => structuredClone(obj);
 
 describe('settlers tick', () => {
   it('keeps potato totals consistent with farming bonus and consumption', () => {
