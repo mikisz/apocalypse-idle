@@ -82,7 +82,9 @@ function BuildingRow({ building }) {
       <div className="flex items-center justify-between">
         <span>
           {building.name}{' '}
-          {building.maxCount != null ? `${count}/${building.maxCount}` : `(${count})`}
+          {building.maxCount != null
+            ? `${count}/${building.maxCount}`
+            : `(${count})`}
         </span>
         <div className="space-x-2">
           <button
@@ -96,8 +98,8 @@ function BuildingRow({ building }) {
                     building.requiresResearch
                   }`
                 : atMax
-                ? `Max ${building.maxCount}`
-                : undefined
+                  ? `Max ${building.maxCount}`
+                  : undefined
             }
           >
             Build

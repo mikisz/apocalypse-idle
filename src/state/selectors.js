@@ -39,11 +39,13 @@ export function getResourceRates(
     let factor = 1;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
-        const canRun = Object.entries(b.inputsPerSecBase).every(([res, base]) => {
-          const need = base * count;
-          const have = state.resources[res]?.amount || 0;
-          return have >= need;
-        });
+        const canRun = Object.entries(b.inputsPerSecBase).every(
+          ([res, base]) => {
+            const need = base * count;
+            const have = state.resources[res]?.amount || 0;
+            return have >= need;
+          },
+        );
         if (!canRun) return;
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count;

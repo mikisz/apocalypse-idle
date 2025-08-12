@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useGame } from '../state/useGame.js';
 import { formatAge } from '../utils/format.js';
-import { assignmentsSummary, computeRoleBonuses } from '../engine/settlers.js';
+import { computeRoleBonuses } from '../engine/settlers.js';
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
 import { ROLE_LIST, SKILL_LABELS } from '../data/roles.js';
 import { RESOURCES } from '../data/resources.js';
+import { getSettlerCapacity } from '../state/selectors.js';
 
 export default function PopulationView() {
   const { state, setSettlerRole } = useGame();
@@ -17,7 +18,8 @@ export default function PopulationView() {
   const filtered = settlers
     .filter((s) => !onlyLiving || !s.isDead)
     .filter((s) => !unassignedOnly || s.role == null);
-  const { assigned, living } = assignmentsSummary(settlers);
+  const living = settlers.filter((s) => !s.isDead).length;
+  const capacity = getSettlerCapacity(state);
   const bonuses = computeRoleBonuses(settlers);
   const bonusLabels = {};
   ROLE_LIST.forEach((r) => {
@@ -30,7 +32,7 @@ export default function PopulationView() {
         <div className="border border-stroke rounded p-3 bg-bg2/50 text-center">
           <div className="text-xs text-muted">Settlers</div>
           <div className="text-lg font-semibold">
-            {assigned}/{living}
+            {living}/{capacity}
           </div>
         </div>
         {Object.entries(bonusLabels).map(([role, label]) => (
