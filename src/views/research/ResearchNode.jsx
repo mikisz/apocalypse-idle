@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { Check } from 'lucide-react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
@@ -70,7 +71,7 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
       <TooltipTrigger asChild>
         <div
           ref={ref}
-          className={`relative w-64 p-3 border rounded bg-card/50 text-sm flex flex-col gap-1 ${
+          className={`relative w-64 p-3 border rounded bg-card text-sm flex flex-col gap-1 ${
             status === 'completed'
               ? 'opacity-80 border-green-600'
               : status === 'inProgress'
@@ -81,12 +82,12 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
           }`}
         >
           <div className="font-semibold text-base">{node.name}</div>
-          <div className="text-muted">{node.shortDesc}</div>
+          <div className="text-muted-foreground">{node.shortDesc}</div>
           <div className="flex items-center gap-1">
             <span>{RESOURCES.science.icon}</span>
             <span>{formatAmount(cost)}</span>
           </div>
-          <div className="text-xs text-muted">
+          <div className="text-xs text-muted-foreground">
             Research time: {formatTime(node.timeSec)}
           </div>
           {status === 'available' && (
@@ -126,7 +127,9 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
             </div>
           )}
           {status === 'completed' && (
-            <span className="absolute top-1 right-1 text-green-500">✔</span>
+            <span className="absolute top-1 right-1 text-green-500">
+              <Check className="w-4 h-4" />
+            </span>
           )}
         </div>
       </TooltipTrigger>

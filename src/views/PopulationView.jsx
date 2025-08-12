@@ -42,7 +42,7 @@ export default function PopulationView() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card className="text-center">
           <CardHeader className="p-0">
-            <CardTitle className="text-sm font-normal text-muted">
+            <CardTitle className="text-sm font-normal text-muted-foreground">
               Settlers
             </CardTitle>
           </CardHeader>
@@ -53,7 +53,7 @@ export default function PopulationView() {
         {Object.entries(BONUS_LABELS).map(([role, label]) => (
           <Card key={role} className="text-center">
             <CardHeader className="p-0">
-              <CardTitle className="text-sm font-normal text-muted">
+              <CardTitle className="text-sm font-normal text-muted-foreground">
                 {label} bonus
               </CardTitle>
             </CardHeader>
@@ -102,7 +102,7 @@ export default function PopulationView() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span
                     className={`px-2 py-0.5 rounded text-xs text-white ${
                       s.sex === 'M' ? 'bg-blue-700' : 'bg-pink-700'
@@ -157,7 +157,7 @@ export default function PopulationView() {
           );
         })
       ) : (
-        <div className="text-center text-muted">No survivors</div>
+        <div className="text-center text-muted-foreground">No survivors</div>
       )}
     </div>
   );

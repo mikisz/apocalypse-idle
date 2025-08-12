@@ -29,7 +29,7 @@ export default function GameAccordion({
           {action && <div className="ml-2">{action}</div>}
         </AccordionPrimitive.Header>
         <AccordionContent>
-          <div className="px-4 pb-4 pt-2 space-y-3">{children}</div>
+          <div className="p-2 space-y-2">{children}</div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
