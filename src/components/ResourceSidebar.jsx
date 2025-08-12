@@ -1,10 +1,17 @@
 import React from 'react';
 import { useGame } from '../state/useGame.js';
 import Accordion from './Accordion.jsx';
-import { getCapacity, getResourceRates } from '../state/selectors.js';
+import {
+  getCapacity,
+  getResourceRates,
+  getSettlerCapacity,
+} from '../state/selectors.js';
 import { computeRoleBonuses } from '../engine/settlers.js';
 import { formatAmount } from '../utils/format.js';
 import { RESOURCE_LIST } from '../data/resources.js';
+import { RADIO_BASE_SECONDS } from '../data/settlement.js';
+import { SKILL_LABELS } from '../data/roles.js';
+import { DAYS_PER_YEAR } from '../engine/time.js';
 
 function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
   return (
@@ -27,14 +34,14 @@ function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
 }
 
 export default function ResourceSidebar() {
-  const { state } = useGame();
+  const { state, setState } = useGame();
   const roleBonuses = computeRoleBonuses(state.population?.settlers || []);
   const rates = getResourceRates(state, true, roleBonuses);
   const groups = {};
   const CATEGORY_LABELS = {
     FOOD: 'Food',
     RAW: 'Raw Materials',
-    SOCIETY: 'Society',
+    SOCIETY: 'Science',
     CONSTRUCTION_MATERIALS: 'Construction Materials',
     ENERGY: 'Energy',
   };
@@ -70,14 +77,95 @@ export default function ResourceSidebar() {
     defaultOpen: true,
   }));
 
+  const settlers = state.population?.settlers?.filter((s) => !s.isDead) || [];
+  const total = settlers.length;
+  const capacity = getSettlerCapacity(state);
+  const ratio = capacity > 0 ? total / capacity : 2;
+  let color = 'text-green-400';
+  if (ratio > 1) color = 'text-red-500';
+  else if (ratio > 0.8) color = 'text-yellow-400';
+  const radioCount = state.buildings?.radio?.count || 0;
+  const candidatePending = !!state.population?.candidate;
+  let radioLine = 'Radio: not built';
+  let progress = 0;
+  if (radioCount > 0) {
+    const powered = (state.resources.power?.amount || 0) > 0;
+    if (candidatePending) {
+      radioLine = 'A settler is waiting for your decision';
+    } else if (!powered) {
+      radioLine = 'Radio: inactive (no power)';
+    } else {
+      const timer = state.colony?.radioTimer ?? RADIO_BASE_SECONDS;
+      const mm = String(Math.floor(timer / 60)).padStart(2, '0');
+      const ss = String(Math.floor(timer % 60)).padStart(2, '0');
+      radioLine = `Next settler in: ${mm}:${ss}`;
+      progress = Math.max(0, Math.min(1, (RADIO_BASE_SECONDS - timer) / RADIO_BASE_SECONDS));
+    }
+  }
+
+  const rendered = [];
+  entries.forEach((g) => {
+    rendered.push(g);
+    if (g.title === 'Science') rendered.push({ title: 'Settlers', settlers: true });
+  });
+  if (!rendered.some((e) => e.title === 'Settlers'))
+    rendered.push({ title: 'Settlers', settlers: true });
+
   return (
     <div className="border border-stroke rounded overflow-hidden bg-bg2">
-      {entries.map((g) => (
-        <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
-          {g.items.map((r) => (
-            <ResourceRow key={r.id} {...r} />
-          ))}
-        </Accordion>
+      {rendered.map((g) => (
+        g.settlers ? (
+          <Accordion key={g.title} title={g.title} defaultOpen>
+            <div className={`text-sm mb-1 ${color}`}>
+              Settlers {total}/{capacity}
+            </div>
+            <div className="text-xs text-muted mb-1">{radioLine}</div>
+            {radioCount > 0 && !candidatePending &&
+              (state.resources.power?.amount || 0) > 0 && (
+                <div className="h-2 bg-stroke rounded mb-1">
+                  <div
+                    className="h-full bg-green-600 rounded"
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </div>
+              )}
+            {settlers.map((s) => {
+              const age = Math.floor((s.ageDays || 0) / DAYS_PER_YEAR);
+              const skillStr = Object.entries(s.skills || {})
+                .filter(([, sk]) => sk.level > 0)
+                .map(([id, sk]) => `${SKILL_LABELS[id] || id} ${sk.level}`)
+                .join(', ');
+              return (
+                <div key={s.id} className="flex justify-between items-center text-sm">
+                  <span>
+                    {s.firstName} {s.lastName} • {age} • {skillStr || 'No skills'}
+                  </span>
+                  <button
+                    className="px-1 border border-stroke rounded text-xs disabled:opacity-50"
+                    onClick={() =>
+                      setState((prev) => {
+                        const list = prev.population.settlers.filter((x) => x.id !== s.id);
+                        return {
+                          ...prev,
+                          population: { ...prev.population, settlers: list },
+                        };
+                      })
+                    }
+                    disabled={total <= 1}
+                  >
+                    Exile
+                  </button>
+                </div>
+              );
+            })}
+          </Accordion>
+        ) : (
+          <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
+            {g.items.map((r) => (
+              <ResourceRow key={r.id} {...r} />
+            ))}
+          </Accordion>
+        )
       ))}
     </div>
   );
