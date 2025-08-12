@@ -20,7 +20,7 @@ export default function SettlerSection({ title, info }) {
       </div>
       <div className="text-xs text-muted mb-1">{radioLine}</div>
       {radioCount > 0 && !candidatePending && powered && (
-        <div className="h-2 bg-stroke rounded mb-1">
+        <div className="h-2 bg-border rounded mb-1">
           <div
             className="h-full bg-green-600 rounded"
             style={{ width: `${progress * 100}%` }}

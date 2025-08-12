@@ -8,7 +8,7 @@ export default function ProductionSection({
   completedResearch = [],
 }) {
   return (
-    <div className="border border-stroke rounded">
+    <div className="border border-border rounded">
       {productionGroups.map((group) => (
         <Accordion key={group.name} title={group.name} defaultOpen>
           {group.buildings.map((b) => (
@@ -32,4 +32,3 @@ export default function ProductionSection({
     </div>
   );
 }
-

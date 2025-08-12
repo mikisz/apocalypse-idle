@@ -8,7 +8,7 @@ export default function Accordion({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-stroke">
+    <div className="border-b border-border">
       <div className="flex items-center justify-between p-2">
         <button
           className="flex-1 flex items-center justify-between"

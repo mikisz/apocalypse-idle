@@ -1,100 +1,84 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-@theme {
-  --color-ink: #e8edf6;
-  --color-muted: #97a3b6;
-  --color-bg: #0b0e14;
-  --color-bg2: #101522;
-  --color-panel: #151b2b;
-  --color-stroke: #232b3d;
-}
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-:root {
-  color-scheme: dark;
-  --radius: 0.625rem;
-  --background: var(--color-bg);
-  --foreground: var(--color-ink);
-  --card: var(--color-panel);
-  --card-foreground: var(--color-ink);
-  --popover: var(--color-panel);
-  --popover-foreground: var(--color-ink);
-  --primary: var(--color-ink);
-  --primary-foreground: var(--color-bg);
-  --secondary: var(--color-bg2);
-  --secondary-foreground: var(--color-ink);
-  --muted: var(--color-bg2);
-  --muted-foreground: var(--color-muted);
-  --accent: var(--color-panel);
-  --accent-foreground: var(--color-ink);
-  --destructive: var(--color-ink);
-  --destructive-foreground: var(--color-bg);
-  --border: var(--color-stroke);
-  --input: var(--color-stroke);
-  --ring: var(--color-stroke);
-}
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-.dark {
-  --background: var(--color-bg);
-  --foreground: var(--color-ink);
-  --card: var(--color-panel);
-  --card-foreground: var(--color-ink);
-  --popover: var(--color-panel);
-  --popover-foreground: var(--color-ink);
-  --primary: var(--color-ink);
-  --primary-foreground: var(--color-bg);
-  --secondary: var(--color-bg2);
-  --secondary-foreground: var(--color-ink);
-  --muted: var(--color-bg2);
-  --muted-foreground: var(--color-muted);
-  --accent: var(--color-panel);
-  --accent-foreground: var(--color-ink);
-  --destructive: var(--color-ink);
-  --destructive-foreground: var(--color-bg);
-  --border: var(--color-stroke);
-  --input: var(--color-stroke);
-  --ring: var(--color-stroke);
-}
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-html,
-body,
-#root {
-  height: 100%;
-}
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: hsl(var(--border));
+    outline-color: hsl(var(--ring) / 0.5);
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    @apply antialiased;
   }
 }

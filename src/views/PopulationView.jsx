@@ -6,18 +6,8 @@ import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
 import { ROLE_LIST, SKILL_LABELS } from '../data/roles.js';
 import { RESOURCES } from '../data/resources.js';
 import { getSettlerCapacity } from '../state/selectors.js';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/components/ui/card';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from '@/components/ui/tabs';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Accordion from '@/components/Accordion.jsx';
 
 const BONUS_LABELS = ROLE_LIST.reduce((acc, r) => {
@@ -51,7 +41,10 @@ export default function PopulationView() {
             Settlers
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="overview" className="flex-1 overflow-y-auto space-y-4">
+        <TabsContent
+          value="overview"
+          className="flex-1 overflow-y-auto space-y-4"
+        >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <Card className="text-center">
               <CardHeader className="p-0">
@@ -103,12 +96,17 @@ export default function PopulationView() {
             filtered.map((s) => {
               const { years, days } = formatAge(s.ageDays);
               const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 };
-              const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level);
+              const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(
+                activeSkill.level,
+              );
               const progress = threshold > 0 ? activeSkill.xp / threshold : 0;
               const badges = Object.entries(s.skills || {})
                 .filter(([, skill]) => skill.level > 0)
                 .map(([role, skill]) => (
-                  <span key={role} className="px-2 py-0.5 bg-bg3 rounded text-xs">
+                  <span
+                    key={role}
+                    className="px-2 py-0.5 bg-card rounded text-xs"
+                  >
                     {SKILL_LABELS[role] || role} {skill.level}
                   </span>
                 ));
@@ -163,7 +161,7 @@ export default function PopulationView() {
                     </div>
                     <div className="space-y-1">
                       <div className="text-sm">Level {activeSkill.level}</div>
-                      <div className="h-2 bg-stroke rounded">
+                      <div className="h-2 bg-border rounded">
                         <div
                           className="h-full bg-green-600 rounded"
                           style={{ width: `${Math.min(progress, 1) * 100}%` }}

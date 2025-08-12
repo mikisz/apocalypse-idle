@@ -75,7 +75,7 @@ export default function BuildingRow({ building, completedResearch }) {
   };
 
   return (
-    <div className="p-2 rounded border border-stroke bg-bg2 space-y-1">
+    <div className="p-2 rounded border border-border bg-card space-y-1">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span>
@@ -163,4 +163,3 @@ export default function BuildingRow({ building, completedResearch }) {
     </div>
   );
 }
-

@@ -44,7 +44,7 @@ export default function PowerPriorityModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-bg2 p-4 rounded shadow max-w-md w-full">
+      <div className="bg-card p-4 rounded shadow max-w-md w-full">
         <h2 className="text-lg mb-2 text-left">Power Priorities</h2>
         <div className="text-center text-xs text-muted">TOP PRIORITY</div>
         <ul className="mt-2 space-y-1 max-h-64 overflow-y-auto">
@@ -54,7 +54,7 @@ export default function PowerPriorityModal({ onClose }) {
             return (
               <li
                 key={id}
-                className="flex items-center justify-between border border-stroke rounded px-2 py-1"
+                className="flex items-center justify-between border border-border rounded px-2 py-1"
                 draggable
                 onDragStart={onDragStart(idx)}
                 onDragOver={onDragOver(idx)}
