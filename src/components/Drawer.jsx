@@ -4,6 +4,7 @@ import { exportSaveFile, load } from '../engine/persistence.js';
 import { createLogEntry } from '../utils/log.js';
 import { Button } from './Button';
 import { Sheet, SheetContent } from './ui/sheet';
+import { Input } from './ui/input';
 
 export default function Drawer() {
   const { state, toggleDrawer, setState, resetGame } = useGame();
@@ -93,7 +94,7 @@ export default function Drawer() {
               >
                 Load
               </Button>
-              <input
+              <Input
                 ref={fileInput}
                 type="file"
                 accept="application/json"
