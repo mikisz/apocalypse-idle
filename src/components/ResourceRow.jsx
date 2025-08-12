@@ -11,7 +11,7 @@ export default function ResourceRow({
   tooltip,
 }) {
   const content = (
-    <li className="flex items-center justify-between text-sm tabular-nums">
+    <li className="flex items-center justify-between text-sm tabular-nums px-1 py-0.5">
       <span className="flex items-center gap-1">
         {icon && <span>{icon}</span>}
         <span>{name}</span>
@@ -21,7 +21,9 @@ export default function ResourceRow({
           {formatAmount(amount)}
           {capacity != null && ` / ${formatAmount(capacity)}`}
         </span>
-        {rate != null && <span className="text-xs muted-foreground">{rate}</span>}
+        {rate != null && (
+          <span className="text-xs muted-foreground">{rate}</span>
+        )}
       </span>
     </li>
   );

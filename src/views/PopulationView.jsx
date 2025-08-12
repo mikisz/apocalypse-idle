@@ -38,7 +38,7 @@ export default function PopulationView() {
   const bonuses = computeRoleBonuses(settlers);
 
   return (
-    <div className="h-full p-4 pb-20 overflow-y-auto space-y-4">
+    <div className="h-full p-4 pb-24 overflow-y-auto space-y-4">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card className="text-center">
           <CardHeader className="p-0">
@@ -84,48 +84,21 @@ export default function PopulationView() {
       {filtered.length > 0 ? (
         filtered.map((s) => {
           const { years, days } = formatAge(s.ageDays);
-          const activeSkill = s.skills?.[s.role] || { level: 0, xp: 0 };
-          const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(activeSkill.level);
-          const progress = threshold > 0 ? activeSkill.xp / threshold : 0;
-          const badges = Object.entries(s.skills || {})
-            .filter(([, skill]) => skill.level > 0)
-            .map(([role, skill]) => (
-              <span key={role} className="px-2 py-0.5 bg-card rounded text-xs">
-                {SKILL_LABELS[role] || role} {skill.level}
-              </span>
-            ));
+          const skillEntries = Object.entries(s.skills || {})
+            .filter(([, sk]) => sk.level > 0)
+            .sort((a, b) => b[1].level - a[1].level);
           return (
-            <Card key={s.id} className="flex flex-col gap-2">
-              <CardHeader>
-                <CardTitle>
-                  {s.firstName} {s.lastName}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                  <span
-                    className={`px-2 py-0.5 rounded text-xs text-white ${
-                      s.sex === 'M' ? 'bg-blue-700' : 'bg-pink-700'
-                    }`}
-                  >
-                    {s.sex}
-                  </span>
-                  <span>
-                    Age: {years}y {days}d
-                  </span>
+            <Card key={s.id}>
+              <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    {s.firstName} {s.lastName}
+                    <span className="px-1 border rounded text-xs">{s.sex}</span>
+                  </CardTitle>
+                  <div className="text-sm text-muted-foreground">
+                    {years}y, {days}d
+                  </div>
                 </div>
-                <Accordion
-                  title={`Happiness: ${Math.round(s.happiness || 0)}%`}
-                >
-                  <ul className="space-y-0.5 text-xs">
-                    {(s.happinessBreakdown || []).map((b, idx) => (
-                      <li key={idx}>
-                        {b.label}: {b.value >= 0 ? '+' : ''}
-                        {b.value}
-                      </li>
-                    ))}
-                  </ul>
-                </Accordion>
                 <Select
                   value={s.role || 'idle'}
                   onValueChange={(v) => setSettlerRole(s.id, v)}
@@ -142,16 +115,57 @@ export default function PopulationView() {
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="space-y-1">
-                  <div className="text-sm">Level {activeSkill.level}</div>
-                  <div className="h-2 bg-border rounded">
-                    <div
-                      className="h-full bg-green-600 rounded"
-                      style={{ width: `${Math.min(progress, 1) * 100}%` }}
-                    />
-                  </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="border rounded">
+                  <Accordion
+                    title={`Happiness: ${Math.round(s.happiness || 0)}%`}
+                    contentClassName="p-2 space-y-0.5"
+                  >
+                    <ul className="space-y-0.5 text-xs">
+                      {(s.happinessBreakdown || []).map((b, idx) => (
+                        <li key={idx}>
+                          {b.label}: {b.value >= 0 ? '+' : ''}
+                          {b.value}
+                        </li>
+                      ))}
+                    </ul>
+                  </Accordion>
                 </div>
-                <div className="flex flex-wrap gap-1">{badges}</div>
+                <Accordion title="Skills" contentClassName="p-2 space-y-2">
+                  <ul className="space-y-2">
+                    {skillEntries.map(([role, skill]) => {
+                      const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(
+                        skill.level,
+                      );
+                      const prog =
+                        threshold > 0 ? Math.min(skill.xp / threshold, 1) : 0;
+                      return (
+                        <li
+                          key={role}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span className="flex items-center gap-1">
+                            {SKILL_LABELS[role] || role}
+                            <span className="px-1 bg-muted rounded text-xs">
+                              [{skill.level}]
+                            </span>
+                          </span>
+                          <div className="flex items-center gap-1 w-32">
+                            <span className="text-xs">{skill.level}</span>
+                            <div className="flex-1 h-2 bg-border rounded">
+                              <div
+                                className="h-full bg-green-600 rounded"
+                                style={{ width: `${prog * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-xs">{skill.level + 1}</span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Accordion>
               </CardContent>
             </Card>
           );

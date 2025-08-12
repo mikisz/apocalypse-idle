@@ -3,6 +3,9 @@ import { useGame } from '../state/useGame.ts';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
+import { formatAge } from '../utils/format.js';
+import { DAYS_PER_YEAR } from '../engine/time.js';
+import Accordion from './Accordion.jsx';
 import { Button } from './ui/button';
 
 import {
@@ -14,7 +17,9 @@ import {
   CardFooter,
 } from './ui/card';
 
-interface Skill { level: number; }
+interface Skill {
+  level: number;
+}
 interface Candidate {
   firstName: string;
   lastName: string;
@@ -30,8 +35,12 @@ export default function CandidateBox(): JSX.Element | null {
 
   const updateAfterDecision = (accepted: boolean): void => {
     setState((prev) => {
-      const newSettler = candidateToSettler(candidate) as (typeof prev.population.settlers)[number];
-      const settlers = accepted ? [...prev.population.settlers, newSettler] : prev.population.settlers;
+      const newSettler = candidateToSettler(
+        candidate,
+      ) as (typeof prev.population.settlers)[number];
+      const settlers = accepted
+        ? [...prev.population.settlers, newSettler]
+        : prev.population.settlers;
       return {
         ...prev,
         population: { ...prev.population, settlers, candidate: null },
@@ -43,36 +52,68 @@ export default function CandidateBox(): JSX.Element | null {
   const accept = (): void => updateAfterDecision(true);
   const reject = (): void => updateAfterDecision(false);
 
-  const skills = Object.entries(candidate.skills || {})
+  const sortedSkills = Object.entries(candidate.skills || {})
     .filter(([, s]) => s.level > 0)
-    .map(([id, s]) => `${SKILL_LABELS[id] || id} ${s.level}`)
-    .join(', ');
+    .sort((a, b) => b[1].level - a[1].level);
+
+  const { years, days } = formatAge(candidate.age * DAYS_PER_YEAR);
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>A new settler has arrived!</CardTitle>
-        <CardDescription className="text-sm">
-          {candidate.firstName} {candidate.lastName}
-          <span className="px-2 muted-foreground">·</span>
-          {candidate.sex === 'M' ? 'Male' : 'Female'}
-          <span className="px-2 muted-foreground">·</span>
-          Age {candidate.age}
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            {candidate.firstName} {candidate.lastName}
+            <span className="px-1 border rounded text-xs">{candidate.sex}</span>
+          </CardTitle>
+          <CardDescription>
+            {years}y, {days}d
+          </CardDescription>
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-2">
-        <div className="text-xs muted-foreground">
-          {skills || 'No notable skills'}
-        </div>
+      <CardContent className="space-y-4">
+        <Accordion title="Skills" contentClassName="p-2 space-y-2">
+          <ul className="space-y-2">
+            {sortedSkills.length > 0 ? (
+              sortedSkills.map(([id, s]) => (
+                <li
+                  key={id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="flex items-center gap-1">
+                    {SKILL_LABELS[id] || id}
+                    <span className="px-1 bg-muted rounded text-xs">
+                      [{s.level}]
+                    </span>
+                  </span>
+                  <div className="flex items-center gap-1 w-32">
+                    <span className="text-xs">{s.level}</span>
+                    <div className="flex-1 h-2 bg-border rounded">
+                      <div
+                        className="h-full bg-green-600 rounded"
+                        style={{ width: '0%' }}
+                      />
+                    </div>
+                    <span className="text-xs">{s.level + 1}</span>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li className="text-xs text-muted-foreground">
+                No notable skills
+              </li>
+            )}
+          </ul>
+        </Accordion>
       </CardContent>
 
       <CardFooter className="justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={reject}>
+          Reject
+        </Button>
         <Button variant="secondary" size="sm" onClick={accept}>
           Accept
-        </Button>
-        <Button variant="destructive" size="sm" onClick={reject}>
-          Reject
         </Button>
       </CardFooter>
     </Card>

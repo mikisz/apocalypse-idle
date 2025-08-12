@@ -13,7 +13,7 @@ export default function ResourceSidebar() {
   const { sections, settlersInfo, happinessInfo } = useResourceSections(state);
 
   return (
-    <div className="border border-border rounded overflow-hidden bg-card p-2 space-y-2">
+    <div className="border border-border rounded-xl overflow-hidden bg-card space-y-2">
       {sections.map((g) =>
         g.settlers ? (
           <SettlerSection key={g.title} title={g.title} info={settlersInfo} />
@@ -40,8 +40,13 @@ export default function ResourceSidebar() {
             </div>
           </Accordion>
         ) : (
-          <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
-            <ul className="space-y-1">
+          <Accordion
+            key={g.title}
+            title={g.title}
+            defaultOpen={g.defaultOpen}
+            contentClassName="p-0"
+          >
+            <ul className="divide-y divide-border">
               {g.items.map((r) => (
                 <ResourceRow key={r.id} {...r} />
               ))}
