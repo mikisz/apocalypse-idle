@@ -2,6 +2,7 @@ import { initSeasons } from '../engine/time.js';
 import { CURRENT_SAVE_VERSION } from '../engine/persistence.js';
 import { RESOURCES } from '../data/resources.js';
 import { makeRandomSettler } from '../data/names.js';
+import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 
 const initResources = () => {
   const obj = {};
@@ -19,6 +20,11 @@ const initBuildings = () => ({
 
 const initSettlers = () => [makeRandomSettler()];
 
+const initColony = () => ({
+  starvationTimerSeconds: 0,
+  radioTimer: RADIO_BASE_SECONDS,
+});
+
 const initResearch = () => ({ current: null, completed: [], progress: {} });
 
 export const defaultState = {
@@ -29,7 +35,8 @@ export const defaultState = {
   resources: initResources(),
   buildings: initBuildings(),
   research: initResearch(),
-  population: { settlers: initSettlers() },
+  population: { settlers: initSettlers(), candidate: null },
+  colony: initColony(),
   log: [],
   lastSaved: Date.now(),
 };
