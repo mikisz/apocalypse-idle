@@ -3,6 +3,7 @@ import { useGame } from '../state/useGame.ts';
 import { exportSaveFile, load } from '../engine/persistence.js';
 import { createLogEntry } from '../utils/log.js';
 import { Button } from './Button';
+import { Sheet, SheetContent } from './ui/sheet';
 
 export default function Drawer() {
   const { state, toggleDrawer, setState, resetGame } = useGame();
@@ -50,14 +51,13 @@ export default function Drawer() {
   };
 
   return (
-    <>
-      <div
-        className={`fixed inset-0 bg-black/50 transition-opacity z-40 ${state.ui.drawerOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        onClick={toggleDrawer}
-      />
-      <aside
-        className={`fixed top-0 bottom-0 right-0 w-64 bg-bg2 border-l border-stroke z-50 transform transition-transform ${state.ui.drawerOpen ? 'translate-x-0' : 'translate-x-full'}`}
-      >
+    <Sheet
+      open={state.ui.drawerOpen}
+      onOpenChange={(open) => {
+        if (open !== state.ui.drawerOpen) toggleDrawer();
+      }}
+    >
+      <SheetContent side="right" className="w-64">
         <div className="p-4 space-y-6">
           <section>
             <h2 className="font-semibold mb-2">📊 Statistics</h2>
@@ -109,7 +109,7 @@ export default function Drawer() {
             </Button>
           </section>
         </div>
-      </aside>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }
