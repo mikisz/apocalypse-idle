@@ -4,6 +4,12 @@ import ResearchNode from './ResearchNode.jsx';
 import { useGame } from '../../state/useGame.ts';
 import { RESOURCES } from '../../data/resources.js';
 
+const RESEARCH_ROWS = RESEARCH.reduce((acc, r) => {
+  acc[r.row] = acc[r.row] || [];
+  acc[r.row].push(r);
+  return acc;
+}, []);
+
 function evaluate(node, state) {
   const completed = state.research.completed || [];
   if (completed.includes(node.id)) return { status: 'completed', reasons: {} };
@@ -74,12 +80,6 @@ export default function ResearchTree({ onStart }) {
     return () => window.removeEventListener('resize', computeLines);
   }, [computeLines]);
 
-  const rows = [];
-  RESEARCH.forEach((r) => {
-    rows[r.row] = rows[r.row] || [];
-    rows[r.row].push(r);
-  });
-
   return (
     <div ref={containerRef} className="relative overflow-auto h-full">
       <svg className="absolute inset-0 pointer-events-none">
@@ -110,7 +110,7 @@ export default function ResearchTree({ onStart }) {
         ))}
       </svg>
       <div className="flex flex-col gap-8 relative z-10 py-4">
-        {rows.map((nodes, idx) => (
+        {RESEARCH_ROWS.map((nodes, idx) => (
           <div key={idx} className="flex gap-8 justify-center">
             {nodes.map((node) => {
               const { status, reasons } = evaluate(node, state);
