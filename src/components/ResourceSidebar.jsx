@@ -12,7 +12,7 @@ export default function ResourceSidebar() {
   const { sections, settlersInfo } = useResourceSections(state);
 
   return (
-    <div className="border border-stroke rounded overflow-hidden bg-bg2">
+    <div className="border border-border rounded overflow-hidden bg-card">
       {sections.map((g) =>
         g.settlers ? (
           <SettlerSection key={g.title} title={g.title} info={settlersInfo} />

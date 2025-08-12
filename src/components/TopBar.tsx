@@ -20,7 +20,7 @@ export default function TopBar(): JSX.Element {
       : 0;
 
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">
+    <header className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 border-b border-border bg-card">
       <span className="tabular-nums text-xl">Year {time.year}</span>
       <h1 className="font-semibold">Apocalypse Idle</h1>
       <div className="relative flex items-center gap-2">
@@ -38,7 +38,7 @@ export default function TopBar(): JSX.Element {
         </Button>
         {open && (
           <div
-            className="absolute top-full right-0 mt-1 p-2 bg-bg2 border border-stroke rounded text-xs shadow-lg"
+            className="absolute top-full right-0 mt-1 p-2 bg-card border border-border rounded text-xs shadow-lg"
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
           >

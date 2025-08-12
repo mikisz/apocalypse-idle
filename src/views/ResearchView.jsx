@@ -3,18 +3,8 @@ import ResearchTree from './research/ResearchTree.jsx';
 import { RESEARCH_MAP } from '../data/research.js';
 import { formatTime } from '../utils/time.js';
 import { Button } from '@/components/Button';
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from '@/components/ui/tabs';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 export default function ResearchView() {
   const { state, beginResearch, abortResearch } = useGame();
@@ -42,7 +32,7 @@ export default function ResearchView() {
                   <CardTitle>Researching: {node.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="h-2 bg-stroke rounded">
+                  <div className="h-2 bg-border rounded">
                     <div
                       className="h-full bg-blue-600 rounded"
                       style={{ width: `${pct * 100}%` }}
@@ -55,8 +45,7 @@ export default function ResearchView() {
                       size="sm"
                       className="border-red-400 text-red-300 hover:bg-red-900/20"
                       onClick={() => {
-                        if (window.confirm('Cancel research?'))
-                          abortResearch();
+                        if (window.confirm('Cancel research?')) abortResearch();
                       }}
                     >
                       Cancel

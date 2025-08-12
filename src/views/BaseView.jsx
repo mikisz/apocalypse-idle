@@ -24,7 +24,7 @@ export default function BaseView() {
           storageBuildings={storageBuildings}
           completedResearch={completedResearch}
         />
-        <div className="border border-stroke rounded">
+        <div className="border border-border rounded">
           <Accordion title="Change Log">
             <EventLog log={state.log} />
           </Accordion>
@@ -33,4 +33,3 @@ export default function BaseView() {
     </div>
   );
 }
-

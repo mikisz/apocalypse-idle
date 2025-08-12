@@ -67,14 +67,14 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
   return (
     <div
       ref={ref}
-      className={`relative w-56 p-3 border rounded bg-bg2/50 text-sm flex flex-col gap-1 ${
+      className={`relative w-56 p-3 border rounded bg-card/50 text-sm flex flex-col gap-1 ${
         status === 'completed'
           ? 'opacity-80 border-green-600'
           : status === 'inProgress'
             ? 'border-blue-500'
             : status === 'available'
               ? 'border-blue-300'
-              : 'opacity-50 border-stroke'
+              : 'opacity-50 border-border'
       }`}
       title={tooltip}
     >

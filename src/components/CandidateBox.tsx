@@ -24,7 +24,9 @@ export default function CandidateBox(): JSX.Element | null {
 
   const updateAfterDecision = (accepted: boolean): void => {
     setState((prev) => {
-      const newSettler = candidateToSettler(candidate) as typeof prev.population.settlers[number];
+      const newSettler = candidateToSettler(
+        candidate,
+      ) as (typeof prev.population.settlers)[number];
       const settlers = accepted
         ? [...prev.population.settlers, newSettler]
         : prev.population.settlers;
@@ -50,7 +52,7 @@ export default function CandidateBox(): JSX.Element | null {
     .join(', ');
 
   return (
-    <div className="p-4 border border-stroke bg-bg2 rounded space-y-2">
+    <div className="p-4 border border-border bg-card rounded space-y-2">
       <div className="font-semibold">A new settler has arrived!</div>
       <div className="text-sm">
         {candidate.firstName} {candidate.lastName} •{' '}
