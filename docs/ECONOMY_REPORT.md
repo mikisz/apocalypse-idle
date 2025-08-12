@@ -1,7 +1,9 @@
 # Economy Report
 
 ## 1) Overview
-Economy generated from commit **fea12af6a78ea53efde6c6b33916b2cdc4d64b21** on 2025-08-12 03:58:01 +0200. Save version: **5**.
+
+Economy generated from commit **817ab1aa9f0ca61c503b8319294da30152cc6ca2** on 2025-08-12 04:05:51 +0200. Save version: **5**.
+
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -81,10 +83,13 @@ Starting season: spring, Year: 1.
 | power | 0 | 2 | resources.js:RESOURCES.power.startingAmount/startingCapacity |
 
 ### Buildings
-| building | count | source |
-| - | - | - |
-| potatoField | 2 | defaultState.js:initBuildings().potatoField.count |
-| loggingCamp | 1 | defaultState.js:initBuildings().loggingCamp.count |
+
+| building | count |
+| - | - |
+| potatoField | 2 |
+| loggingCamp | 1 |
+| shelter | 1 |
+
 
 ## 8) Rules & Formulas
 - Building cost: costBase * costGrowth^count, rounded up (source: buildings.js:getBuildingCost())
