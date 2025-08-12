@@ -4,8 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import PopulationView from '../PopulationView.jsx';
 import { GameContext } from '../../state/useGame.ts';
 
+// JSDOM doesn't implement scrollIntoView which Radix Select relies on
+window.HTMLElement.prototype.scrollIntoView = () => {};
+
 describe('PopulationView', () => {
-  test('shows idle settlers and propagates role changes', () => {
+  test('shows idle settlers and propagates role changes', async () => {
     const settler = {
       id: 's1',
       firstName: 'Test',
@@ -28,10 +31,14 @@ describe('PopulationView', () => {
       </GameContext.Provider>,
     );
 
-    const select = screen.getByRole('combobox');
-    expect(select.value).toBe('idle');
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.textContent).toContain('Idle');
 
-    fireEvent.change(select, { target: { value: 'farmer' } });
+    // JSDOM doesn't implement pointer capture APIs used by Radix, so stub them
+    // to allow the select to open during the test.
+    fireEvent.click(trigger);
+    const farmer = await screen.findByRole('option', { name: 'Farmer' });
+    fireEvent.click(farmer);
     expect(setSettlerRole).toHaveBeenCalledWith('s1', 'farmer');
   });
 });

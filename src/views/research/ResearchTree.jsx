@@ -47,6 +47,8 @@ export default function ResearchTree({ onStart }) {
   const containerRef = useRef(null);
   const nodeRefs = useRef({});
   const [lines, setLines] = useState([]);
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0, left: 0, top: 0 });
 
   const computeLines = useCallback(() => {
     const container = containerRef.current;
@@ -80,8 +82,45 @@ export default function ResearchTree({ onStart }) {
     return () => window.removeEventListener('resize', computeLines);
   }, [computeLines]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onMouseDown = (e) => {
+      if (e.button !== 0 || e.target.closest('button')) return;
+      isDragging.current = true;
+      dragStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        left: el.scrollLeft,
+        top: el.scrollTop,
+      };
+    };
+    const onMouseMove = (e) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - dragStart.current.x;
+      const dy = e.clientY - dragStart.current.y;
+      el.scrollLeft = dragStart.current.left - dx;
+      el.scrollTop = dragStart.current.top - dy;
+    };
+    const onMouseUp = () => {
+      isDragging.current = false;
+    };
+    el.addEventListener('mousedown', onMouseDown);
+    el.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown);
+      el.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
   return (
-    <div ref={containerRef} className="relative overflow-auto h-full">
+    <div
+      ref={containerRef}
+      onScroll={computeLines}
+      className="relative h-full overflow-auto cursor-grab [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
       <svg className="absolute inset-0 pointer-events-none">
         <defs>
           <marker
