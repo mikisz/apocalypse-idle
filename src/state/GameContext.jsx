@@ -26,8 +26,7 @@ import { getResourceRates } from './selectors.js';
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BUILDINGS } from '../data/roles.js';
 import { createLogEntry } from '../utils/log.js';
-import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { generateCandidate } from '../engine/candidates.js';
+import { updateRadio } from '../engine/radio.js';
 
 function mergeDeep(target, source) {
   const out = { ...target };
@@ -126,18 +125,7 @@ export function GameProvider({ children }) {
         Math.random,
         roleBonuses,
       );
-      let candidate = prev.population?.candidate || null;
-      let radioTimer = prev.colony?.radioTimer ?? RADIO_BASE_SECONDS;
-      if (prev.buildings?.radio?.count > 0) {
-        const powered = (prev.resources.power?.amount || 0) > 0;
-        if (powered && !candidate) {
-          radioTimer = Math.max(0, radioTimer - dt);
-          if (radioTimer <= 0) {
-            candidate = generateCandidate();
-            radioTimer = 0;
-          }
-        }
-      }
+      const { candidate, radioTimer } = updateRadio(prev, dt);
       const nextSeconds = (settlersProcessed.gameTime?.seconds || 0) + dt;
       const computedYear = getYear({
         ...settlersProcessed,

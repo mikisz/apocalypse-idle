@@ -8,8 +8,7 @@ import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { BALANCE } from '../data/balance.js';
-import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { generateCandidate } from './candidates.js';
+import { updateRadio } from './radio.js';
 
 const structuredClone =
   globalThis.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));
@@ -129,19 +128,7 @@ export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
     if (current.resources[res].amount > 0)
       current.resources[res].discovered = true;
   });
-  let candidate = state.population?.candidate || null;
-  let radioTimer = state.colony?.radioTimer ?? RADIO_BASE_SECONDS;
-  if (
-    (state.buildings?.radio?.count || 0) > 0 &&
-    !candidate &&
-    (state.resources.power?.amount || 0) > 0
-  ) {
-    radioTimer = Math.max(0, radioTimer - elapsedSeconds);
-    if (radioTimer <= 0) {
-      candidate = generateCandidate();
-      radioTimer = 0;
-    }
-  }
+  const { candidate, radioTimer } = updateRadio(state, elapsedSeconds);
   const gains = {};
   Object.keys(before).forEach((res) => {
     const gain =
