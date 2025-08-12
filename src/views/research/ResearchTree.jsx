@@ -91,9 +91,8 @@ export default function ResearchTree({ onStart }) {
             refX="5"
             refY="3"
             orient="auto"
-            fill="#666"
           >
-            <polygon points="0 0, 6 3, 0 6" />
+            <polygon points="0 0, 6 3, 0 6" className="fill-muted-foreground" />
           </marker>
         </defs>
         {lines.map((l, i) => (
@@ -103,7 +102,7 @@ export default function ResearchTree({ onStart }) {
             y1={l.y1}
             x2={l.x2}
             y2={l.y2}
-            stroke="#666"
+            className="stroke-muted-foreground"
             strokeWidth="2"
             markerEnd="url(#arrowhead)"
           />

@@ -42,10 +42,6 @@ export default {
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
         xl: 'var(--radius-xl)',
-        xl2: '14px',
-      },
-      boxShadow: {
-        card: '0 6px 20px rgba(0,0,0,.25)',
       },
     },
   },
