@@ -70,28 +70,30 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         });
       }
     }
-    Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
-      const category = RESOURCES[res].category;
-      const mult = getSeasonMultiplier(season, category);
-      const role = ROLE_BY_RESOURCE[res];
-      const bonusPercent = roleBonuses[role] || 0;
-      const researchBonus = getResearchOutputBonus(state, res);
-      const gain =
-        base *
-        mult *
-        count *
-        (1 + bonusPercent / 100 + researchBonus) *
-        seconds *
-        factor;
-      const capacity = getCapacity(state, res);
-      const currentEntry = resources[res] || { amount: 0, discovered: false };
-      const next = clampResource(currentEntry.amount + gain, capacity);
-      resources[res] = {
-        amount: next,
-        discovered: currentEntry.discovered || count > 0 || next > 0,
-        produced: (currentEntry.produced || 0) + Math.max(0, gain),
-      };
-    });
+    if (b.outputsPerSecBase) {
+      Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
+        const category = RESOURCES[res].category;
+        const mult = getSeasonMultiplier(season, category);
+        const role = ROLE_BY_RESOURCE[res];
+        const bonusPercent = roleBonuses[role] || 0;
+        const researchBonus = getResearchOutputBonus(state, res);
+        const gain =
+          base *
+          mult *
+          count *
+          (1 + bonusPercent / 100 + researchBonus) *
+          seconds *
+          factor;
+        const capacity = getCapacity(state, res);
+        const currentEntry = resources[res] || { amount: 0, discovered: false };
+        const next = clampResource(currentEntry.amount + gain, capacity);
+        resources[res] = {
+          amount: next,
+          discovered: currentEntry.discovered || count > 0 || next > 0,
+          produced: (currentEntry.produced || 0) + Math.max(0, gain),
+        };
+      });
+    }
   });
   Object.keys(resources).forEach((res) => {
     const entry = resources[res];

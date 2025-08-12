@@ -7,6 +7,7 @@ vi.mock('../candidates.js', () => ({
 }));
 
 import { updateRadio } from '../radio.js';
+import { applyProduction } from '../production.js';
 import { generateCandidate } from '../candidates.js';
 
 const baseState = {
@@ -30,5 +31,16 @@ describe('updateRadio', () => {
     expect(generateCandidate).toHaveBeenCalledOnce();
     expect(candidate).toEqual(fakeCandidate);
     expect(radioTimer).toBe(0);
+  });
+});
+
+describe('radio building production', () => {
+  it('consumes power without producing resources', () => {
+    const state = {
+      buildings: { radio: { count: 1 } },
+      resources: { power: { amount: 1 } },
+    };
+    const next = applyProduction(state, 5);
+    expect(next.resources.power.amount).toBeCloseTo(0.5, 5);
   });
 });
