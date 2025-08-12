@@ -5,6 +5,7 @@ import { execSync } from 'child_process';
 
 import { BUILDINGS, getBuildingCost } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
+import { RESEARCH } from '../src/data/research.js';
 import {
   initSeasons,
   getSeasonMultiplier,
@@ -101,6 +102,16 @@ const buildings = BUILDINGS.map((b) => ({
 
 const roles = [];
 
+const research = RESEARCH.map((r) => ({
+  id: r.id,
+  name: r.name,
+  cost: r.cost,
+  timeSec: r.timeSec,
+  prereqs: r.prereqs,
+  ...(r.unlocks ? { unlocks: r.unlocks } : {}),
+  ...(r.effects ? { effects: r.effects } : {}),
+}));
+
 const snapshot = {
   version: commitHash,
   saveVersion: CURRENT_SAVE_VERSION,
@@ -108,6 +119,7 @@ const snapshot = {
   seasons: seasonData,
   resources,
   buildings,
+  research,
   roles,
   formula: {
     order: ['base', 'season', 'roles', 'sum', 'clamp'],
@@ -151,6 +163,22 @@ function formatObj(obj) {
     : '-';
 }
 
+function formatArray(arr) {
+  return arr && arr.length ? arr.join(', ') : '-';
+}
+
+function formatUnlocks(unlocks) {
+  if (!unlocks) return '-';
+  const parts = [];
+  if (unlocks.resources?.length)
+    parts.push(`resources: ${unlocks.resources.join(', ')}`);
+  if (unlocks.buildings?.length)
+    parts.push(`buildings: ${unlocks.buildings.join(', ')}`);
+  if (unlocks.categories?.length)
+    parts.push(`categories: ${unlocks.categories.join(', ')}`);
+  return parts.join('; ') || '-';
+}
+
 let md = '';
 md += '# Economy Report\n\n';
 md += '## 1) Overview\n';
@@ -192,11 +220,18 @@ BUILDINGS.forEach((b, idx) => {
   md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
 });
 md += '\n';
+md += '## 5) Research\n';
+md += '| id | name | science cost | time (sec) | prereqs | unlocks |\n';
+md += '| - | - | - | - | - | - |\n';
+research.forEach((r) => {
+  md += `| ${r.id} | ${r.name} | ${r.cost.science ?? '-'} | ${r.timeSec} | ${formatArray(r.prereqs)} | ${formatUnlocks(r.unlocks)} |\n`;
+});
+md += '\n';
 
-md += '## 5) Population and Roles\n';
+md += '## 6) Population and Roles\n';
 md += 'No role-based production modifiers in effect.\n\n';
 
-md += '## 6) Production Math (Exact Formula)\n';
+md += '## 7) Production Math (Exact Formula)\n';
 md += 'Per building per tick:\n\n';
 md += '`effectiveCycle = cycleTimeSec * seasonSpeed`\n\n';
 md += '`effectiveHarvest = harvestAmount * outputValue * seasonYield`\n\n';
@@ -206,11 +241,11 @@ md +=
   'Sum production for each resource across buildings, then `clampResource(value, capacity)` where values below 0 become 0 and above capacity become capacity.\n\n';
 md += 'Offline progress is applied in 60-second chunks.\n\n';
 
-md += '## 7) Costs, Refunds, and Edge Rules\n';
+md += '## 8) Costs, Refunds, and Edge Rules\n';
 md +=
   'Building costs scale by `cost * 1.15^count`, rounded up. Demolition refunds 50% of the previous cost (floored) and adds back resources subject to capacity. Resource values are rounded to 6 decimals in clamping and cannot be negative.\n\n';
 
-md += '## 8) Starting State\n';
+md += '## 9) Starting State\n';
 md += `Starting season: ${seasons[0].id}, Year: 1.\n\n`;
 md += '### Resources\n';
 md += '| resource | amount | capacity |\n| - | - | - |\n';
