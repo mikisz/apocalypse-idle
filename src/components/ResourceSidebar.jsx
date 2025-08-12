@@ -10,8 +10,6 @@ import { computeRoleBonuses } from '../engine/settlers.js';
 import { formatAmount } from '../utils/format.js';
 import { RESOURCE_LIST } from '../data/resources.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { SKILL_LABELS } from '../data/roles.js';
-import { DAYS_PER_YEAR } from '../engine/time.js';
 
 function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
   return (
@@ -34,7 +32,7 @@ function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
 }
 
 export default function ResourceSidebar() {
-  const { state, setState } = useGame();
+  const { state } = useGame();
   const roleBonuses = computeRoleBonuses(state.population?.settlers || []);
   const rates = getResourceRates(state, true, roleBonuses);
   const groups = {};
@@ -112,10 +110,10 @@ export default function ResourceSidebar() {
   const rendered = [];
   entries.forEach((g) => {
     rendered.push(g);
-    if (g.title === 'Science')
+    if (hasRadioResearch && g.title === 'Science')
       rendered.push({ title: 'Settlers', settlers: true });
   });
-  if (!rendered.some((e) => e.title === 'Settlers'))
+  if (hasRadioResearch && !rendered.some((e) => e.title === 'Settlers'))
     rendered.push({ title: 'Settlers', settlers: true });
 
   return (
@@ -137,41 +135,6 @@ export default function ResourceSidebar() {
                   />
                 </div>
               )}
-            {settlers.map((s) => {
-              const age = Math.floor((s.ageDays || 0) / DAYS_PER_YEAR);
-              const skillStr = Object.entries(s.skills || {})
-                .filter(([, sk]) => sk.level > 0)
-                .map(([id, sk]) => `${SKILL_LABELS[id] || id} ${sk.level}`)
-                .join(', ');
-              return (
-                <div
-                  key={s.id}
-                  className="flex justify-between items-center text-sm"
-                >
-                  <span>
-                    {s.firstName} {s.lastName} • {age} •{' '}
-                    {skillStr || 'No skills'}
-                  </span>
-                  <button
-                    className="px-1 border border-stroke rounded text-xs disabled:opacity-50"
-                    onClick={() =>
-                      setState((prev) => {
-                        const list = prev.population.settlers.filter(
-                          (x) => x.id !== s.id,
-                        );
-                        return {
-                          ...prev,
-                          population: { ...prev.population, settlers: list },
-                        };
-                      })
-                    }
-                    disabled={total <= 1}
-                  >
-                    Exile
-                  </button>
-                </div>
-              );
-            })}
           </Accordion>
         ) : (
           <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>

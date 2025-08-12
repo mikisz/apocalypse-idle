@@ -40,7 +40,8 @@ export default function CandidateBox() {
     <div className="p-4 border border-stroke bg-bg2 rounded space-y-2">
       <div className="font-semibold">A new settler has arrived!</div>
       <div className="text-sm">
-        {candidate.firstName} {candidate.lastName} • {candidate.sex === 'M' ? 'Male' : 'Female'} • Age {candidate.age}
+        {candidate.firstName} {candidate.lastName} •{' '}
+        {candidate.sex === 'M' ? 'Male' : 'Female'} • Age {candidate.age}
       </div>
       <div className="text-xs text-muted">{skills || 'No skills'}</div>
       <div className="space-x-2">
