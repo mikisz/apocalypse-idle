@@ -6,6 +6,9 @@ import {
   pbtAtN,
 } from '../economyMath.ts';
 import type { BuildingData, SeasonsRecord } from '../economyTypes.ts';
+import { BUILDINGS } from '../../data/buildings.js';
+import { RESOURCES } from '../../data/resources.js';
+import { SEASONS } from '../../engine/time.js';
 
 describe('economyMath helpers', () => {
   it('valueWeightedStream', () => {
@@ -19,13 +22,39 @@ describe('economyMath helpers', () => {
     expect(nextCost(10, 1.15, 2)).toBe(Math.ceil(10 * 1.15 ** 2));
   });
 
-  it('seasonMultiplier averages', () => {
-    const seasons: SeasonsRecord = {
-      spring: { multipliers: { FOOD: 1.2 } },
-      summer: { multipliers: { FOOD: 1.0 } },
-    };
-    const building: BuildingData = { id: 'b', costGrowth: 1, category: 'FOOD' };
-    expect(seasonMultiplier(building, 'average', seasons)).toBeCloseTo((1.2 + 1.0) / 2);
+  it('seasonMultiplier derives category from building resources', () => {
+    const seasons: SeasonsRecord = Object.fromEntries(
+      SEASONS.map((s) => [s.id, { multipliers: s.multipliers }]),
+    );
+    const potatoField = BUILDINGS.find((b) => b.id === 'potatoField');
+    expect(potatoField).toBeDefined();
+    const category = RESOURCES.potatoes.category;
+    const springMult = seasonMultiplier(potatoField!, 'spring', seasons);
+    const winterMult = seasonMultiplier(potatoField!, 'winter', seasons);
+    expect(springMult).toBeCloseTo(
+      SEASONS.find((s) => s.id === 'spring')!.multipliers[category],
+    );
+    expect(winterMult).toBeCloseTo(
+      SEASONS.find((s) => s.id === 'winter')!.multipliers[category],
+    );
+  });
+
+  it('seasonMultiplier respects explicit seasonProfile', () => {
+    const seasons: SeasonsRecord = Object.fromEntries(
+      SEASONS.map((s) => [s.id, { multipliers: s.multipliers }]),
+    );
+    const huntersHut = BUILDINGS.find((b) => b.id === 'huntersHut');
+    expect(huntersHut).toBeDefined();
+    expect(seasonMultiplier(huntersHut!, 'winter', seasons)).toBeCloseTo(0.8);
+  });
+
+  it('seasonMultiplier constant profile returns 1', () => {
+    const seasons: SeasonsRecord = Object.fromEntries(
+      SEASONS.map((s) => [s.id, { multipliers: s.multipliers }]),
+    );
+    const sawmill = BUILDINGS.find((b) => b.id === 'sawmill');
+    expect(sawmill).toBeDefined();
+    expect(seasonMultiplier(sawmill!, 'spring', seasons)).toBe(1);
   });
 
   it('pbtAtN basic', () => {
@@ -38,7 +67,6 @@ describe('economyMath helpers', () => {
       costBase: { wood: 10 },
       costGrowth: 1.1,
       outputsPerSecBase: { wood: 1 },
-      category: 'RAW',
     };
     const weights = { wood: 1 };
     const pbt = pbtAtN(building, 0, 'average', weights, seasons);
