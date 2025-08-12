@@ -29,32 +29,40 @@ import { createLogEntry } from '../utils/log.js';
 import { updateRadio } from '../engine/radio.js';
 import { formatAmount } from '../utils/format.js';
 
-function mergeDeep(target, source) {
-  const out = { ...target };
-  Object.keys(source).forEach((key) => {
-    const srcVal = source[key];
-    const tgtVal = target?.[key];
-    if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
-      out[key] = mergeDeep(tgtVal || {}, srcVal);
-    } else if (srcVal !== undefined) {
-      out[key] = srcVal;
-    }
-  });
-  return out;
-}
-
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded) {
+  const cloned = structuredClone(loaded || {});
   const gameTime =
-    typeof loaded.gameTime === 'number'
-      ? { seconds: loaded.gameTime }
-      : loaded.gameTime || { seconds: 0 };
-  const base = mergeDeep(defaultState, { ...loaded, gameTime });
-  base.meta = { ...base.meta, seasons: initSeasons() };
+    typeof cloned.gameTime === 'number'
+      ? { seconds: cloned.gameTime }
+      : cloned.gameTime || { seconds: 0 };
+  const base = structuredClone(defaultState);
+  base.version = cloned.version ?? base.version;
+  base.gameTime = { ...base.gameTime, ...gameTime };
+  base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
+  base.ui = { ...base.ui, ...cloned.ui };
+  base.resources = { ...base.resources, ...cloned.resources };
+  base.buildings = { ...base.buildings, ...cloned.buildings };
+  base.powerTypePriority = {
+    ...base.powerTypePriority,
+    ...cloned.powerTypePriority,
+  };
+  base.research = { ...base.research, ...cloned.research };
+  base.population = { ...base.population, ...cloned.population };
+  if (Array.isArray(cloned.population?.settlers)) {
+    base.population.settlers = cloned.population.settlers.map((s) => ({
+      ...s,
+    }));
+  }
+  base.colony = { ...base.colony, ...cloned.colony };
+  if (Array.isArray(cloned.log)) {
+    base.log = [...cloned.log];
+  }
+  base.lastSaved = cloned.lastSaved ?? base.lastSaved;
   const prevYear = base.gameTime.year || getYear(base);
   base.gameTime.year = prevYear;
   const now = Date.now();
-  const elapsed = Math.floor((now - (loaded.lastSaved || now)) / 1000);
+  const elapsed = Math.floor((now - (cloned.lastSaved || now)) / 1000);
   if (elapsed > 0) {
     const bonuses = computeRoleBonuses(base.population?.settlers || []);
     const { state: progressed, gains } = applyOfflineProgress(
