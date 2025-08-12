@@ -13,11 +13,11 @@ export default function BaseView() {
     useBuildingGroups();
 
   return (
-    <div className="h-full flex flex-col md:flex-row md:space-x-6 overflow-y-auto md:overflow-hidden">
+    <div className="h-full flex flex-col md:flex-row md:space-x-6 overflow-y-auto md:overflow-hidden p-4">
       <div className="pb-24 md:w-64 md:flex-shrink-0">
         <ResourceSidebar />
       </div>
-      <div className="flex-1 p-4 space-y-6 pb-24 md:overflow-y-auto">
+      <div className="flex-1 space-y-6 pb-24 md:overflow-y-auto">
         <CandidateBox />
         <ProductionSection
           productionGroups={productionGroups}

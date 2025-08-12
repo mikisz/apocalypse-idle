@@ -101,6 +101,14 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
         <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={demolish}
+            disabled={count <= 0}
+          >
+            Demolish
+          </Button>
           {buildTooltip ? (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -123,14 +131,6 @@ export default function BuildingRow({ building, completedResearch }) {
               Build
             </Button>
           )}
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={demolish}
-            disabled={count <= 0}
-          >
-            Demolish
-          </Button>
         </div>
       </div>
       <div className="text-xs muted-foreground space-y-1">

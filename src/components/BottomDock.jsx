@@ -18,7 +18,7 @@ export default function BottomDock() {
       onValueChange={setActiveTab}
       className="fixed bottom-0 left-0 right-0 z-50 bg-card shadow-lg"
     >
-      <TabsList className="w-full grid grid-cols-4 rounded-none border-t bg-card p-3">
+      <TabsList className="w-full grid grid-cols-4 rounded-none border-t bg-card p-3 h-16">
         {tabs.map((t) => (
           <TabsTrigger
             key={t.id}
