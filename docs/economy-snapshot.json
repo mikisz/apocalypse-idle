@@ -312,6 +312,156 @@
       "seasonalMultipliers": {}
     }
   ],
+  "research": [
+    {
+      "id": "basicEnergy",
+      "name": "Basic Energy",
+      "cost": {
+        "science": 20
+      },
+      "timeSec": 120,
+      "prereqs": [],
+      "unlocks": {
+        "resources": ["power"],
+        "buildings": ["woodGenerator", "battery"],
+        "categories": ["Energy"]
+      },
+      "effects": []
+    },
+    {
+      "id": "industry1",
+      "name": "Industry I",
+      "cost": {
+        "science": 40
+      },
+      "timeSec": 60,
+      "prereqs": [],
+      "unlocks": {
+        "buildings": ["sawmill", "metalWorkshop", "materialsDepot"],
+        "categories": ["CONSTRUCTION_MATERIALS"]
+      },
+      "effects": []
+    },
+    {
+      "id": "woodworking1",
+      "name": "Woodworking I",
+      "cost": {
+        "science": 30
+      },
+      "timeSec": 45,
+      "prereqs": ["industry1"],
+      "effects": [
+        {
+          "category": "WOOD",
+          "percent": 0.05,
+          "type": "output"
+        }
+      ]
+    },
+    {
+      "id": "salvaging1",
+      "name": "Salvaging I",
+      "cost": {
+        "science": 30
+      },
+      "timeSec": 45,
+      "prereqs": ["industry1"],
+      "effects": [
+        {
+          "category": "SCRAP",
+          "percent": 0.05,
+          "type": "output"
+        }
+      ]
+    },
+    {
+      "id": "logistics1",
+      "name": "Logistics I",
+      "cost": {
+        "science": 35
+      },
+      "timeSec": 60,
+      "prereqs": ["industry1"],
+      "effects": [
+        {
+          "category": "RAW",
+          "percent": 0.05,
+          "type": "storage"
+        },
+        {
+          "category": "CONSTRUCTION_MATERIALS",
+          "percent": 0.05,
+          "type": "storage"
+        }
+      ]
+    },
+    {
+      "id": "industry2",
+      "name": "Industry II",
+      "cost": {
+        "science": 140
+      },
+      "timeSec": 180,
+      "prereqs": ["industry1"],
+      "unlocks": {
+        "buildings": ["toolsmithy"]
+      },
+      "effects": []
+    },
+    {
+      "id": "woodworking2",
+      "name": "Woodworking II",
+      "cost": {
+        "science": 70
+      },
+      "timeSec": 120,
+      "prereqs": ["woodworking1", "industry2"],
+      "effects": [
+        {
+          "category": "WOOD",
+          "percent": 0.05,
+          "type": "output"
+        }
+      ]
+    },
+    {
+      "id": "salvaging2",
+      "name": "Salvaging II",
+      "cost": {
+        "science": 70
+      },
+      "timeSec": 120,
+      "prereqs": ["salvaging1", "industry2"],
+      "effects": [
+        {
+          "category": "SCRAP",
+          "percent": 0.05,
+          "type": "output"
+        }
+      ]
+    },
+    {
+      "id": "logistics2",
+      "name": "Logistics II",
+      "cost": {
+        "science": 80
+      },
+      "timeSec": 150,
+      "prereqs": ["logistics1", "industry2"],
+      "effects": [
+        {
+          "category": "RAW",
+          "percent": 0.05,
+          "type": "storage"
+        },
+        {
+          "category": "CONSTRUCTION_MATERIALS",
+          "percent": 0.05,
+          "type": "storage"
+        }
+      ]
+    }
+  ],
   "roles": [],
   "formula": {
     "order": ["base", "season", "roles", "sum", "clamp"],

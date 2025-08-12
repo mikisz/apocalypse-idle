@@ -2,7 +2,7 @@
 
 ## 1) Overview
 
-Economy generated from commit **965f8303e7488ace47c19773059d713a040dfacc** on 2025-08-12 02:07:02 +0200. Save version: **4**.
+Economy generated from commit **965f8303e7488ace47c19773059d713a040dfacc** on 2025-08-12 02:07:02 +0200. Save version: **4**.  
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -43,31 +43,42 @@ Global rules: resources cannot go negative; amounts are clamped to capacity.
 | rawStorage    | Warehouse      | storage    | wood: 25, scrap: 10, stone: 10 | 0.5    | -       | -               | -              | -                                                |
 | battery       | Battery        | storage    | wood: 40, stone: 20            | 0.5    | -       | -               | -              | -                                                |
 
-## 5) Population and Roles
+## 5) Research
+
+| id           | name           | science cost | time (sec) | prereqs                 | unlocks                                                                               |
+| ------------ | -------------- | ------------ | ---------- | ----------------------- | ------------------------------------------------------------------------------------- |
+| basicEnergy  | Basic Energy   | 20           | 120        | -                       | resources: power; buildings: woodGenerator, battery; categories: Energy               |
+| industry1    | Industry I     | 40           | 60         | -                       | buildings: sawmill, metalWorkshop, materialsDepot; categories: CONSTRUCTION_MATERIALS |
+| woodworking1 | Woodworking I  | 30           | 45         | industry1               | -                                                                                     |
+| salvaging1   | Salvaging I    | 30           | 45         | industry1               | -                                                                                     |
+| logistics1   | Logistics I    | 35           | 60         | industry1               | -                                                                                     |
+| industry2    | Industry II    | 140          | 180        | industry1               | buildings: toolsmithy                                                                 |
+| woodworking2 | Woodworking II | 70           | 120        | woodworking1, industry2 | -                                                                                     |
+| salvaging2   | Salvaging II   | 70           | 120        | salvaging1, industry2   | -                                                                                     |
+| logistics2   | Logistics II   | 80           | 150        | logistics1, industry2   | -                                                                                     |
+
+## 6) Population and Roles
 
 No role-based production modifiers in effect.
 
-## 6) Production Math (Exact Formula)
+## 7) Production Math (Exact Formula)
 
 Per building per tick:
 
-`effectiveCycle = cycleTimeSec * seasonSpeed`
-
-`effectiveHarvest = harvestAmount * outputValue * seasonYield`
-
-`cycles = floor((elapsed + timer) / effectiveCycle)`
-
+`effectiveCycle = cycleTimeSec * seasonSpeed`  
+`effectiveHarvest = harvestAmount * outputValue * seasonYield`  
+`cycles = floor((elapsed + timer) / effectiveCycle)`  
 `production = effectiveHarvest * count * cycles`
 
 Sum production for each resource across buildings, then `clampResource(value, capacity)` where values below 0 become 0 and above capacity become capacity.
 
 Offline progress is applied in 60-second chunks.
 
-## 7) Costs, Refunds, and Edge Rules
+## 8) Costs, Refunds, and Edge Rules
 
 Building costs scale by `cost * 1.15^count`, rounded up. Demolition refunds 50% of the previous cost (floored) and adds back resources subject to capacity. Resource values are rounded to 6 decimals in clamping and cannot be negative.
 
-## 8) Starting State
+## 9) Starting State
 
 Starting season: spring, Year: 1.
 
