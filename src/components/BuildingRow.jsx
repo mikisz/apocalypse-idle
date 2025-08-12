@@ -8,6 +8,7 @@ import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
 import { RESEARCH_MAP } from '../data/research.js';
 import { Button } from './Button';
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 export default function BuildingRow({ building, completedResearch }) {
   const { state, setState } = useGame();
@@ -74,6 +75,15 @@ export default function BuildingRow({ building, completedResearch }) {
     setState((prev) => demolishBuilding(prev, building.id));
   };
 
+  const buildTooltip = !unlocked
+    ? `Requires: ${
+        RESEARCH_MAP[building.requiresResearch]?.name ||
+        building.requiresResearch
+      }`
+    : atMax
+      ? `Max ${building.maxCount}`
+      : null;
+
   return (
     <div className="p-2 rounded border border-border bg-card space-y-1">
       <div className="flex items-center justify-between">
@@ -91,24 +101,30 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
         <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={build}
-            disabled={!canAfford || !unlocked || atMax}
-            title={
-              !unlocked
-                ? `Requires: ${
-                    RESEARCH_MAP[building.requiresResearch]?.name ||
-                    building.requiresResearch
-                  }`
-                : atMax
-                  ? `Max ${building.maxCount}`
-                  : undefined
-            }
-          >
-            Build
-          </Button>
+          {buildTooltip ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={build}
+                  disabled={!canAfford || !unlocked || atMax}
+                >
+                  Build
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{buildTooltip}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={build}
+              disabled={!canAfford || !unlocked || atMax}
+            >
+              Build
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
