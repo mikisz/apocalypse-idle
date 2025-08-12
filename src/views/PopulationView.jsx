@@ -42,7 +42,7 @@ export default function PopulationView() {
           >
             <div className="text-xs text-muted">{label} bonus</div>
             <div className="text-lg font-semibold">
-              +{(bonuses[role] || 0).toFixed(1)}%
+              +{Math.round(bonuses[role] || 0)}%
             </div>
           </div>
         ))}

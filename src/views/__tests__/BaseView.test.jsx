@@ -1,20 +1,21 @@
 import React from 'react';
-import { useGame } from '../state/useGame.js';
-import EventLog from '../components/EventLog.jsx';
-import ResourceSidebar from '../components/ResourceSidebar.jsx';
-import Accordion from '../components/Accordion.jsx';
-import CandidateBox from '../components/CandidateBox.jsx';
+import { describe, it, expect } from 'vitest';
+import { useGame } from '../../state/useGame.js';
+import EventLog from '../../components/EventLog.jsx';
+import ResourceSidebar from '../../components/ResourceSidebar.jsx';
+import Accordion from '../../components/Accordion.jsx';
+import CandidateBox from '../../components/CandidateBox.jsx';
 import {
   PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,
   getBuildingCost,
-} from '../data/buildings.js';
-import { RESOURCES } from '../data/resources.js';
-import { getSeason, getSeasonMultiplier } from '../engine/time.js';
-import { getCapacity } from '../state/selectors.js';
-import { formatAmount } from '../utils/format.js';
-import { clampResource, demolishBuilding } from '../engine/production.js';
-import { RESEARCH_MAP } from '../data/research.js';
+} from '../../data/buildings.js';
+import { RESOURCES } from '../../data/resources.js';
+import { getSeason, getSeasonMultiplier } from '../../engine/time.js';
+import { getCapacity } from '../../state/selectors.js';
+import { formatAmount } from '../../utils/format.js';
+import { clampResource, demolishBuilding } from '../../engine/production.js';
+import { RESEARCH_MAP } from '../../data/research.js';
 
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
@@ -212,3 +213,9 @@ export default function BaseView() {
     </div>
   );
 }
+
+describe('BaseView', () => {
+  it('renders without crashing', () => {
+    expect(typeof BaseView).toBe('function');
+  });
+});
