@@ -34,6 +34,18 @@ export const RESEARCH = [
     effects: [],
   },
   {
+    id: 'hunting1',
+    name: 'Hunting I',
+    type: 'unlock',
+    shortDesc: 'Unlocks hunting for supplemental food.',
+    cost: { science: 35 },
+    timeSec: 45,
+    prereqs: [],
+    unlocks: { buildings: ['huntersHut'], resources: ['meat'] },
+    row: 1,
+    effects: [],
+  },
+  {
     id: 'radio',
     name: 'Radio',
     type: 'unlock',

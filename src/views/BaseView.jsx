@@ -31,7 +31,11 @@ function BuildingRow({ building, completedResearch }) {
   );
   const perOutputs = Object.entries(building.outputsPerSecBase || {}).map(
     ([res, base]) => {
-      const mult = getSeasonMultiplier(season, RESOURCES[res].category);
+      let mult;
+      if (building.seasonProfile === 'constant') mult = 1;
+      else if (typeof building.seasonProfile === 'object')
+        mult = building.seasonProfile[season.id] ?? 1;
+      else mult = getSeasonMultiplier(season, RESOURCES[res].category);
       return { res, perSec: base * mult };
     },
   );

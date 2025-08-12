@@ -8,19 +8,32 @@ import { formatTime } from '../../utils/time.js';
 function buildTooltip(node) {
   const lines = [];
   if (node.unlocks?.buildings?.length) {
-    const names = node.unlocks.buildings
-      .map((b) => BUILDING_MAP[b]?.name || b)
-      .join(', ');
-    lines.push(`New buildings: ${names}`);
+    if (node.unlocks.buildings.length === 1) {
+      const b = node.unlocks.buildings[0];
+      const name = BUILDING_MAP[b]?.name || b;
+      lines.push(`New building: ${name}`);
+    } else {
+      const names = node.unlocks.buildings
+        .map((b) => BUILDING_MAP[b]?.name || b)
+        .join(', ');
+      lines.push(`New buildings: ${names}`);
+    }
   }
   if (node.unlocks?.categories?.length) {
     lines.push(`New resource category: ${node.unlocks.categories.join(', ')}`);
   }
   if (node.unlocks?.resources?.length) {
-    const names = node.unlocks.resources
-      .map((r) => RESOURCES[r]?.name || r)
-      .join(', ');
-    lines.push(`New resources: ${names}`);
+    if (node.unlocks.resources.length === 1) {
+      const r = node.unlocks.resources[0];
+      const name = RESOURCES[r]?.name || r;
+      const cat = RESOURCES[r]?.category;
+      lines.push(`New ${cat ? `${cat} ` : ''}resource: ${name}`);
+    } else {
+      const names = node.unlocks.resources
+        .map((r) => RESOURCES[r]?.name || r)
+        .join(', ');
+      lines.push(`New resources: ${names}`);
+    }
   }
   const effs = Array.isArray(node.effects)
     ? node.effects

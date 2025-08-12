@@ -7,6 +7,15 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 300,
   },
+  meat: {
+    id: 'meat',
+    name: 'Meat',
+    icon: '🍖',
+    category: 'FOOD',
+    startingAmount: 0,
+    startingCapacity: 300,
+    unit: '',
+  },
   wood: {
     id: 'wood',
     name: 'Wood',
