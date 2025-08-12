@@ -24,12 +24,25 @@ export function useResourceSections(state) {
 
   const netRates = useMemo(
     () => getResourceRates(state, true, roleBonuses),
-    [state, roleBonuses],
+    [
+      state.resources,
+      state.buildings,
+      state.research?.completed,
+      state.population?.settlers,
+      state.gameTime,
+      roleBonuses,
+    ],
   );
 
   const prodRates = useMemo(
     () => getResourceRates(state, false, roleBonuses),
-    [state, roleBonuses],
+    [
+      state.resources,
+      state.buildings,
+      state.research?.completed,
+      state.gameTime,
+      roleBonuses,
+    ],
   );
 
   const entries = useMemo(() => {
@@ -91,7 +104,14 @@ export function useResourceSections(state) {
       items,
       defaultOpen: true,
     }));
-  }, [state, netRates, prodRates]);
+  }, [
+    state.resources,
+    state.buildings,
+    state.research?.completed,
+    state.foodPool,
+    netRates,
+    prodRates,
+  ]);
 
   const totalSettlers = settlers.length;
   const capacity = getSettlerCapacity(state);
