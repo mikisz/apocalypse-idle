@@ -38,7 +38,7 @@ export default function PopulationView() {
   const bonuses = computeRoleBonuses(settlers);
 
   return (
-    <div className="h-full p-4 pb-20 overflow-y-auto space-y-4">
+    <div className="h-full px-2 pb-20 overflow-y-auto space-y-4">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card className="text-center">
           <CardHeader className="p-0">

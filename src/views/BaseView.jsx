@@ -14,10 +14,10 @@ export default function BaseView() {
 
   return (
     <div className="h-full flex flex-col md:flex-row md:space-x-6 overflow-y-auto md:overflow-hidden">
-      <div className="p-4 pb-20 md:w-64 md:flex-shrink-0 md:overflow-y-auto">
+      <div className="px-2 pb-20 md:w-64 md:flex-shrink-0">
         <ResourceSidebar />
       </div>
-      <div className="flex-1 p-4 space-y-6 pb-20 md:overflow-y-auto">
+      <div className="flex-1 px-2 space-y-6 pb-20 md:overflow-y-auto">
         <CandidateBox />
         <ProductionSection
           productionGroups={productionGroups}

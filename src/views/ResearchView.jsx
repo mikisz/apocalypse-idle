@@ -13,7 +13,7 @@ export default function ResearchView() {
   const remaining = node ? Math.max(node.timeSec - progress, 0) : 0;
   const pct = node ? Math.min(progress / node.timeSec, 1) : 0;
   return (
-    <div className="h-full p-4 pb-20 flex flex-col gap-4">
+    <div className="h-full px-2 pb-20 flex flex-col gap-4">
       {current && node && (
         <Card>
           <CardHeader>
