@@ -12,7 +12,7 @@ export function computeRoleBonuses(settlers) {
   settlers.forEach((s) => {
     if (s.isDead || !s.role) return;
     const skill = s.skills?.[s.role] || { level: 0 };
-    const bonus = ROLE_BONUS_PER_SETTLER(skill.level);
+    const bonus = ROLE_BONUS_PER_SETTLER(skill.level) * 100;
     bonuses[s.role] = (bonuses[s.role] || 0) + bonus;
   });
   return bonuses;
