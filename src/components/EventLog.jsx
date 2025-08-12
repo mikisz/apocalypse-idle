@@ -10,7 +10,7 @@ export default function EventLog({ log = [] }) {
           <ul className="text-sm space-y-1">
             {log.map((entry) => (
               <li key={entry.id}>
-                <span className="muted-foreground mr-2">
+                <span className="text-muted-foreground mr-2">
                   {new Date(entry.time).toLocaleString()}
                 </span>
                 {entry.text}

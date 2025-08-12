@@ -62,17 +62,16 @@ export default function Drawer() {
         <div className="p-6 space-y-8">
           <section>
             <h2 className="font-semibold mb-2">📊 Statistics</h2>
-            <p className="text-sm muted-foreground">Coming soon</p>
+            <p className="text-sm text-muted-foreground">Coming soon</p>
           </section>
           <section>
             <h2 className="font-semibold mb-2">⚙️ Settings</h2>
-            <p className="text-sm muted-foreground">Coming soon</p>
+            <p className="text-sm text-muted-foreground">Coming soon</p>
           </section>
           <section>
             <h2 className="font-semibold mb-2">💾 Save/Load</h2>
             <div className="flex gap-2">
               <Button
-                variant="outline"
                 size="sm"
                 onClick={() => {
                   exportSaveFile(state);
@@ -88,7 +87,7 @@ export default function Drawer() {
                 Save
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={() => fileInput.current?.click()}
               >
@@ -105,7 +104,7 @@ export default function Drawer() {
           </section>
           <section>
             <h2 className="font-semibold mb-2">🧹 Reset</h2>
-            <Button variant="outline" size="sm" onClick={resetGame}>
+            <Button variant="destructive" size="sm" onClick={resetGame}>
               Reset colony
             </Button>
           </section>

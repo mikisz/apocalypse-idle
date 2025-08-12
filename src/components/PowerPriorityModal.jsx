@@ -55,7 +55,9 @@ export default function PowerPriorityModal({ onClose }) {
         <DialogHeader>
           <DialogTitle>Power Priorities</DialogTitle>
         </DialogHeader>
-        <div className="text-center text-xs muted-foreground">TOP PRIORITY</div>
+        <div className="text-center text-xs text-muted-foreground">
+          TOP PRIORITY
+        </div>
         <ul className="mt-2 space-y-1 max-h-64 overflow-y-auto">
           {order.map((id, idx) => {
             const b = BUILDING_MAP[id];
@@ -74,7 +76,9 @@ export default function PowerPriorityModal({ onClose }) {
                   <span>{b?.name || id}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs muted-foreground">x{count}</span>
+                  <span className="text-xs text-muted-foreground">
+                    x{count}
+                  </span>
                   <Button
                     variant="outline"
                     size="sm"
@@ -96,12 +100,14 @@ export default function PowerPriorityModal({ onClose }) {
             );
           })}
         </ul>
-        <div className="text-center text-xs muted-foreground mt-2">LOW PRIORITY</div>
+        <div className="text-center text-xs text-muted-foreground mt-2">
+          LOW PRIORITY
+        </div>
         <DialogFooter className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="outline" size="sm" onClick={save}>
+          <Button size="sm" onClick={save}>
             Save
           </Button>
         </DialogFooter>

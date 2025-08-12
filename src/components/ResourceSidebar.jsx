@@ -6,6 +6,7 @@ import ResourceRow from './ResourceRow.jsx';
 import SettlerSection from './SettlerSection.jsx';
 import { useResourceSections } from './useResourceSections.js';
 import { Button } from './Button';
+import { ScrollArea } from './ui/scroll-area';
 
 export default function ResourceSidebar() {
   const { state } = useGame();
@@ -13,7 +14,7 @@ export default function ResourceSidebar() {
   const { sections, settlersInfo, happinessInfo } = useResourceSections(state);
 
   return (
-    <div className="border border-border rounded overflow-hidden bg-card">
+    <ScrollArea className="border border-border rounded bg-card">
       {sections.map((g) =>
         g.settlers ? (
           <SettlerSection key={g.title} title={g.title} info={settlersInfo} />
@@ -67,6 +68,6 @@ export default function ResourceSidebar() {
       {showPowerModal && (
         <PowerPriorityModal onClose={() => setShowPowerModal(false)} />
       )}
-    </div>
+    </ScrollArea>
   );
 }

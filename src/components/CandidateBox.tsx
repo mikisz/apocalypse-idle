@@ -14,7 +14,9 @@ import {
   CardFooter,
 } from './ui/card';
 
-interface Skill { level: number; }
+interface Skill {
+  level: number;
+}
 interface Candidate {
   firstName: string;
   lastName: string;
@@ -30,8 +32,12 @@ export default function CandidateBox(): JSX.Element | null {
 
   const updateAfterDecision = (accepted: boolean): void => {
     setState((prev) => {
-      const newSettler = candidateToSettler(candidate) as (typeof prev.population.settlers)[number];
-      const settlers = accepted ? [...prev.population.settlers, newSettler] : prev.population.settlers;
+      const newSettler = candidateToSettler(
+        candidate,
+      ) as (typeof prev.population.settlers)[number];
+      const settlers = accepted
+        ? [...prev.population.settlers, newSettler]
+        : prev.population.settlers;
       return {
         ...prev,
         population: { ...prev.population, settlers, candidate: null },
@@ -54,15 +60,15 @@ export default function CandidateBox(): JSX.Element | null {
         <CardTitle>A new settler has arrived!</CardTitle>
         <CardDescription className="text-sm">
           {candidate.firstName} {candidate.lastName}
-          <span className="px-2 muted-foreground">·</span>
+          <span className="px-2 text-muted-foreground">·</span>
           {candidate.sex === 'M' ? 'Male' : 'Female'}
-          <span className="px-2 muted-foreground">·</span>
+          <span className="px-2 text-muted-foreground">·</span>
           Age {candidate.age}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-2">
-        <div className="text-xs muted-foreground">
+        <div className="text-xs text-muted-foreground">
           {skills || 'No notable skills'}
         </div>
       </CardContent>

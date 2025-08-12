@@ -105,7 +105,6 @@ export default function BuildingRow({ building, completedResearch }) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={build}
                   disabled={!canAfford || !unlocked || atMax}
@@ -117,7 +116,6 @@ export default function BuildingRow({ building, completedResearch }) {
             </Tooltip>
           ) : (
             <Button
-              variant="outline"
               size="sm"
               onClick={build}
               disabled={!canAfford || !unlocked || atMax}
@@ -126,7 +124,7 @@ export default function BuildingRow({ building, completedResearch }) {
             </Button>
           )}
           <Button
-            variant="outline"
+            variant="destructive"
             size="sm"
             onClick={demolish}
             disabled={count <= 0}
@@ -135,7 +133,7 @@ export default function BuildingRow({ building, completedResearch }) {
           </Button>
         </div>
       </div>
-      <div className="text-xs muted-foreground space-y-1">
+      <div className="text-xs text-muted-foreground space-y-1">
         <div>{building.description}</div>
         <div>
           Cost:{' '}
