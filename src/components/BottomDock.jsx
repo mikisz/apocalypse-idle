@@ -12,7 +12,7 @@ export default function BottomDock() {
   const { state, setActiveTab } = useGame();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex border-t border-stroke bg-bg2">
+    <nav className="fixed bottom-0 left-0 right-0 z-20 flex border-t border-stroke bg-bg2">
       {tabs.map((t) => (
         <button
           key={t.id}

@@ -81,7 +81,7 @@ export default function ResearchTree({ onStart }) {
   });
 
   return (
-    <div ref={containerRef} className="relative overflow-y-auto max-h-[60vh]">
+    <div ref={containerRef} className="relative overflow-auto h-full">
       <svg className="absolute inset-0 pointer-events-none">
         <defs>
           <marker
