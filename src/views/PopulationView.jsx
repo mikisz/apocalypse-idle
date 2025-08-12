@@ -98,6 +98,19 @@ export default function PopulationView() {
                   Age: {years}y {days}d
                 </span>
               </div>
+              <details className="text-sm">
+                <summary className="cursor-pointer">
+                  Happiness: {Math.round(s.happiness || 0)}%
+                </summary>
+                <ul className="ml-4 space-y-0.5 text-xs">
+                  {(s.happinessBreakdown || []).map((b, idx) => (
+                    <li key={idx}>
+                      {b.label}: {b.value >= 0 ? '+' : ''}
+                      {b.value}
+                    </li>
+                  ))}
+                </ul>
+              </details>
               <div className="relative inline-block w-36">
                 <select
                   value={s.role || 'idle'}

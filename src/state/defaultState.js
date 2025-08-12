@@ -4,6 +4,7 @@ import { RESOURCES } from '../data/resources.js';
 import { BUILDINGS } from '../data/buildings.js';
 import { makeRandomSettler } from '../data/names.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
+import { BALANCE } from '../data/balance.js';
 
 const initResources = () => {
   const obj = {};
@@ -40,6 +41,10 @@ const initSettlers = () => [makeRandomSettler()];
 const initColony = () => ({
   starvationTimerSeconds: 0,
   radioTimer: RADIO_BASE_SECONDS,
+  happiness: {
+    value: BALANCE.HAPPINESS_BASE,
+    breakdown: [{ label: 'Base', value: BALANCE.HAPPINESS_BASE }],
+  },
 });
 
 const initResearch = () => ({ current: null, completed: [], progress: {} });
