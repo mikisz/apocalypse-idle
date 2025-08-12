@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.js';
@@ -17,15 +17,15 @@ interface Candidate {
 }
 
 export default function CandidateBox(): JSX.Element | null {
-  const { state, setState } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const candidate: Candidate | null = state.population?.candidate ?? null;
+  const { state, setState } = useGame();
+  const candidate = state.population?.candidate as Candidate | null;
   if (!candidate) return null;
 
   const updateAfterDecision = (accepted: boolean): void => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState((prev: any) => {
+    setState((prev) => {
+      const newSettler = candidateToSettler(candidate) as typeof prev.population.settlers[number];
       const settlers = accepted
-        ? [...prev.population.settlers, candidateToSettler(candidate)]
+        ? [...prev.population.settlers, newSettler]
         : prev.population.settlers;
       return {
         ...prev,

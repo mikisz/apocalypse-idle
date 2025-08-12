@@ -8,7 +8,7 @@ import BaseView from './views/BaseView.jsx';
 import PopulationView from './views/PopulationView.jsx';
 import ResearchView from './views/ResearchView.jsx';
 import ExpeditionsView from './views/ExpeditionsView.jsx';
-import { useGame } from './state/useGame.js';
+import { useGame } from './state/useGame.ts';
 
 function ActiveView() {
   const { state } = useGame();

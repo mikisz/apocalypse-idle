@@ -1,4 +1,4 @@
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 import { formatTime } from '../utils/time.js';
 
 export default function OfflineProgressModal() {

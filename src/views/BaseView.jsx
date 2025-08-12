@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGame } from '../state/useGame.js';
+import { useGame } from '../state/useGame.ts';
 import EventLog from '../components/EventLog.jsx';
 import ResourceSidebar from '../components/ResourceSidebar.jsx';
 import Accordion from '../components/Accordion.jsx';
