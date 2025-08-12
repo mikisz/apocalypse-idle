@@ -1,8 +1,8 @@
-import React from 'react'
-import * as AccordionPrimitive from '@radix-ui/react-accordion'
-import { ChevronDownIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Accordion, AccordionItem, AccordionContent } from './ui/accordion'
+import React from 'react';
+import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import { ChevronDownIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Accordion, AccordionItem, AccordionContent } from './ui/accordion';
 
 export default function GameAccordion({
   title,
@@ -17,10 +17,10 @@ export default function GameAccordion({
       defaultValue={defaultOpen ? 'item' : undefined}
     >
       <AccordionItem value="item">
-        <AccordionPrimitive.Header className="flex items-center">
+        <AccordionPrimitive.Header className="flex items-center bg-card">
           <AccordionPrimitive.Trigger
             className={cn(
-              'flex flex-1 items-center justify-between px-2 py-2 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180'
+              'flex flex-1 items-center justify-between px-4 py-4 font-medium transition-all hover:bg-muted/50 [&[data-state=open]>svg]:rotate-180',
             )}
           >
             <span>{title}</span>
@@ -29,9 +29,9 @@ export default function GameAccordion({
           {action && <div className="ml-2">{action}</div>}
         </AccordionPrimitive.Header>
         <AccordionContent>
-          <div className="space-y-2">{children}</div>
+          <div className="px-4 pb-4 pt-2 space-y-3">{children}</div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }

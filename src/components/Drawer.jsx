@@ -58,7 +58,7 @@ export default function Drawer() {
       }}
     >
       <SheetContent side="right" className="w-64">
-        <div className="p-4 space-y-6">
+        <div className="p-6 space-y-8">
           <section>
             <h2 className="font-semibold mb-2">📊 Statistics</h2>
             <p className="text-sm text-muted">Coming soon</p>
