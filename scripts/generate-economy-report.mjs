@@ -67,6 +67,10 @@ function baseProductionPerSec(b) {
   return { ...(b.outputsPerSecBase || {}) };
 }
 
+function baseInputsPerSec(b) {
+  return { ...(b.inputsPerSecBase || {}) };
+}
+
 function getBuildingSeasonModifiers(building, season) {
   const outputs = Object.keys(building.outputsPerSecBase || {});
   const res = outputs[0];
@@ -94,6 +98,7 @@ const buildings = BUILDINGS.map((b) => ({
   demolitionRefund: 0.5,
   storageProvided: { ...(b.addsCapacity || {}) },
   baseProductionPerSec: baseProductionPerSec(b),
+  baseInputsPerSec: baseInputsPerSec(b),
   seasonalMode: b.cycleTimeSec ? 'default' : 'ignore',
   seasonalCustom: null,
   seasonalMultipliers: buildingSeasonMultipliers(b),
@@ -185,11 +190,11 @@ md += '\n';
 
 md += '## 4) Buildings\n';
 md +=
-  '| id | name | type | cost | refund | storage | base prod/s | season mults |\n';
-md += '| - | - | - | - | - | - | - | - |\n';
+  '| id | name | type | cost | refund | storage | base prod/s | inputs per sec | season mults |\n';
+md += '| - | - | - | - | - | - | - | - | - |\n';
 BUILDINGS.forEach((b, idx) => {
   const row = buildings[idx];
-  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
+  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.baseInputsPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
 });
 md += '\n';
 
