@@ -135,7 +135,7 @@ export function GameProvider({ children }) {
         Math.random,
         roleBonuses,
       );
-      const { candidate, radioTimer } = updateRadio(prev, dt);
+      const { candidate, radioTimer } = updateRadio(settlersProcessed, dt);
       const nextSeconds = (settlersProcessed.gameTime?.seconds || 0) + dt;
       const computedYear = getYear({
         ...settlersProcessed,
