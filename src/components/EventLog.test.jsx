@@ -12,16 +12,19 @@ describe('EventLog', () => {
 
   it('renders and updates entries', () => {
     const initial = [
-      { id: 'a', text: 'First entry' },
-      { id: 'b', text: 'Second entry' },
+      { id: 'a', text: 'First entry', time: 0 },
+      { id: 'b', text: 'Second entry', time: 1 },
     ];
     const { rerender } = render(<EventLog log={initial} />);
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
-    expect(screen.getByText('First entry')).toBeTruthy();
+    expect(screen.getAllByRole('listitem')[0].textContent).toMatch(
+      /First entry/,
+    );
 
     rerender(<EventLog log={[initial[1]]} />);
-    expect(screen.queryByText('First entry')).toBeNull();
+    expect(screen.getAllByRole('listitem')[0].textContent).toMatch(
+      /Second entry/,
+    );
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
-    expect(screen.getByText('Second entry')).toBeTruthy();
   });
 });

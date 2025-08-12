@@ -13,6 +13,7 @@ export default function ResearchView() {
   return (
 
     <div className="p-4 pb-20 space-y-4 h-full flex flex-col">
+
       <div className="border border-stroke rounded p-4 bg-bg2/50">
         {current && node ? (
           <div className="space-y-2">
