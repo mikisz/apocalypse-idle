@@ -5,6 +5,7 @@ import PowerPriorityModal from './PowerPriorityModal.jsx';
 import ResourceRow from './ResourceRow.jsx';
 import SettlerSection from './SettlerSection.jsx';
 import { useResourceSections } from './useResourceSections.js';
+import { Button } from './Button';
 
 export default function ResourceSidebar() {
   const { state } = useGame();
@@ -23,15 +24,17 @@ export default function ResourceSidebar() {
             ))}
             {g.title === 'Energy' && (
               <div className="pt-2 text-right">
-                <button
-                  className="text-xs text-blue-500 hover:underline"
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="px-0 h-auto text-xs"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowPowerModal(true);
                   }}
                 >
                   Set priorities
-                </button>
+                </Button>
               </div>
             )}
           </Accordion>
