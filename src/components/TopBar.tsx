@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
 import { useGame } from '../state/useGame.ts';
+import { Button } from './Button';
 
 export default function TopBar(): JSX.Element {
   const { state, toggleDrawer } = useGame();
@@ -26,14 +27,15 @@ export default function TopBar(): JSX.Element {
         <span className="tabular-nums text-sm">
           Avg Happiness: {avgHappiness}%
         </span>
-        <button
-          className="text-xl tabular-nums"
+        <Button
+          variant="ghost"
+          className="text-xl tabular-nums px-0"
           onClick={() => setOpen((o) => !o)}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
           {time.season.icon} {time.season.label}, Day {time.day}
-        </button>
+        </Button>
         {open && (
           <div
             className="absolute top-full right-0 mt-1 p-2 bg-bg2 border border-stroke rounded text-xs shadow-lg"
@@ -47,12 +49,14 @@ export default function TopBar(): JSX.Element {
             ))}
           </div>
         )}
-        <button
-          className="text-xl px-2 py-1 rounded border border-stroke"
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xl px-2"
           onClick={toggleDrawer}
         >
           ☰
-        </button>
+        </Button>
       </div>
     </header>
   );

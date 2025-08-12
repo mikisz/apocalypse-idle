@@ -1,5 +1,6 @@
 import { useGame } from '../state/useGame.ts';
 import { formatTime } from '../utils/time.js';
+import { Button } from './Button';
 
 export default function OfflineProgressModal() {
   const { state, dismissOfflineModal } = useGame();
@@ -19,12 +20,9 @@ export default function OfflineProgressModal() {
             </div>
           ))}
         </div>
-        <button
-          className="px-4 py-2 rounded border border-stroke"
-          onClick={dismissOfflineModal}
-        >
+        <Button variant="outline" onClick={dismissOfflineModal}>
           Continue
-        </button>
+        </Button>
       </div>
     </div>
   );

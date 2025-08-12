@@ -5,6 +5,7 @@ import {
   buildInitialPowerTypeOrder,
   getPoweredConsumerTypeIds,
 } from '../engine/power.js';
+import { Button } from './Button';
 
 export default function PowerPriorityModal({ onClose }) {
   const { state, setState } = useGame();
@@ -65,18 +66,22 @@ export default function PowerPriorityModal({ onClose }) {
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-muted">x{count}</span>
-                  <button
-                    className="text-xs px-1 border rounded"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-1"
                     onClick={() => move(idx, idx - 1)}
                   >
                     ↑
-                  </button>
-                  <button
-                    className="text-xs px-1 border rounded"
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs px-1"
                     onClick={() => move(idx, idx + 1)}
                   >
                     ↓
-                  </button>
+                  </Button>
                 </div>
               </li>
             );
@@ -84,15 +89,12 @@ export default function PowerPriorityModal({ onClose }) {
         </ul>
         <div className="text-center text-xs text-muted mt-2">LOW PRIORITY</div>
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            className="px-2 py-1 border rounded text-sm"
-            onClick={onClose}
-          >
+          <Button variant="outline" size="sm" onClick={onClose}>
             Cancel
-          </button>
-          <button className="px-2 py-1 border rounded text-sm" onClick={save}>
+          </Button>
+          <Button variant="outline" size="sm" onClick={save}>
             Save
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useGame } from '../state/useGame.ts';
 import { exportSaveFile, load } from '../engine/persistence.js';
 import { createLogEntry } from '../utils/log.js';
+import { Button } from './Button';
 
 export default function Drawer() {
   const { state, toggleDrawer, setState, resetGame } = useGame();
@@ -69,8 +70,9 @@ export default function Drawer() {
           <section>
             <h2 className="font-semibold mb-2">💾 Save/Load</h2>
             <div className="flex gap-2">
-              <button
-                className="px-2 py-1 rounded border border-stroke"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   exportSaveFile(state);
                   setState((prev) => ({
@@ -83,13 +85,14 @@ export default function Drawer() {
                 }}
               >
                 Save
-              </button>
-              <button
-                className="px-2 py-1 rounded border border-stroke"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => fileInput.current?.click()}
               >
                 Load
-              </button>
+              </Button>
               <input
                 ref={fileInput}
                 type="file"
@@ -101,12 +104,9 @@ export default function Drawer() {
           </section>
           <section>
             <h2 className="font-semibold mb-2">🧹 Reset</h2>
-            <button
-              className="px-2 py-1 rounded border border-stroke"
-              onClick={resetGame}
-            >
+            <Button variant="outline" size="sm" onClick={resetGame}>
               Reset colony
-            </button>
+            </Button>
           </section>
         </div>
       </aside>

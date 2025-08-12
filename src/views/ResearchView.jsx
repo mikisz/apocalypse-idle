@@ -2,6 +2,7 @@ import { useGame } from '../state/useGame.ts';
 import ResearchTree from './research/ResearchTree.jsx';
 import { RESEARCH_MAP } from '../data/research.js';
 import { formatTime } from '../utils/time.js';
+import { Button } from '@/components/Button';
 
 export default function ResearchView() {
   const { state, beginResearch, abortResearch } = useGame();
@@ -26,14 +27,16 @@ export default function ResearchView() {
             </div>
             <div className="flex justify-between items-center text-sm">
               <span>Time remaining: {formatTime(remaining)}</span>
-              <button
-                className="px-2 py-1 border border-red-400 rounded text-red-300 hover:bg-red-900/20"
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-400 text-red-300 hover:bg-red-900/20"
                 onClick={() => {
                   if (window.confirm('Cancel research?')) abortResearch();
                 }}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         ) : (

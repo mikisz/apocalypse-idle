@@ -4,6 +4,7 @@ import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
 import { formatAmount } from '../../utils/format.js';
 import { formatTime } from '../../utils/time.js';
+import { Button } from '@/components/Button';
 
 function buildTooltip(node) {
   const lines = [];
@@ -87,18 +88,20 @@ const ResearchNode = forwardRef(({ node, status, reasons, onStart }, ref) => {
         Research time: {formatTime(node.timeSec)}
       </div>
       {status === 'available' && (
-        <button
-          className="mt-1 px-2 py-1 border border-blue-400 rounded text-blue-200 hover:bg-blue-900/20"
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-1 border-blue-400 text-blue-200 hover:bg-blue-900/20"
           onClick={() => onStart(node.id)}
         >
           Start
-        </button>
+        </Button>
       )}
       {status === 'locked' && (
         <div className="mt-1">
-          <button className="px-2 py-1 border rounded opacity-50 cursor-not-allowed">
+          <Button variant="outline" size="sm" disabled>
             Locked
-          </button>
+          </Button>
           <div className="mt-1 space-y-1 text-xs text-red-400">
             {reasons.missingPrereqs?.length > 0 && (
               <div>Require: {reasons.missingPrereqs.join(', ')}</div>

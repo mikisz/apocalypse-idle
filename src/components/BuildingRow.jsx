@@ -7,6 +7,7 @@ import { getCapacity } from '../state/selectors.js';
 import { formatAmount } from '../utils/format.js';
 import { clampResource, demolishBuilding } from '../engine/production.js';
 import { RESEARCH_MAP } from '../data/research.js';
+import { Button } from './Button';
 
 export default function BuildingRow({ building, completedResearch }) {
   const { state, setState } = useGame();
@@ -90,8 +91,9 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
         <div className="space-x-2">
-          <button
-            className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={build}
             disabled={!canAfford || !unlocked || atMax}
             title={
@@ -106,14 +108,15 @@ export default function BuildingRow({ building, completedResearch }) {
             }
           >
             Build
-          </button>
-          <button
-            className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={demolish}
             disabled={count <= 0}
           >
             Demolish
-          </button>
+          </Button>
         </div>
       </div>
       <div className="text-xs text-muted space-y-1">
