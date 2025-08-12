@@ -17,12 +17,12 @@ export default function ResourceSidebar() {
         g.settlers ? (
           <SettlerSection key={g.title} title={g.title} info={settlersInfo} />
         ) : (
-          <Accordion
-            key={g.title}
-            title={g.title}
-            defaultOpen={g.defaultOpen}
-            action={
-              g.title === 'Energy' && (
+          <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
+            {g.items.map((r) => (
+              <ResourceRow key={r.id} {...r} />
+            ))}
+            {g.title === 'Energy' && (
+              <div className="pt-2 text-right">
                 <button
                   className="text-xs text-blue-500 hover:underline"
                   onClick={(e) => {
@@ -32,12 +32,8 @@ export default function ResourceSidebar() {
                 >
                   Set priorities
                 </button>
-              )
-            }
-          >
-            {g.items.map((r) => (
-              <ResourceRow key={r.id} {...r} />
-            ))}
+              </div>
+            )}
           </Accordion>
         ),
       )}

@@ -1,38 +1,97 @@
-import React from 'react';
-import { BUILDINGS } from '../data/buildings.js';
+import React, { useState } from 'react';
+import { BUILDING_MAP } from '../data/buildings.js';
 import { useGame } from '../state/useGame.js';
+import {
+  buildInitialPowerTypeOrder,
+  getPoweredConsumerTypeIds,
+} from '../engine/power.js';
 
 export default function PowerPriorityModal({ onClose }) {
-  const { state } = useGame();
-  const consumers = BUILDINGS.filter(
-    (b) => b.inputsPerSecBase?.power || b.poweredMode,
-  );
+  const { state, setState } = useGame();
+  const initialOrder = buildInitialPowerTypeOrder(state.powerTypeOrder || []);
+  const [order, setOrder] = useState(initialOrder);
+  const [dragIndex, setDragIndex] = useState(null);
+
+  const move = (from, to) => {
+    if (to < 0 || to >= order.length) return;
+    const updated = [...order];
+    const [item] = updated.splice(from, 1);
+    updated.splice(to, 0, item);
+    setOrder(updated);
+  };
+
+  const onDragStart = (idx) => () => setDragIndex(idx);
+  const onDragOver = (idx) => (e) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === idx) return;
+    move(dragIndex, idx);
+    setDragIndex(idx);
+  };
+  const onDragEnd = () => setDragIndex(null);
+
+  const save = () => {
+    const powered = getPoweredConsumerTypeIds();
+    const cleaned = [];
+    order.forEach((id) => {
+      if (powered.includes(id) && !cleaned.includes(id)) cleaned.push(id);
+      else if (!powered.includes(id))
+        console.warn('Unknown or non-powered typeId in powerTypeOrder:', id);
+    });
+    setState((prev) => ({ ...prev, powerTypeOrder: cleaned }));
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-bg2 p-4 rounded shadow max-w-md w-full">
-        <h2 className="text-lg mb-4">Power priorities</h2>
-        <div className="space-y-2 max-h-64 overflow-y-auto">
-          {[5, 4, 3, 2, 1].map((p) => (
-            <details key={p} open>
-              <summary className="font-semibold">Priority {p}</summary>
-              <ul className="pl-4 list-disc">
-                {consumers
-                  .filter(
-                    (c) => state.powerTypePriority?.[c.id]?.priority === p,
-                  )
-                  .map((c) => (
-                    <li key={c.id}>{c.name}</li>
-                  ))}
-              </ul>
-            </details>
-          ))}
-        </div>
+        <h2 className="text-lg mb-2 text-left">Power Priorities</h2>
+        <div className="text-center text-xs text-muted">TOP PRIORITY</div>
+        <ul className="mt-2 space-y-1 max-h-64 overflow-y-auto">
+          {order.map((id, idx) => {
+            const b = BUILDING_MAP[id];
+            const count = state.buildings?.[id]?.count || 0;
+            return (
+              <li
+                key={id}
+                className="flex items-center justify-between border border-stroke rounded px-2 py-1"
+                draggable
+                onDragStart={onDragStart(idx)}
+                onDragOver={onDragOver(idx)}
+                onDragEnd={onDragEnd}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="cursor-move select-none">☰</span>
+                  <span>{b?.name || id}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted">x{count}</span>
+                  <button
+                    className="text-xs px-1 border rounded"
+                    onClick={() => move(idx, idx - 1)}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    className="text-xs px-1 border rounded"
+                    onClick={() => move(idx, idx + 1)}
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="text-center text-xs text-muted mt-2">LOW PRIORITY</div>
         <div className="mt-4 flex justify-end gap-2">
           <button
             className="px-2 py-1 border rounded text-sm"
             onClick={onClose}
           >
-            Close
+            Cancel
+          </button>
+          <button className="px-2 py-1 border rounded text-sm" onClick={save}>
+            Save
           </button>
         </div>
       </div>

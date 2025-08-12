@@ -28,6 +28,7 @@ import { ROLE_BUILDINGS } from '../data/roles.js';
 import { createLogEntry } from '../utils/log.js';
 import { updateRadio } from '../engine/radio.js';
 import { formatAmount } from '../utils/format.js';
+import { buildInitialPowerTypeOrder } from '../engine/power.js';
 
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded) {
@@ -43,10 +44,7 @@ export function prepareLoadedState(loaded) {
   base.ui = { ...base.ui, ...cloned.ui };
   base.resources = { ...base.resources, ...cloned.resources };
   base.buildings = { ...base.buildings, ...cloned.buildings };
-  base.powerTypePriority = {
-    ...base.powerTypePriority,
-    ...cloned.powerTypePriority,
-  };
+  base.powerTypeOrder = buildInitialPowerTypeOrder(cloned.powerTypeOrder || []);
   base.research = { ...base.research, ...cloned.research };
   base.population = { ...base.population, ...cloned.population };
   if (Array.isArray(cloned.population?.settlers)) {

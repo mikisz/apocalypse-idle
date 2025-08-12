@@ -24,7 +24,7 @@ export const BUILDINGS = [
     refund: 0.5,
     seasonProfile: { spring: 1.1, summer: 1.0, autumn: 0.9, winter: 0.8 },
     description:
-      "Hunts for meat year-round; less affected by seasons than crops.",
+      'Hunts for meat year-round; less affected by seasons than crops.',
   },
   {
     id: 'loggingCamp',
@@ -129,6 +129,7 @@ export const BUILDINGS = [
     type: 'production',
     category: 'Utilities',
     requiresResearch: 'radio',
+    requiresPower: true,
     inputsPerSecBase: { power: 0.1 },
     costBase: { wood: 80, scrap: 40, stone: 20 },
     costGrowth: 1,
