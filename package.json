@@ -13,7 +13,14 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "report:economy": "node scripts/generate-economy-report.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/data/**/*": [
+      "npm run report:economy --",
+      "git add docs/economy-snapshot.json docs/ECONOMY_REPORT.md"
+    ]
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.1",
@@ -56,6 +63,8 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7"
   }
 }
