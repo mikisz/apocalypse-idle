@@ -181,7 +181,10 @@ export default function BaseView() {
   });
   const GROUP_ORDER = [
     'Food',
-    'Production',
+    'Wood',
+    'Scrap',
+    'Stone',
+    'Construction Materials',
     'Science',
     'Energy',
     'Settlement',
