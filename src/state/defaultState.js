@@ -1,6 +1,7 @@
 import { initSeasons } from '../engine/time.js';
 import { CURRENT_SAVE_VERSION } from '../engine/persistence.js';
 import { RESOURCES } from '../data/resources.js';
+import { BUILDINGS } from '../data/buildings.js';
 import { makeRandomSettler } from '../data/names.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 
@@ -19,6 +20,21 @@ const initBuildings = () => ({
   shelter: { count: 1 },
 });
 
+const initPowerTypePriority = () => {
+  const result = {};
+  const orderCounters = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  BUILDINGS.forEach((b) => {
+    if (!b.inputsPerSecBase?.power && !b.poweredMode) return;
+    let priority = 1;
+    if (b.category === 'Food') priority = 5;
+    else if (b.type === 'processing') priority = 3;
+    else if (b.category === 'Raw Materials') priority = 2;
+    const order = orderCounters[priority]++;
+    result[b.id] = { priority, order };
+  });
+  return result;
+};
+
 const initSettlers = () => [makeRandomSettler()];
 
 const initColony = () => ({
@@ -35,6 +51,7 @@ export const defaultState = {
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
   buildings: initBuildings(),
+  powerTypePriority: initPowerTypePriority(),
   research: initResearch(),
   population: { settlers: initSettlers(), candidate: null },
   colony: initColony(),
