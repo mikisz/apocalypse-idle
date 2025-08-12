@@ -16,7 +16,7 @@ export default function BottomDock() {
     <Tabs
       value={state.ui.activeTab}
       onValueChange={setActiveTab}
-      className="fixed bottom-0 left-0 right-0 z-20"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-card"
     >
       <TabsList className="w-full grid grid-cols-4 rounded-none border-t bg-card p-0">
         {tabs.map((t) => (
