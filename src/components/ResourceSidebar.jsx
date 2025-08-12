@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../state/useGame.js';
 import Accordion from './Accordion.jsx';
+import PowerPriorityModal from './PowerPriorityModal.jsx';
 import {
   getCapacity,
   getResourceRates,
@@ -34,6 +35,7 @@ function ResourceRow({ icon, name, amount, capacity, rate, tooltip }) {
 
 export default function ResourceSidebar() {
   const { state } = useGame();
+  const [showPowerModal, setShowPowerModal] = useState(false);
   const roleBonuses = computeRoleBonuses(state.population?.settlers || []);
   const netRates = getResourceRates(state, true, roleBonuses);
   const prodRates = getResourceRates(state, false, roleBonuses);
@@ -164,12 +166,31 @@ export default function ResourceSidebar() {
               )}
           </Accordion>
         ) : (
-          <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
+          <Accordion
+            key={g.title}
+            title={g.title}
+            defaultOpen={g.defaultOpen}
+            action=
+              {g.title === 'Energy' && (
+                <button
+                  className="text-xs text-blue-500 hover:underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPowerModal(true);
+                  }}
+                >
+                  Set priorities
+                </button>
+              )}
+          >
             {g.items.map((r) => (
               <ResourceRow key={r.id} {...r} />
             ))}
           </Accordion>
         ),
+      )}
+      {showPowerModal && (
+        <PowerPriorityModal onClose={() => setShowPowerModal(false)} />
       )}
     </div>
   );
