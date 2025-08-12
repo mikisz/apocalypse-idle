@@ -70,7 +70,8 @@ export function useResourceSections(state) {
         0,
       );
       const totalCapacity =
-        state.foodPool?.capacity ?? getCapacity(state, 'potatoes');
+        state.foodPool?.capacity ??
+        foodIds.reduce((sum, id) => sum + getCapacity(state, id), 0);
       const totalNetRate = foodIds.reduce(
         (sum, id) => sum + (netRates[id]?.perSec || 0),
         0,
