@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { GameContext } from './useGame.js';
-import useGameLoop from '../engine/useGameLoop.js';
+import useGameLoop from '../engine/useGameLoop.ts';
 import { saveGame, loadGame, deleteSave } from '../engine/persistence.js';
 import { processTick, applyOfflineProgress } from '../engine/production.js';
 import { processSettlersTick, computeRoleBonuses } from '../engine/settlers.js';

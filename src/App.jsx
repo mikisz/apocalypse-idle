@@ -1,5 +1,5 @@
 import { GameProvider } from './state/GameContext.jsx';
-import TopBar from './components/TopBar.jsx';
+import TopBar from './components/TopBar.tsx';
 import BottomDock from './components/BottomDock.jsx';
 import Drawer from './components/Drawer.jsx';
 import OfflineProgressModal from './components/OfflineProgressModal.jsx';

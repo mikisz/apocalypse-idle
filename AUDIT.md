@@ -24,7 +24,7 @@
 ## Architecture Map
 
 - **State**: `GameContext` provider storing game state, actions and timers.
-- **Engine**: `time.js`, `production.js`, `persistence.js`, `useGameLoop.js`.
+- **Engine**: `time.js`, `production.js`, `persistence.js`, `useGameLoop.ts`.
 - **Data**: `buildings.js`, `names.js`.
 - **UI**: Components (TopBar, Drawer, ResourceSidebar, etc.) and Views (Base, Population, Research, Expeditions).
 

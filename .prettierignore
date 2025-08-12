@@ -2,3 +2,5 @@ dist
 dist-ssr
 node_modules
 package-lock.json
+docs
+scripts/generate-economy-report.mjs

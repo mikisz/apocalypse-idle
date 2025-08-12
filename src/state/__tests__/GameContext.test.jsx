@@ -12,7 +12,7 @@ vi.mock('../../engine/persistence.js', () => ({
   CURRENT_SAVE_VERSION: 2,
 }));
 
-vi.mock('../../engine/useGameLoop.js', () => ({
+vi.mock('../../engine/useGameLoop.ts', () => ({
   default: vi.fn(),
 }));
 

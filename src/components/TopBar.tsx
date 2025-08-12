@@ -1,13 +1,14 @@
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
 import { useGame } from '../state/useGame.js';
 
-export default function TopBar() {
-  const { state, toggleDrawer } = useGame();
+export default function TopBar(): JSX.Element {
+  const { state, toggleDrawer } = useGame() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   const time = getTimeBreakdown(state);
-  const modifiers = getSeasonModifiers(state);
-  const [open, setOpen] = useState(false);
-  const labels = { FOOD: 'Food', RAW: 'Raw' };
+  const modifiers: Record<string, number> = getSeasonModifiers(state);
+  const [open, setOpen] = useState<boolean>(false);
+  const labels: Record<string, string> = { FOOD: 'Food', RAW: 'Raw' };
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b border-stroke bg-bg2">

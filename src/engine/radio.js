@@ -1,7 +1,11 @@
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { generateCandidate } from './candidates.js';
 
-export function updateRadio(state, elapsedSeconds, candidateGenerator = generateCandidate) {
+export function updateRadio(
+  state,
+  elapsedSeconds,
+  candidateGenerator = generateCandidate,
+) {
   let candidate = state.population?.candidate || null;
   let radioTimer = state.colony?.radioTimer ?? RADIO_BASE_SECONDS;
   if ((state.buildings?.radio?.count || 0) > 0) {
