@@ -4,34 +4,53 @@ import { DAYS_PER_YEAR } from './time.js';
 
 function randomSkillLevel(rng = Math.random) {
   const r = rng();
-  if (r < 0.6) return 0;
-  if (r < 0.8) return 1;
-  if (r < 0.9) return 2;
-  if (r < 0.96) return 3;
-  if (r < 0.99) return 4;
-  if (r < 0.995) return 5;
+  if (r < 0.68) return 0;
+  if (r < 0.87) return 1;
+  if (r < 0.95) return 2;
+  if (r < 0.985) return 3;
+  if (r < 0.996) return 4;
+  if (r < 0.999) return 5;
   return 6;
+}
+
+function pickRandom(arr, rng) {
+  return arr[Math.floor(rng() * arr.length)];
 }
 
 export function generateCandidate(rng = Math.random) {
   const sex = rng() < 0.5 ? 'M' : 'F';
   const firstNames = FIRST_NAMES[sex];
-  const firstName = firstNames[Math.floor(rng() * firstNames.length)];
-  const lastName = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)];
-  const age = Math.floor(18 + rng() * 48); // 18..65
+  const firstName = pickRandom(firstNames, rng);
+  const lastName = pickRandom(LAST_NAMES, rng);
+  const age = Math.floor(18 + Math.pow(rng(), 1.6) * 47);
+
   const skills = {};
   ROLE_LIST.forEach((r) => {
     skills[r.id] = { level: randomSkillLevel(rng) };
   });
-  if (age > 40 && rng() < 0.3) {
-    const idx = Math.floor(rng() * ROLE_LIST.length);
-    const key = ROLE_LIST[idx].id;
+
+  if (age > 45 && rng() < 0.15) {
+    const key = pickRandom(ROLE_LIST, rng).id;
     skills[key].level = Math.min(6, skills[key].level + 1);
   }
+
+  const nonZero = Object.keys(skills).filter((k) => skills[k].level > 0);
+  const maxNonZero = rng() < 0.5 ? 3 : 4;
+  if (nonZero.length > maxNonZero) {
+    for (let i = nonZero.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [nonZero[i], nonZero[j]] = [nonZero[j], nonZero[i]];
+    }
+    nonZero.slice(maxNonZero).forEach((key) => {
+      skills[key].level = 0;
+    });
+  }
+
   if (ROLE_LIST.every((r) => skills[r.id].level === 6)) {
-    const key = ROLE_LIST[Math.floor(rng() * ROLE_LIST.length)].id;
+    const key = pickRandom(ROLE_LIST, rng).id;
     skills[key].level = 5;
   }
+
   return {
     id: globalThis.crypto?.randomUUID
       ? globalThis.crypto.randomUUID()
