@@ -27,9 +27,9 @@ function ActiveView() {
 export default function App() {
   return (
     <GameProvider>
-      <div className="min-h-screen flex flex-col bg-bg text-ink">
+      <div className="h-screen flex flex-col bg-bg text-ink overflow-hidden">
         <TopBar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-hidden">
           <ActiveView />
         </div>
         <BottomDock />

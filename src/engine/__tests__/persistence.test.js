@@ -70,5 +70,6 @@ describe('persistence migrations and validation', () => {
     expect(state.log).toHaveLength(1);
     expect(state.log[0].text).toBe('hello world');
     expect(typeof state.log[0].id).toBe('string');
+    expect(typeof state.log[0].time).toBe('number');
   });
 });

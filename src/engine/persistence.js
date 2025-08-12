@@ -6,7 +6,7 @@ const structuredClone =
 
 const STORAGE_KEY = 'apocalypse-idle-save';
 
-export const CURRENT_SAVE_VERSION = 5;
+export const CURRENT_SAVE_VERSION = 6;
 
 export const migrations = [
   {
@@ -105,6 +105,22 @@ export const migrations = [
       return save;
     },
   },
+  {
+    from: 5,
+    to: 6,
+    up(save) {
+      if (!Array.isArray(save.log)) {
+        save.log = [];
+      } else {
+        const now = Date.now();
+        save.log = save.log.map((entry) => ({
+          ...entry,
+          time: typeof entry.time === 'number' ? entry.time : now,
+        }));
+      }
+      return save;
+    },
+  },
 ];
 
 export function applyMigrations(save) {
@@ -162,11 +178,12 @@ export function validateSave(obj) {
           e &&
           typeof e === 'object' &&
           typeof e.id === 'string' &&
-          typeof e.text === 'string',
+          typeof e.text === 'string' &&
+          (obj.version < 6 || typeof e.time === 'number'),
       )
     )
       throw new Error(
-        'Invalid save: log entries must be objects with id and text',
+        'Invalid save: log entries must be objects with id, text and time',
       );
     if (!('research' in obj)) throw new Error('Invalid save: missing research');
     if (

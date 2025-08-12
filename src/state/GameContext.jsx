@@ -27,6 +27,7 @@ import { RESOURCES } from '../data/resources.js';
 import { ROLE_BUILDINGS } from '../data/roles.js';
 import { createLogEntry } from '../utils/log.js';
 import { updateRadio } from '../engine/radio.js';
+import { formatAmount } from '../utils/format.js';
 
 function mergeDeep(target, source) {
   const out = { ...target };
@@ -42,7 +43,8 @@ function mergeDeep(target, source) {
   return out;
 }
 
-function prepareLoadedState(loaded) {
+/* eslint-disable-next-line react-refresh/only-export-components */
+export function prepareLoadedState(loaded) {
   const gameTime =
     typeof loaded.gameTime === 'number'
       ? { seconds: loaded.gameTime }
@@ -60,6 +62,12 @@ function prepareLoadedState(loaded) {
       elapsed,
       bonuses,
     );
+    const offlineLogs = Object.entries(gains).map(([res, amt]) =>
+      createLogEntry(
+        `Gained ${formatAmount(amt)} ${RESOURCES[res].name} while offline`,
+        now,
+      ),
+    );
     const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
     const yearAfter = getYear({
       ...progressed,
@@ -70,6 +78,7 @@ function prepareLoadedState(loaded) {
       ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
     }));
     const show = Object.keys(gains).length > 0;
+    const log = [...offlineLogs, ...(progressed.log || [])].slice(0, 100);
     return {
       ...progressed,
       population: { ...progressed.population, settlers },
@@ -78,6 +87,7 @@ function prepareLoadedState(loaded) {
         ...progressed.ui,
         offlineProgress: show ? { elapsed, gains } : null,
       },
+      log,
       lastSaved: now,
     };
   }
