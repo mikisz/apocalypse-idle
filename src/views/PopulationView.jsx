@@ -68,7 +68,7 @@ export default function PopulationView() {
           <Checkbox
             id="onlyLiving"
             checked={onlyLiving}
-            onCheckedChange={setOnlyLiving}
+            onCheckedChange={(v) => setOnlyLiving(v === true)}
           />
           <label htmlFor="onlyLiving">Only living</label>
         </div>
@@ -76,7 +76,7 @@ export default function PopulationView() {
           <Checkbox
             id="unassignedOnly"
             checked={unassignedOnly}
-            onCheckedChange={setUnassignedOnly}
+            onCheckedChange={(v) => setUnassignedOnly(v === true)}
           />
           <label htmlFor="unassignedOnly">Unassigned only</label>
         </div>
