@@ -13,8 +13,13 @@ import {
   SEASON_DURATION,
 } from '../src/engine/time.js';
 import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js';
+import { BALANCE, ROLE_BONUS_PER_SETTLER } from '../src/data/balance.js';
+import {
+  RADIO_BASE_SECONDS,
+  SHELTER_COST_GROWTH,
+  SHELTER_MAX,
+} from '../src/data/settlement.js';
 import { defaultState } from '../src/state/defaultState.js';
-import { getCapacity } from '../src/state/selectors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,12 +46,16 @@ function computeResourceMultiplier(resId, season) {
 }
 
 const seasonData = {};
-seasons.forEach((s) => {
+seasons.forEach((s, idx) => {
   const multipliers = {};
   resourceKeys.forEach((r) => {
     multipliers[r] = computeResourceMultiplier(r, s);
   });
-  seasonData[s.id] = { durationSec: SEASON_DURATION, multipliers };
+  seasonData[s.id] = {
+    durationSec: SEASON_DURATION,
+    multipliers,
+    origin: { file: 'time.js', path: `SEASONS[${idx}]` },
+  };
 });
 
 const resources = resourceKeys.map((id) => {
@@ -55,9 +64,10 @@ const resources = resourceKeys.map((id) => {
     key: id,
     displayName: r.name,
     category: r.category,
-    startingAmount: defaultState.resources[id]?.amount ?? 0,
-    startingCapacity: getCapacity(defaultState, id),
+    startingAmount: r.startingAmount ?? 0,
+    startingCapacity: r.startingCapacity ?? 0,
     unit: r.unit ?? null,
+    origin: { file: 'resources.js', path: `RESOURCES.${id}` },
   };
 });
 
@@ -65,59 +75,60 @@ function buildingType(b) {
   return b.type || (b.capacityAdd ? 'storage' : 'other');
 }
 
-function baseProductionPerSec(b) {
-  return { ...(b.outputsPerSecBase || {}) };
-}
-
-function baseInputsPerSec(b) {
-  return { ...(b.inputsPerSecBase || {}) };
-}
-
-function getBuildingSeasonModifiers(building, season) {
-  const outputs = Object.keys(building.outputsPerSecBase || {});
-  const res = outputs[0];
-  if (!res) return { speed: 1, yield: 1 };
-  const category = RESOURCES[res]?.category;
-  const mult = getSeasonMultiplier(season, category);
-  return { speed: 1, yield: mult };
+function clean(obj) {
+  return Object.fromEntries(
+    Object.entries(obj || {}).map(([k, v]) => [k, typeof v === 'number' ? Number(v.toFixed(3)) : v]),
+  );
 }
 
 function buildingSeasonMultipliers(b) {
-  if (!b.outputsPerSecBase) return {};
+  const resKey = Object.keys(b.outputsPerSecBase || {})[0];
+  const cat = resKey ? RESOURCES[resKey]?.category : null;
   const result = {};
   seasons.forEach((s) => {
-    const mods = getBuildingSeasonModifiers(b, s);
-    result[s.id] = (mods.yield ?? 1) / (mods.speed ?? 1);
+    result[s.id] = cat ? getSeasonMultiplier(s, cat) : 1;
   });
   return result;
 }
 
-const buildings = BUILDINGS.map((b) => ({
+const buildings = BUILDINGS.map((b, idx) => ({
   id: b.id,
   name: b.name,
   type: buildingType(b),
-  constructionCost: getBuildingCost(b, 0),
-  demolitionRefund: b.refund ?? 0,
-  storageProvided: { ...(b.capacityAdd || {}) },
-  baseProductionPerSec: baseProductionPerSec(b),
-  baseInputsPerSec: baseInputsPerSec(b),
-  seasonalMultipliers: buildingSeasonMultipliers(b),
+  cost: clean(b.costBase || {}),
+  costGrowth: b.costGrowth,
+  refund: b.refund ?? 0,
+  storage: clean(b.capacityAdd || {}),
+  outputsPerSec: clean(b.outputsPerSecBase || {}),
+  inputsPerSec: clean(b.inputsPerSecBase || {}),
+  requiresResearch: b.requiresResearch || '',
+  seasonMults: buildingSeasonMultipliers(b),
+  origin: { file: 'buildings.js', path: `BUILDINGS[${idx}]` },
 }));
+
 const roles = ROLE_LIST.map((r) => ({
   id: r.id,
   name: r.name,
+  skill: r.skill,
   resource: r.resource,
   building: r.building,
+  origin: { file: 'roles.js', path: `ROLES.${r.id}` },
 }));
 
-const research = RESEARCH.map((r) => ({
+const research = RESEARCH.map((r, idx) => ({
   id: r.id,
   name: r.name,
   scienceCost: r.cost?.science ?? 0,
   timeSec: r.timeSec,
-  prereqs: r.prereqs,
-  ...(r.unlocks ? { unlocks: r.unlocks } : {}),
-  ...(r.effects ? { effects: r.effects } : {}),
+  prereqs: r.prereqs || [],
+  milestones: r.milestones || null,
+  unlocks: {
+    resources: r.unlocks?.resources || [],
+    buildings: r.unlocks?.buildings || [],
+    categories: r.unlocks?.categories || [],
+  },
+  effects: r.effects || [],
+  origin: { file: 'research.js', path: `RESEARCH[${idx}]` },
 }));
 
 const startingResources = Object.fromEntries(
@@ -128,10 +139,29 @@ const startingBuildings = Object.fromEntries(
   Object.entries(defaultState.buildings).map(([id, info]) => [id, info.count || 0]),
 );
 
+const rulesOrigins = {
+  getBuildingCost: { file: 'buildings.js', path: 'getBuildingCost()' },
+  refund: { file: 'buildings.js', path: 'BUILDINGS[].refund' },
+  clamp: { file: 'production.js', path: 'clampResource()' },
+  tickSeconds: { file: 'balance.js', path: 'BALANCE.TICK_SECONDS' },
+  foodConsumption: {
+    file: 'balance.js',
+    path: 'BALANCE.FOOD_CONSUMPTION_PER_SETTLER',
+  },
+  starvationTimer: {
+    file: 'balance.js',
+    path: 'BALANCE.STARVATION_DEATH_TIMER_SECONDS',
+  },
+  roleBonusFn: { file: 'balance.js', path: 'ROLE_BONUS_PER_SETTLER' },
+  shelterMax: { file: 'settlement.js', path: 'SHELTER_MAX' },
+  shelterCostGrowth: { file: 'settlement.js', path: 'SHELTER_COST_GROWTH' },
+  radioBaseSeconds: { file: 'settlement.js', path: 'RADIO_BASE_SECONDS' },
+};
+
 const snapshot = {
   version: commitHash,
   saveVersion: CURRENT_SAVE_VERSION,
-  tickSeconds: 1,
+  tickSeconds: BALANCE.TICK_SECONDS,
   seasons: seasonData,
   resources,
   buildings,
@@ -139,8 +169,7 @@ const snapshot = {
   roles,
   formula: {
     order: ['base', 'season', 'roles', 'sum', 'clamp'],
-    demolitionRefund: 0.5,
-    clampRule: 'min(value, capacity) and never negative',
+    rulesOrigins,
   },
   startingState: {
     season: seasons[0].id,
@@ -156,51 +185,9 @@ fs.writeFileSync(
   JSON.stringify(snapshot, null, 2) + '\n',
 );
 
-function formatCost(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v != null);
-  return entries.length
-    ? entries.map(([k, v]) => `${k}: ${v}`).join(', ')
-    : '-';
-}
-
-function formatObj(obj) {
-  const entries = Object.entries(obj || {}).filter(([, v]) => v != null);
-  return entries.length
-    ? entries
-        .map(([k, v]) => `${k}: ${Number(v.toFixed ? v.toFixed(3) : v)}`)
-        .join(', ')
-    : '-';
-}
-
-function formatArray(arr) {
-  return arr && arr.length ? arr.join(', ') : '-';
-}
-
-function formatEffects(effects) {
-  if (!effects || effects.length === 0) return '-';
-  return effects
-    .map((e) => {
-      const parts = [];
-      if (e.resource) parts.push(`resource=${e.resource}`);
-      if (e.category) parts.push(`category=${e.category}`);
-      if (e.percent != null) parts.push(`percent=${(e.percent * 100).toFixed(1)}%`);
-      if (e.type) parts.push(`type=${e.type}`);
-      return `{ ${parts.join(', ')} }`;
-    })
-    .join(', ');
-}
-
-function formatUnlocks(unlocks, effects) {
-  const parts = [];
-  if (unlocks?.resources?.length)
-    parts.push(`resources: ${unlocks.resources.join(', ')}`);
-  if (unlocks?.buildings?.length)
-    parts.push(`buildings: ${unlocks.buildings.join(', ')}`);
-  if (unlocks?.categories?.length)
-    parts.push(`categories: ${unlocks.categories.join(', ')}`);
-  if (effects?.length) parts.push(`effects: ${formatEffects(effects)}`);
-  return parts.join('; ') || '-';
-}
+const formatJSON = (obj) =>
+  obj && Object.keys(obj).length ? JSON.stringify(obj) : '-';
+const formatArr = (arr) => (arr && arr.length ? arr.join(', ') : '-');
 
 let md = '';
 md += '# Economy Report\n\n';
@@ -211,70 +198,82 @@ md +=
 
 md += '## 2) Resources\n';
 md +=
-  '| key | displayName | category | startingAmount | startingCapacity | unit |\n';
-md += '| - | - | - | - | - | - |\n';
+  '| key | displayName | category | startingAmount | startingCapacity | unit | source |\n';
+md += '| - | - | - | - | - | - | - |\n';
 resources.forEach((r) => {
-  md += `| ${r.key} | ${r.displayName} | ${r.category} | ${r.startingAmount} | ${r.startingCapacity} | ${r.unit ?? ''} |\n`;
+  md += `| ${r.key} | ${r.displayName} | ${r.category} | ${r.startingAmount} | ${r.startingCapacity} | ${r.unit ?? ''} | resources.js:RESOURCES.${r.key} |\n`;
 });
-md +=
-  '\n';
+md += '\n';
 
 md += '## 3) Seasons\n';
 md += '| season | duration (sec) |';
 resourceKeys.forEach((r) => (md += ` ${r} |`));
-md += '\n| - | - |';
+md += ' source |\n| - | - |';
 resourceKeys.forEach(() => (md += ' - |'));
-md += '\n';
-seasons.forEach((s) => {
+md += ' - |\n';
+seasons.forEach((s, idx) => {
   md += `| ${s.id} | ${seasonData[s.id].durationSec} |`;
   resourceKeys.forEach((r) => {
     md += ` ${seasonData[s.id].multipliers[r].toFixed(3)} |`;
   });
-  md += '\n';
+  md += ` time.js:SEASONS[${idx}] |\n`;
 });
 md += '\n';
 
 md += '## 4) Buildings\n';
 md +=
-  '| id | name | type | cost | refund | storage | base prod/s | inputs per sec | season mults |\n';
-md += '| - | - | - | - | - | - | - | - | - |\n';
-buildings.forEach((row) => {
-  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatCost(row.constructionCost)} | ${row.demolitionRefund} | ${formatObj(row.storageProvided)} | ${formatObj(row.baseProductionPerSec)} | ${formatObj(row.baseInputsPerSec)} | ${formatObj(row.seasonalMultipliers)} |\n`;
+  '| id | name | type | cost | costGrowth | refund | storage | base prod/s | inputs per sec | requiresResearch | season mults | source |\n';
+md +=
+  '| - | - | - | - | - | - | - | - | - | - | - | - |\n';
+buildings.forEach((row, idx) => {
+  md += `| ${row.id} | ${row.name} | ${row.type} | ${formatJSON(row.cost)} | ${row.costGrowth} | ${row.refund} | ${formatJSON(row.storage)} | ${formatJSON(row.outputsPerSec)} | ${formatJSON(row.inputsPerSec)} | ${row.requiresResearch || '-'} | ${formatJSON(row.seasonMults)} | buildings.js:BUILDINGS[${idx}] |\n`;
 });
 md += '\n';
+
 md += '## 5) Research\n';
-md += '| id | name | science cost | time (sec) | prereqs | unlocks |\n';
-md += '| - | - | - | - | - | - |\n';
-research.forEach((r) => {
-  md += `| ${r.id} | ${r.name} | ${r.scienceCost} | ${r.timeSec} | ${formatArray(r.prereqs)} | ${formatUnlocks(r.unlocks, r.effects)} |\n`;
+md +=
+  '| id | name | science cost | time (sec) | prereqs | milestones | unlocks | effects | source |\n';
+md += '| - | - | - | - | - | - | - | - | - |\n';
+research.forEach((r, idx) => {
+  md += `| ${r.id} | ${r.name} | ${r.scienceCost} | ${r.timeSec} | ${formatArr(r.prereqs)} | ${formatJSON(r.milestones)} | ${formatJSON(r.unlocks)} | ${formatJSON(r.effects)} | research.js:RESEARCH[${idx}] |\n`;
 });
 md += '\n';
+
 md += '## 6) Roles\n';
-if (roles.length) {
-  md += '| id | name | resource | building |\n';
-  md += '| - | - | - | - |\n';
-  roles.forEach((r) => {
-    md += `| ${r.id} | ${r.name} | ${r.resource} | ${r.building} |\n`;
-  });
-  md += '\n';
-} else {
-  md += 'No role-based modifiers defined.\n\n';
-}
+md += '| id | name | skill | resource | building | source |\n';
+md += '| - | - | - | - | - | - |\n';
+roles.forEach((r) => {
+  md += `| ${r.id} | ${r.name} | ${r.skill} | ${r.resource} | ${r.building} | roles.js:ROLES.${r.id} |\n`;
+});
+md += '\n';
 
 md += '## 7) Starting State\n';
 md += `Starting season: ${snapshot.startingState.season}, Year: ${snapshot.startingState.year}.\n\n`;
 md += '### Resources\n';
-md += '| resource | amount | capacity |\n| - | - | - |\n';
+md += '| resource | amount | capacity | source |\n| - | - | - | - |\n';
 Object.entries(startingResources).forEach(([key, val]) => {
-  md += `| ${key} | ${val.amount} | ${val.capacity} |\n`;
+  md += `| ${key} | ${val.amount} | ${val.capacity} | resources.js:RESOURCES.${key}.startingAmount/startingCapacity |\n`;
 });
 md += '\n### Buildings\n';
-md += '| building | count |\n| - | - |\n';
+md += '| building | count | source |\n| - | - | - |\n';
 Object.entries(startingBuildings)
   .filter(([, count]) => count > 0)
   .forEach(([id, count]) => {
-    md += `| ${id} | ${count} |\n`;
+    md += `| ${id} | ${count} | defaultState.js:initBuildings().${id}.count |\n`;
   });
 md += '\n';
 
+md += '## 8) Rules & Formulas\n';
+md += `- Building cost: costBase * costGrowth^count, rounded up (source: buildings.js:getBuildingCost())\n`;
+md += `- Demolition refund: refund * last cost (source: buildings.js:BUILDINGS[].refund)\n`;
+md += `- Clamp: clampResource(value, capacity) (source: production.js:clampResource())\n`;
+md += `- TICK_SECONDS = ${BALANCE.TICK_SECONDS} (source: balance.js:BALANCE.TICK_SECONDS)\n`;
+md += `- FOOD_CONSUMPTION_PER_SETTLER = ${BALANCE.FOOD_CONSUMPTION_PER_SETTLER} (source: balance.js:BALANCE.FOOD_CONSUMPTION_PER_SETTLER)\n`;
+md += `- STARVATION_DEATH_TIMER_SECONDS = ${BALANCE.STARVATION_DEATH_TIMER_SECONDS} (source: balance.js:BALANCE.STARVATION_DEATH_TIMER_SECONDS)\n`;
+md += `- ROLE_BONUS_PER_SETTLER(level): level<=10 -> 0.1*level; else 1 + 0.05*(level-10) (source: balance.js:ROLE_BONUS_PER_SETTLER)\n`;
+md += `- SHELTER_MAX = ${SHELTER_MAX} (source: settlement.js:SHELTER_MAX)\n`;
+md += `- SHELTER_COST_GROWTH = ${SHELTER_COST_GROWTH} (source: settlement.js:SHELTER_COST_GROWTH)\n`;
+md += `- RADIO_BASE_SECONDS = ${RADIO_BASE_SECONDS} (source: settlement.js:RADIO_BASE_SECONDS)\n`;
+
 fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);
+
