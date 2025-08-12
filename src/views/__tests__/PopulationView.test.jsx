@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PopulationView from '../PopulationView.jsx';
-import { GameContext } from '../../state/useGame.js';
+import { GameContext } from '../../state/useGame.ts';
 
 describe('PopulationView', () => {
   test('shows idle settlers and propagates role changes', () => {

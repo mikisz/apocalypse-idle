@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { GameProvider } from '../GameContext.jsx';
-import { useGame } from '../useGame.js';
+import { useGame } from '../useGame.ts';
 import { loadGame } from '../../engine/persistence.js';
 
 vi.mock('../../engine/persistence.js', () => ({
