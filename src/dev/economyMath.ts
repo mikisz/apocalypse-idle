@@ -1,4 +1,5 @@
 import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
+import { RESOURCES } from '../data/resources.js';
 
 export function valueWeightedStream(
   outputs: ResourceMap = {},
@@ -34,22 +35,30 @@ export function marginalWeightedCost(
 }
 
 export function seasonMultiplier(
-  buildingOrCategory: BuildingData | string,
+  building: BuildingData,
   mode: 'average' | 'winter' | 'spring' | 'summer' | 'autumn',
   seasons: SeasonsRecord,
 ): number {
   const seasonIds = Object.keys(seasons);
 
+  function resolveCategory(): string | undefined {
+    for (const res of Object.keys(building.outputsPerSecBase || {})) {
+      const cat = RESOURCES[res]?.category;
+      if (cat) return cat;
+    }
+    for (const res of Object.keys(building.inputsPerSecBase || {})) {
+      const cat = RESOURCES[res]?.category;
+      if (cat) return cat;
+    }
+    return undefined;
+  }
+
   function multForSeason(seasonId: string): number {
-    if (typeof buildingOrCategory === 'string') {
-      return seasons[seasonId]?.multipliers?.[buildingOrCategory] ?? 1;
+    if (building.seasonProfile === 'constant') return 1;
+    if (typeof building.seasonProfile === 'object') {
+      return building.seasonProfile[seasonId] ?? 1;
     }
-    const b = buildingOrCategory as BuildingData;
-    if (b.seasonProfile === 'constant') return 1;
-    if (typeof b.seasonProfile === 'object') {
-      return b.seasonProfile[seasonId] ?? 1;
-    }
-    const cat = b.category;
+    const cat = resolveCategory();
     return cat ? seasons[seasonId]?.multipliers?.[cat] ?? 1 : 1;
   }
 
