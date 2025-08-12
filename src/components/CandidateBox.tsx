@@ -21,13 +21,12 @@ export default function CandidateBox(): JSX.Element | null {
   const candidate: Candidate | null = state.population?.candidate ?? null;
   if (!candidate) return null;
 
-  const accept = (): void => {
+  const updateAfterDecision = (accepted: boolean): void => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setState((prev: any) => {
-      const settlers = [
-        ...prev.population.settlers,
-        candidateToSettler(candidate),
-      ];
+      const settlers = accepted
+        ? [...prev.population.settlers, candidateToSettler(candidate)]
+        : prev.population.settlers;
       return {
         ...prev,
         population: { ...prev.population, settlers, candidate: null },
@@ -36,13 +35,12 @@ export default function CandidateBox(): JSX.Element | null {
     });
   };
 
+  const accept = (): void => {
+    updateAfterDecision(true);
+  };
+
   const reject = (): void => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setState((prev: any) => ({
-      ...prev,
-      population: { ...prev.population, candidate: null },
-      colony: { ...prev.colony, radioTimer: RADIO_BASE_SECONDS },
-    }));
+    updateAfterDecision(false);
   };
 
   const skills = Object.entries(candidate.skills || {})
