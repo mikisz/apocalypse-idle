@@ -1,5 +1,5 @@
 {
-  "version": "8c7304eda7c13985bd2fbb4bf829d7118c52c925",
+  "version": "817ab1aa9f0ca61c503b8319294da30152cc6ca2",
   "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
@@ -669,6 +669,7 @@
   },
   "startingBuildings": {
     "potatoField": 2,
-    "loggingCamp": 1
+    "loggingCamp": 1,
+    "shelter": 1
   }
 }

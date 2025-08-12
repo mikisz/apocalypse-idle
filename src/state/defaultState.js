@@ -16,6 +16,7 @@ const initResources = () => {
 const initBuildings = () => ({
   potatoField: { count: 2 },
   loggingCamp: { count: 1 },
+  shelter: { count: 1 },
 });
 
 const initSettlers = () => [makeRandomSettler()];

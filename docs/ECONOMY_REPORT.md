@@ -1,7 +1,7 @@
 # Economy Report
 
 ## 1) Overview
-Economy generated from commit **8c7304eda7c13985bd2fbb4bf829d7118c52c925** on 2025-08-12 03:40:40 +0200. Save version: **5**.
+Economy generated from commit **817ab1aa9f0ca61c503b8319294da30152cc6ca2** on 2025-08-12 04:05:51 +0200. Save version: **5**.
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -85,4 +85,5 @@ Starting season: spring, Year: 1.
 | - | - |
 | potatoField | 2 |
 | loggingCamp | 1 |
+| shelter | 1 |
 
