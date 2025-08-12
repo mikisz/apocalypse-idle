@@ -7,7 +7,7 @@ vi.mock('../candidates.js', () => ({
 }));
 
 import { updateRadio } from '../radio.js';
-import { applyProduction } from '../production.js';
+import { applyProduction, applyOfflineProgress } from '../production.js';
 import { getResourceRates } from '../../state/selectors.js';
 import { generateCandidate } from '../candidates.js';
 
@@ -52,6 +52,22 @@ describe('radio building production', () => {
     };
     const rates = getResourceRates(state);
     expect(rates.power.perSec).toBeCloseTo(-0.1, 5);
+  });
+});
+
+describe('applyOfflineProgress', () => {
+  it('uses post-production state to update radio', () => {
+    generateCandidate.mockClear();
+    const state = {
+      buildings: { radio: { count: 1 }, woodGenerator: { count: 1 } },
+      resources: { power: { amount: 0 }, wood: { amount: 100 } },
+      population: { candidate: null },
+      colony: { radioTimer: 3 },
+    };
+    const { state: next } = applyOfflineProgress(state, 5);
+    expect(generateCandidate).toHaveBeenCalledOnce();
+    expect(next.population.candidate).toEqual(fakeCandidate);
+    expect(next.colony.radioTimer).toBe(0);
   });
 });
 

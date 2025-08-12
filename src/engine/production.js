@@ -167,7 +167,12 @@ export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
     if (current.resources[res].amount > 0)
       current.resources[res].discovered = true;
   });
-  const { candidate, radioTimer } = updateRadio(state, elapsedSeconds);
+  const { candidate, radioTimer } = updateRadio(current, elapsedSeconds);
+  current = {
+    ...current,
+    population: { ...current.population, candidate },
+    colony: { ...current.colony, radioTimer },
+  };
   const gains = {};
   Object.keys(before).forEach((res) => {
     const gain =
@@ -175,11 +180,7 @@ export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
     if (gain > 0) gains[res] = gain;
   });
   return {
-    state: {
-      ...current,
-      population: { ...current.population, candidate },
-      colony: { ...current.colony, radioTimer },
-    },
+    state: current,
     gains,
   };
 }
