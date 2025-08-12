@@ -132,6 +132,7 @@ export function useResourceSections(state) {
     });
     if (hasRadioResearch && !rendered.some((e) => e.title === 'Settlers'))
       rendered.push({ title: 'Settlers', settlers: true });
+    rendered.push({ title: 'Happiness', happiness: true });
     return rendered;
   }, [entries, hasRadioResearch]);
 
@@ -146,5 +147,12 @@ export function useResourceSections(state) {
     powered,
   };
 
-  return { sections, settlersInfo };
+  const happinessInfo = {
+    avg: Math.round(state.colony?.happiness?.value || 0),
+    total: totalSettlers,
+    capacity,
+    breakdown: state.colony?.happiness?.breakdown || [],
+  };
+
+  return { sections, settlersInfo, happinessInfo };
 }

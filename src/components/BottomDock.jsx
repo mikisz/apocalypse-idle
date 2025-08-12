@@ -18,12 +18,12 @@ export default function BottomDock() {
       onValueChange={setActiveTab}
       className="fixed bottom-0 left-0 right-0 z-50 bg-card shadow-lg"
     >
-      <TabsList className="w-full grid grid-cols-4 rounded-none border-t bg-card p-2">
+      <TabsList className="w-full grid grid-cols-4 rounded-none border-t bg-card p-3">
         {tabs.map((t) => (
           <TabsTrigger
             key={t.id}
             value={t.id}
-            className="flex flex-col py-3 text-xl"
+            className="flex flex-col py-4 text-xl"
           >
             <span aria-hidden="true">{t.icon}</span>
             <span className="sr-only">{t.label}</span>
