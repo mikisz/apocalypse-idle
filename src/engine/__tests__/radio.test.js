@@ -7,6 +7,8 @@ vi.mock('../candidates.js', () => ({
 }));
 
 import { updateRadio } from '../radio.js';
+import { applyProduction } from '../production.js';
+import { getResourceRates } from '../../state/selectors.js';
 import { generateCandidate } from '../candidates.js';
 
 const baseState = {
@@ -30,5 +32,37 @@ describe('updateRadio', () => {
     expect(generateCandidate).toHaveBeenCalledOnce();
     expect(candidate).toEqual(fakeCandidate);
     expect(radioTimer).toBe(0);
+  });
+});
+
+describe('radio building production', () => {
+  it('consumes power without producing resources', () => {
+    const state = {
+      buildings: { radio: { count: 1 } },
+      resources: { power: { amount: 1 } },
+    };
+    const next = applyProduction(state, 5);
+    expect(next.resources.power.amount).toBeCloseTo(0.5, 5);
+  });
+
+  it('reports power consumption in resource rates', () => {
+    const state = {
+      buildings: { radio: { count: 1 } },
+      resources: { power: { amount: 1 } },
+    };
+    const rates = getResourceRates(state);
+    expect(rates.power.perSec).toBeCloseTo(-0.1, 5);
+  });
+});
+
+describe('buildings without inputs or outputs', () => {
+  it('do not crash resource rate calculations', () => {
+    const state = { buildings: { shelter: { count: 1 } }, resources: {} };
+    expect(() => getResourceRates(state)).not.toThrow();
+  });
+
+  it('do not crash production calculations', () => {
+    const state = { buildings: { shelter: { count: 1 } }, resources: {} };
+    expect(() => applyProduction(state, 5)).not.toThrow();
   });
 });

@@ -35,7 +35,6 @@ export function getResourceRates(
   PRODUCTION_BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     if (count <= 0) return;
-    if (!b.outputsPerSecBase) return;
     let factor = 1;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
@@ -66,16 +65,22 @@ export function getResourceRates(
         });
       }
     }
-    Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
-      const category = RESOURCES[res].category;
-      const mult = getSeasonMultiplier(season, category);
-      const role = ROLE_BY_RESOURCE[res];
-      const bonusPercent = roleBonuses[role] || 0;
-      const researchBonus = getResearchOutputBonus(state, res);
-      const perSec =
-        base * mult * count * (1 + bonusPercent / 100 + researchBonus) * factor;
-      rates[res] = (rates[res] || 0) + perSec;
-    });
+    if (b.outputsPerSecBase) {
+      Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
+        const category = RESOURCES[res].category;
+        const mult = getSeasonMultiplier(season, category);
+        const role = ROLE_BY_RESOURCE[res];
+        const bonusPercent = roleBonuses[role] || 0;
+        const researchBonus = getResearchOutputBonus(state, res);
+        const perSec =
+          base *
+          mult *
+          count *
+          (1 + bonusPercent / 100 + researchBonus) *
+          factor;
+        rates[res] = (rates[res] || 0) + perSec;
+      });
+    }
   });
 
   if (includeConsumption) {
