@@ -38,8 +38,8 @@ export const RESEARCH = [
     name: 'Hunting I',
     type: 'unlock',
     shortDesc: 'Unlocks hunting for supplemental food.',
-    cost: { science: 35 },
-    timeSec: 45,
+    cost: { science: 50 }, // changed: 35→50
+    timeSec: 90, // changed: 45→90
     prereqs: [],
     unlocks: { buildings: ['huntersHut'], resources: ['meat'] },
     row: 1,
@@ -50,8 +50,8 @@ export const RESEARCH = [
     name: 'Radio',
     type: 'unlock',
     shortDesc: 'Unlocks radio broadcasts to attract settlers.',
-    cost: { science: 120 },
-    timeSec: 180,
+    cost: { science: 150 }, // changed: 120→150
+    timeSec: 240, // changed: 180→240
     prereqs: ['industry1', 'basicEnergy'],
     unlocks: { buildings: ['radio'] },
     row: 1,
@@ -62,8 +62,8 @@ export const RESEARCH = [
     name: 'Woodworking I',
     type: 'efficiency',
     shortDesc: '+5% to wood and derived planks.',
-    cost: { science: 50 },
-    timeSec: 70,
+    cost: { science: 60 }, // changed: 50→60
+    timeSec: 90, // changed: 70→90
     prereqs: ['industry1'],
     effects: [{ category: 'WOOD', percent: 0.05, type: 'output' }],
     row: 1,
@@ -73,8 +73,8 @@ export const RESEARCH = [
     name: 'Salvaging I',
     type: 'efficiency',
     shortDesc: '+5% to scrap and derived metal parts.',
-    cost: { science: 50 },
-    timeSec: 70,
+    cost: { science: 60 }, // changed: 50→60
+    timeSec: 90, // changed: 70→90
     prereqs: ['industry1'],
     effects: [{ category: 'SCRAP', percent: 0.05, type: 'output' }],
     row: 1,
@@ -112,8 +112,8 @@ export const RESEARCH = [
     name: 'Woodworking II',
     type: 'efficiency',
     shortDesc: 'Additional +5% to wood and planks.',
-    cost: { science: 110 },
-    timeSec: 180,
+    cost: { science: 140 }, // changed: 110→140
+    timeSec: 240, // changed: 180→240
     prereqs: ['woodworking1', 'industry2'],
     effects: [{ category: 'WOOD', percent: 0.05, type: 'output' }],
     row: 3,
@@ -123,8 +123,8 @@ export const RESEARCH = [
     name: 'Salvaging II',
     type: 'efficiency',
     shortDesc: 'Additional +5% to scrap and metal parts.',
-    cost: { science: 110 },
-    timeSec: 180,
+    cost: { science: 140 }, // changed: 110→140
+    timeSec: 240, // changed: 180→240
     prereqs: ['salvaging1', 'industry2'],
     effects: [{ category: 'SCRAP', percent: 0.05, type: 'output' }],
     row: 3,
@@ -135,14 +135,36 @@ export const RESEARCH = [
     type: 'efficiency',
     shortDesc:
       'Additional +5% storage capacity for raw materials and construction materials.',
-    cost: { science: 120 },
-    timeSec: 210,
+    cost: { science: 150 }, // changed: 120→150
+    timeSec: 270, // changed: 210→270
     prereqs: ['logistics1', 'industry2'],
     effects: [
       { category: 'RAW', percent: 0.05, type: 'storage' },
       { category: 'CONSTRUCTION_MATERIALS', percent: 0.05, type: 'storage' },
     ],
     row: 3,
+  },
+  {
+    id: 'hunting2',
+    name: 'Hunting II',
+    type: 'efficiency',
+    shortDesc: '+10% to all food outputs.',
+    cost: { science: 130 },
+    timeSec: 240,
+    prereqs: ['hunting1'],
+    effects: [{ category: 'FOOD', percent: 0.1, type: 'output' }],
+    row: 2,
+  },
+  {
+    id: 'industryProduction',
+    name: 'Industry Production',
+    type: 'efficiency',
+    shortDesc: '+10% output for construction materials.',
+    cost: { science: 130 },
+    timeSec: 240,
+    prereqs: ['industry1'],
+    effects: [{ category: 'CONSTRUCTION_MATERIALS', percent: 0.1, type: 'output' }],
+    row: 2,
   },
 ];
 
