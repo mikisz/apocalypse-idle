@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
-import { BUILDINGS } from '../src/data/buildings.js';
+import { BUILDINGS, getBuildingCost } from '../src/data/buildings.js';
 import { RESOURCES } from '../src/data/resources.js';
 import {
   initSeasons,
@@ -90,7 +90,7 @@ const buildings = BUILDINGS.map((b) => ({
   id: b.id,
   name: b.name,
   type: buildingType(b),
-  constructionCost: { ...b.cost },
+  constructionCost: getBuildingCost(b, 0),
   demolitionRefund: 0.5,
   storageProvided: { ...(b.addsCapacity || {}) },
   baseProductionPerSec: baseProductionPerSec(b),
