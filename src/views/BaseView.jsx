@@ -195,11 +195,11 @@ export default function BaseView() {
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
   ];
   return (
-    <div className="p-4 space-y-6 pb-20 md:flex md:space-y-0 md:space-x-6">
-      <div className="md:w-64 md:flex-shrink-0">
+    <div className="h-full flex flex-col md:flex-row md:space-x-6 overflow-y-auto md:overflow-hidden">
+      <div className="p-4 pb-20 md:w-64 md:flex-shrink-0 md:overflow-y-auto">
         <ResourceSidebar />
       </div>
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 p-4 space-y-6 pb-20 md:overflow-y-auto">
         <CandidateBox />
         <div className="border border-stroke rounded">
           {prodGroupKeys.map((key) => (
@@ -223,9 +223,10 @@ export default function BaseView() {
             ))}
           </Accordion>
         </div>
-        <div>
-          <h2 className="font-semibold mb-2">Event Log</h2>
-          <EventLog log={state.log} />
+        <div className="border border-stroke rounded">
+          <Accordion title="Change Log">
+            <EventLog log={state.log} />
+          </Accordion>
         </div>
       </div>
     </div>
