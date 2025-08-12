@@ -3,6 +3,7 @@ import { useGame } from '../state/useGame.js';
 import EventLog from '../components/EventLog.jsx';
 import ResourceSidebar from '../components/ResourceSidebar.jsx';
 import Accordion from '../components/Accordion.jsx';
+import CandidateBox from '../components/CandidateBox.jsx';
 import {
   PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,
@@ -17,6 +18,7 @@ import { clampResource, demolishBuilding } from '../engine/production.js';
 function BuildingRow({ building }) {
   const { state, setState } = useGame();
   const count = state.buildings[building.id]?.count || 0;
+  const atMax = building.maxCount != null && count >= building.maxCount;
   const season = getSeason(state);
   const scaledCost = getBuildingCost(building, count);
   const costEntries = Object.entries(scaledCost);
@@ -39,7 +41,7 @@ function BuildingRow({ building }) {
   };
 
   const build = () => {
-    if (!canAfford) return;
+    if (!canAfford || atMax) return;
     setState((prev) => {
       const resources = { ...prev.resources };
       costEntries.forEach(([res, amt]) => {
@@ -74,13 +76,15 @@ function BuildingRow({ building }) {
     <div className="p-2 rounded border border-stroke bg-bg2 space-y-1">
       <div className="flex items-center justify-between">
         <span>
-          {building.name} ({count})
+          {building.name}{' '}
+          {building.maxCount != null ? `${count}/${building.maxCount}` : `(${count})`}
         </span>
         <div className="space-x-2">
           <button
             className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
             onClick={build}
-            disabled={!canAfford}
+            disabled={!canAfford || atMax}
+            title={atMax ? `Max ${building.maxCount}` : undefined}
           >
             Build
           </button>
@@ -121,6 +125,7 @@ function BuildingRow({ building }) {
               .join(', ')}
           </div>
         )}
+        {building.maxCount != null && <div>Max: {building.maxCount}</div>}
         {building.outputsPerSecBase?.power &&
           getCapacity(state, 'power') <= 0 && (
             <div>No Power storage. Excess is lost.</div>
@@ -141,7 +146,7 @@ export default function BaseView() {
     if (!prodGroups[cat]) prodGroups[cat] = [];
     prodGroups[cat].push(b);
   });
-  const GROUP_ORDER = ['Food', 'Production', 'Science', 'Energy'];
+  const GROUP_ORDER = ['Food', 'Production', 'Science', 'Energy', 'Settlement', 'Utilities'];
   const prodGroupKeys = [
     ...GROUP_ORDER.filter((g) => prodGroups[g]),
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
@@ -152,6 +157,7 @@ export default function BaseView() {
         <ResourceSidebar />
       </div>
       <div className="flex-1 space-y-6">
+        <CandidateBox />
         <div className="border border-stroke rounded">
           {prodGroupKeys.map((key) => (
             <Accordion key={key} title={key} defaultOpen>

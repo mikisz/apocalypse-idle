@@ -135,6 +135,7 @@
       "baseProductionPerSec": {
         "potatoes": 0.375
       },
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -156,6 +157,7 @@
       "baseProductionPerSec": {
         "wood": 0.2
       },
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -177,6 +179,7 @@
       "baseProductionPerSec": {
         "scrap": 0.06
       },
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -199,6 +202,7 @@
       "baseProductionPerSec": {
         "stone": 0.08
       },
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -222,6 +226,7 @@
       "baseProductionPerSec": {
         "science": 0.5
       },
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -244,6 +249,9 @@
       "baseProductionPerSec": {
         "power": 1
       },
+      "baseInputsPerSec": {
+        "wood": 0.3
+      },
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {
@@ -265,6 +273,7 @@
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {},
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {}
@@ -281,6 +290,7 @@
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {},
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {}
@@ -296,6 +306,7 @@
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {},
+      "baseInputsPerSec": {},
       "seasonalMode": "ignore",
       "seasonalCustom": null,
       "seasonalMultipliers": {}
