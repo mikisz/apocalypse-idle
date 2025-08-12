@@ -96,12 +96,14 @@ export default function PowerPriorityModal({ onClose }) {
             );
           })}
         </ul>
-        <div className="text-center text-xs muted-foreground mt-2">LOW PRIORITY</div>
+        <div className="text-center text-xs muted-foreground mt-2">
+          LOW PRIORITY
+        </div>
         <DialogFooter className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="outline" size="sm" onClick={save}>
+          <Button size="sm" onClick={save}>
             Save
           </Button>
         </DialogFooter>
