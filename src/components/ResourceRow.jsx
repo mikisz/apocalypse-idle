@@ -21,7 +21,7 @@ export default function ResourceRow({
           {formatAmount(amount)}
           {capacity != null && ` / ${formatAmount(capacity)}`}
         </span>
-        {rate != null && <span className="text-xs text-muted">{rate}</span>}
+        {rate != null && <span className="text-xs muted-foreground">{rate}</span>}
       </span>
     </li>
   );

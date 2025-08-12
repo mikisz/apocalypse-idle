@@ -18,7 +18,7 @@ export default function SettlerSection({ title, info }) {
       <div className={`text-sm mb-1 ${color}`}>
         Settlers {total}/{capacity}
       </div>
-      <div className="text-xs text-muted mb-1">{radioLine}</div>
+      <div className="text-xs muted-foreground mb-1">{radioLine}</div>
       {radioCount > 0 && !candidatePending && powered && (
         <div className="h-2 bg-border rounded mb-1">
           <div

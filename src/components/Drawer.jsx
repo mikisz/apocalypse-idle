@@ -62,11 +62,11 @@ export default function Drawer() {
         <div className="p-6 space-y-8">
           <section>
             <h2 className="font-semibold mb-2">📊 Statistics</h2>
-            <p className="text-sm text-muted">Coming soon</p>
+            <p className="text-sm muted-foreground">Coming soon</p>
           </section>
           <section>
             <h2 className="font-semibold mb-2">⚙️ Settings</h2>
-            <p className="text-sm text-muted">Coming soon</p>
+            <p className="text-sm muted-foreground">Coming soon</p>
           </section>
           <section>
             <h2 className="font-semibold mb-2">💾 Save/Load</h2>

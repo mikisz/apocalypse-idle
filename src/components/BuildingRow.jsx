@@ -135,7 +135,7 @@ export default function BuildingRow({ building, completedResearch }) {
           </Button>
         </div>
       </div>
-      <div className="text-xs text-muted space-y-1">
+      <div className="text-xs muted-foreground space-y-1">
         <div>{building.description}</div>
         <div>
           Cost:{' '}
