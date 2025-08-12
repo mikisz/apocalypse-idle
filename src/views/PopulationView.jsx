@@ -27,7 +27,7 @@ export default function PopulationView() {
   });
 
   return (
-    <div className="p-4 space-y-4 pb-20">
+    <div className="h-full overflow-y-auto p-4 space-y-4 pb-20">
       <div className="flex flex-wrap gap-2">
         <div className="border border-stroke rounded p-3 bg-bg2/50 text-center">
           <div className="text-xs text-muted">Settlers</div>
