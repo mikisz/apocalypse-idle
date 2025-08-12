@@ -28,10 +28,8 @@ export default function CorruptSaveModal() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2">
-            <Button variant="outline" onClick={retryLoad}>
-              Retry
-            </Button>
-            <Button variant="outline" onClick={resetGame}>
+            <Button onClick={retryLoad}>Retry</Button>
+            <Button variant="destructive" onClick={resetGame}>
               Reset
             </Button>
           </DialogFooter>

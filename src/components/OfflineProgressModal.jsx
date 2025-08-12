@@ -37,9 +37,7 @@ export default function OfflineProgressModal() {
             ))}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={dismissOfflineModal}>
-              Continue
-            </Button>
+            <Button onClick={dismissOfflineModal}>Continue</Button>
           </DialogFooter>
         </DialogContent>
       )}

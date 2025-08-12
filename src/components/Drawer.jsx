@@ -72,7 +72,6 @@ export default function Drawer() {
             <h2 className="font-semibold mb-2">💾 Save/Load</h2>
             <div className="flex gap-2">
               <Button
-                variant="outline"
                 size="sm"
                 onClick={() => {
                   exportSaveFile(state);
@@ -87,11 +86,7 @@ export default function Drawer() {
               >
                 Save
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fileInput.current?.click()}
-              >
+              <Button size="sm" onClick={() => fileInput.current?.click()}>
                 Load
               </Button>
               <Input
@@ -105,7 +100,7 @@ export default function Drawer() {
           </section>
           <section>
             <h2 className="font-semibold mb-2">🧹 Reset</h2>
-            <Button variant="outline" size="sm" onClick={resetGame}>
+            <Button variant="destructive" size="sm" onClick={resetGame}>
               Reset colony
             </Button>
           </section>
