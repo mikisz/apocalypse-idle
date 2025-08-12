@@ -27,7 +27,7 @@ export function assignmentsSummary(settlers) {
 export function processSettlersTick(
   state,
   seconds = BALANCE.TICK_SECONDS,
-  totalFoodProdBase = 0,
+  bonusFoodPerSec = 0,
   rng = Math.random,
   roleBonuses = null,
 ) {
@@ -40,12 +40,11 @@ export function processSettlersTick(
   const bonuses = roleBonuses || computeRoleBonuses(living);
   const totalFoodBonusPercent = bonuses['farmer'] || 0;
 
-  const bonusGainPerSec = totalFoodProdBase * (totalFoodBonusPercent / 100);
+  const bonusGainPerSec = bonusFoodPerSec;
   const totalSettlersConsumption =
     living.length * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
   // Final food change per second after bonuses and consumption
-  const netFoodPerSec =
-    totalFoodProdBase + bonusGainPerSec - totalSettlersConsumption;
+  const netFoodPerSec = bonusGainPerSec - totalSettlersConsumption;
 
   const capacity = getCapacity(state, 'potatoes');
   const currentEntry = state.resources.potatoes || {
@@ -130,7 +129,7 @@ export function processSettlersTick(
 
   const telemetry = {
     netFoodPerSec,
-    totalFoodProdBase,
+    bonusFoodPerSec: bonusGainPerSec,
     totalFoodBonusPercent,
     totalSettlersConsumption,
     potatoes: nextAmount,

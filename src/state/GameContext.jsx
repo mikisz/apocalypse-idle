@@ -106,7 +106,9 @@ export function GameProvider({ children }) {
   useGameLoop((dt) => {
     setState((prev) => {
       const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
-      const afterTick = processTick(prev, dt, roleBonuses);
+      const productionBonuses = { ...roleBonuses };
+      delete productionBonuses.farmer;
+      const afterTick = processTick(prev, dt, productionBonuses);
       const withResearch = processResearchTick(afterTick, dt, roleBonuses);
       const rates = getResourceRates(withResearch);
       let totalFoodProdBase = 0;
@@ -115,10 +117,12 @@ export function GameProvider({ children }) {
           totalFoodProdBase += rates[id]?.perSec || 0;
         }
       });
+      const bonusFoodPerSec =
+        totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
       const { state: settlersProcessed, telemetry } = processSettlersTick(
         withResearch,
         dt,
-        totalFoodProdBase,
+        bonusFoodPerSec,
         Math.random,
         roleBonuses,
       );
