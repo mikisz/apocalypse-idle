@@ -101,8 +101,15 @@ Starting season: spring, Year: 1.
 - STARVATION_DEATH_TIMER_SECONDS = 90 (source: balance.js:BALANCE.STARVATION_DEATH_TIMER_SECONDS)
 - ROLE_BONUS_PER_SETTLER(level): level<=10 -> 0.1*level; else 1 + 0.05*(level-10) (source: balance.js:ROLE_BONUS_PER_SETTLER)
 - SHELTER_MAX = 5 (source: settlement.js:SHELTER_MAX)
-- SHELTER_COST_GROWTH = 1.8 (source: settlement.js:SHELTER_COST_GROWTH)
-- RADIO_BASE_SECONDS = 60 (source: settlement.js:RADIO_BASE_SECONDS)
+ - SHELTER_COST_GROWTH = 1.8 (source: settlement.js:SHELTER_COST_GROWTH)
+ - RADIO_BASE_SECONDS = 60 (source: settlement.js:RADIO_BASE_SECONDS)
+
+## Settler Happiness
+ - Base happiness: 50%.
+ - Overcrowding penalty: -5% per settler above capacity.
+ - Food variety bonus: 0 types -20, 1 type 0, 2 types +5, 3 types +10, 4+ types +15.
+ - Happiness = clamp(50 + foodVarietyBonus + overcrowdingPenalty, 0, 100).
+ - Skill gain multiplier: 0.5 + happiness/100.
 
 ## Summary
 Analyzed **15** buildings. Season mode: **average**.

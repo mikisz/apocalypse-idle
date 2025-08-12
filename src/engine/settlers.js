@@ -2,10 +2,13 @@ import {
   BALANCE,
   XP_TIME_TO_NEXT_LEVEL_SECONDS,
   ROLE_BONUS_PER_SETTLER,
+  FOOD_VARIETY_BONUS,
+  XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
-import { getCapacity } from '../state/selectors.js';
+import { getCapacity, getSettlerCapacity } from '../state/selectors.js';
 import { clampResource } from './production.js';
 import { SECONDS_PER_DAY } from './time.js';
+import { RESOURCES } from '../data/resources.js';
 
 export function computeRoleBonuses(settlers) {
   const bonuses = {};
@@ -35,6 +38,33 @@ export function processSettlersTick(
     ? [...state.population.settlers]
     : [];
   const living = settlers.filter((s) => !s.isDead);
+
+  // Happiness calculation
+  const settlerCap = getSettlerCapacity(state);
+  const overcrowded = Math.max(0, living.length - settlerCap);
+  const overcrowdingPenalty =
+    -overcrowded * BALANCE.HAPPINESS_OVERCR_PENALTY_PER;
+  const foodTypes = Object.keys(RESOURCES).filter(
+    (id) =>
+      RESOURCES[id].category === 'FOOD' &&
+      (state.resources[id]?.amount || 0) > 0,
+  ).length;
+  const foodVarietyBonus = FOOD_VARIETY_BONUS(foodTypes);
+  const base = BALANCE.HAPPINESS_BASE;
+  const happinessValue = Math.min(
+    100,
+    Math.max(0, base + foodVarietyBonus + overcrowdingPenalty),
+  );
+  const happinessBreakdown = [
+    { label: 'Base', value: base },
+    { label: 'Overcrowding', value: overcrowdingPenalty },
+    { label: 'Food variety', value: foodVarietyBonus },
+  ];
+  for (const s of settlers) {
+    s.happiness = happinessValue;
+    s.happinessBreakdown = happinessBreakdown;
+  }
+  const xpMultiplier = XP_MULTIPLIER_FROM_HAPPINESS(happinessValue);
 
   // Compute bonuses
   const bonuses = roleBonuses || computeRoleBonuses(living);
@@ -89,7 +119,11 @@ export function processSettlersTick(
       starvationTimer = 0;
     }
   }
-  const colony = { ...state.colony, starvationTimerSeconds: starvationTimer };
+  const colony = {
+    ...state.colony,
+    starvationTimerSeconds: starvationTimer,
+    happiness: { value: happinessValue, breakdown: happinessBreakdown },
+  };
 
   // Aging and XP
   for (const s of settlers) {
@@ -100,7 +134,8 @@ export function processSettlersTick(
         const entry = s.skills[s.role] || { level: 0, xp: 0 };
         if (entry.level < BALANCE.MAX_LEVEL) {
           entry.xp =
-            (entry.xp || 0) + BALANCE.XP_GAIN_PER_SECOND_ACTIVE * seconds;
+            (entry.xp || 0) +
+            BALANCE.XP_GAIN_PER_SECOND_ACTIVE * seconds * xpMultiplier;
           let lvl = entry.level;
           let xp = entry.xp;
           while (lvl < BALANCE.MAX_LEVEL) {

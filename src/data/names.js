@@ -69,6 +69,7 @@ export const LAST_NAMES = [
 ];
 
 import { DAYS_PER_YEAR } from '../engine/time.js';
+import { BALANCE } from './balance.js';
 
 export function makeRandomSettler({ sex, randomizeAge = false } = {}) {
   const chosenSex = sex || (Math.random() < 0.5 ? 'M' : 'F');
@@ -90,5 +91,7 @@ export function makeRandomSettler({ sex, randomizeAge = false } = {}) {
     ageDays: baseAge + randomDays,
     role: null,
     skills: {},
+    happiness: BALANCE.HAPPINESS_BASE,
+    happinessBreakdown: [{ label: 'Base', value: BALANCE.HAPPINESS_BASE }],
   };
 }
