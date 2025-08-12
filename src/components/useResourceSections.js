@@ -19,6 +19,13 @@ const CATEGORY_LABELS = {
 
 export function useResourceSections(state) {
   const settlers = state.population?.settlers?.filter((s) => !s.isDead) || [];
+  const avgHappiness =
+    settlers.length > 0
+      ? Math.round(
+          settlers.reduce((sum, s) => sum + (s.happiness || 0), 0) /
+            settlers.length,
+        )
+      : 0;
 
   const roleBonuses = useMemo(() => computeRoleBonuses(settlers), [settlers]);
 
@@ -128,12 +135,12 @@ export function useResourceSections(state) {
     entries.forEach((g) => {
       rendered.push(g);
       if (hasRadioResearch && g.title === 'Science')
-        rendered.push({ title: 'Settlers', settlers: true });
+        rendered.push({ title: 'Happiness', settlers: true, avgHappiness });
     });
-    if (hasRadioResearch && !rendered.some((e) => e.title === 'Settlers'))
-      rendered.push({ title: 'Settlers', settlers: true });
+    if (hasRadioResearch && !rendered.some((e) => e.title === 'Happiness'))
+      rendered.push({ title: 'Happiness', settlers: true, avgHappiness });
     return rendered;
-  }, [entries, hasRadioResearch]);
+  }, [entries, hasRadioResearch, avgHappiness]);
 
   const settlersInfo = {
     total: totalSettlers,

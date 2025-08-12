@@ -3,7 +3,7 @@ import { useGame } from '../state/useGame.ts';
 import Accordion from './Accordion.jsx';
 import PowerPriorityModal from './PowerPriorityModal.jsx';
 import ResourceRow from './ResourceRow.jsx';
-import SettlerSection from './SettlerSection.jsx';
+import HappinessSection from './HappinessSection.jsx';
 import { useResourceSections } from './useResourceSections.js';
 
 export default function ResourceSidebar() {
@@ -15,7 +15,12 @@ export default function ResourceSidebar() {
     <div className="border border-border rounded overflow-hidden bg-card">
       {sections.map((g) =>
         g.settlers ? (
-          <SettlerSection key={g.title} title={g.title} info={settlersInfo} />
+          <HappinessSection
+            key={g.title}
+            title={g.title}
+            info={settlersInfo}
+            avgHappiness={g.avgHappiness}
+          />
         ) : (
           <Accordion key={g.title} title={g.title} defaultOpen={g.defaultOpen}>
             {g.items.map((r) => (

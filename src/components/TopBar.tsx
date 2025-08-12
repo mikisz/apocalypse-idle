@@ -10,23 +10,12 @@ export default function TopBar(): JSX.Element {
   const modifiers: Record<string, number> = getSeasonModifiers(state);
   const [open, setOpen] = useState<boolean>(false);
   const labels: Record<string, string> = { FOOD: 'Food', RAW: 'Raw' };
-  const settlers = state.population?.settlers || [];
-  const avgHappiness =
-    settlers.length > 0
-      ? Math.round(
-          settlers.reduce((sum, s) => sum + (s.happiness || 0), 0) /
-            settlers.length,
-        )
-      : 0;
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between px-4 py-2 border-b border-border bg-card">
       <span className="tabular-nums text-xl">Year {time.year}</span>
       <h1 className="font-semibold">Apocalypse Idle</h1>
       <div className="relative flex items-center gap-2">
-        <span className="tabular-nums text-sm">
-          Avg Happiness: {avgHappiness}%
-        </span>
         <Button
           variant="ghost"
           className="text-xl tabular-nums px-0"
