@@ -1,5 +1,5 @@
 {
-  "version": "7ae16b531a8fdf5232b9e17876730285d6e57f9a",
+  "version": "8c7304eda7c13985bd2fbb4bf829d7118c52c925",
   "saveVersion": 5,
   "tickSeconds": 1,
   "seasons": {
@@ -153,7 +153,7 @@
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "wood": 0.2
+        "wood": 0.25
       },
       "baseInputsPerSec": {},
       "seasonalMultipliers": {
@@ -173,7 +173,7 @@
       "demolitionRefund": 0.5,
       "storageProvided": {},
       "baseProductionPerSec": {
-        "scrap": 0.06
+        "scrap": 0.08
       },
       "baseInputsPerSec": {},
       "seasonalMultipliers": {
@@ -219,7 +219,7 @@
         "planks": 0.5
       },
       "baseInputsPerSec": {
-        "wood": 1
+        "wood": 0.8
       },
       "seasonalMultipliers": {
         "spring": 1,
@@ -244,7 +244,7 @@
         "metalParts": 0.4
       },
       "baseInputsPerSec": {
-        "scrap": 1
+        "scrap": 0.4
       },
       "seasonalMultipliers": {
         "spring": 1,
@@ -289,7 +289,7 @@
         "power": 1
       },
       "baseInputsPerSec": {
-        "wood": 0.3
+        "wood": 0.25
       },
       "seasonalMultipliers": {
         "spring": 1,
@@ -393,7 +393,7 @@
       },
       "demolitionRefund": 0.5,
       "storageProvided": {
-        "power": 20
+        "power": 40
       },
       "baseProductionPerSec": {},
       "baseInputsPerSec": {},
@@ -404,8 +404,8 @@
     {
       "id": "basicEnergy",
       "name": "Basic Energy",
-      "scienceCost": 50,
-      "timeSec": 90,
+      "scienceCost": 80,
+      "timeSec": 120,
       "prereqs": [
         "industry1"
       ],
@@ -426,8 +426,8 @@
     {
       "id": "industry1",
       "name": "Industry I",
-      "scienceCost": 40,
-      "timeSec": 60,
+      "scienceCost": 60,
+      "timeSec": 90,
       "prereqs": [],
       "unlocks": {
         "buildings": [
@@ -448,10 +448,11 @@
     {
       "id": "radio",
       "name": "Radio",
-      "scienceCost": 80,
-      "timeSec": 120,
+      "scienceCost": 120,
+      "timeSec": 180,
       "prereqs": [
-        "industry1"
+        "industry1",
+        "basicEnergy"
       ],
       "unlocks": {
         "buildings": [
@@ -463,8 +464,8 @@
     {
       "id": "woodworking1",
       "name": "Woodworking I",
-      "scienceCost": 30,
-      "timeSec": 45,
+      "scienceCost": 50,
+      "timeSec": 70,
       "prereqs": [
         "industry1"
       ],
@@ -479,8 +480,8 @@
     {
       "id": "salvaging1",
       "name": "Salvaging I",
-      "scienceCost": 30,
-      "timeSec": 45,
+      "scienceCost": 50,
+      "timeSec": 70,
       "prereqs": [
         "industry1"
       ],
@@ -495,8 +496,8 @@
     {
       "id": "logistics1",
       "name": "Logistics I",
-      "scienceCost": 35,
-      "timeSec": 60,
+      "scienceCost": 60,
+      "timeSec": 90,
       "prereqs": [
         "industry1"
       ],
@@ -516,8 +517,8 @@
     {
       "id": "industry2",
       "name": "Industry II",
-      "scienceCost": 140,
-      "timeSec": 180,
+      "scienceCost": 200,
+      "timeSec": 240,
       "prereqs": [
         "industry1"
       ],
@@ -531,8 +532,8 @@
     {
       "id": "woodworking2",
       "name": "Woodworking II",
-      "scienceCost": 70,
-      "timeSec": 120,
+      "scienceCost": 110,
+      "timeSec": 180,
       "prereqs": [
         "woodworking1",
         "industry2"
@@ -548,8 +549,8 @@
     {
       "id": "salvaging2",
       "name": "Salvaging II",
-      "scienceCost": 70,
-      "timeSec": 120,
+      "scienceCost": 110,
+      "timeSec": 180,
       "prereqs": [
         "salvaging1",
         "industry2"
@@ -565,8 +566,8 @@
     {
       "id": "logistics2",
       "name": "Logistics II",
-      "scienceCost": 80,
-      "timeSec": 150,
+      "scienceCost": 120,
+      "timeSec": 210,
       "prereqs": [
         "logistics1",
         "industry2"

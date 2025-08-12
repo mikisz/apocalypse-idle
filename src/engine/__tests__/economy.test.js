@@ -32,7 +32,7 @@ describe('economy basics', () => {
     state.buildings.loggingCamp.count = 0;
     state.buildings.sawmill = { count: 1 };
     const next = processTick(state, 1);
-    expect(next.resources.wood.amount).toBeCloseTo(9, 5);
+    expect(next.resources.wood.amount).toBeCloseTo(9.2, 5);
     expect(next.resources.planks.amount).toBeCloseTo(0.5, 5);
   });
 
