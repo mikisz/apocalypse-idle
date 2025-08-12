@@ -23,29 +23,49 @@ export function clampResource(value, capacity) {
 export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
   const resources = { ...state.resources };
+  const buildings = { ...state.buildings };
   PRODUCTION_BUILDINGS.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     if (count <= 0) return;
     let factor = 1;
+    let powerShortage = false;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
+        let missingPower = false;
         const canRun = Object.entries(b.inputsPerSecBase).every(
           ([res, base]) => {
             const need = base * count * seconds;
             const have = resources[res]?.amount || 0;
-            return have >= need;
+            const enough = have >= need;
+            if (res === 'power' && !enough) missingPower = true;
+            return enough;
           },
         );
-        if (!canRun) return;
+        const entry = buildings[b.id] || { count };
+        if (!canRun) {
+          if (missingPower)
+            buildings[b.id] = { ...entry, offlineReason: 'power' };
+          else if (entry.offlineReason) {
+            const copy = { ...entry };
+            delete copy.offlineReason;
+            buildings[b.id] = copy;
+          }
+          return;
+        }
+        if (entry.offlineReason) {
+          const copy = { ...entry };
+          delete copy.offlineReason;
+          buildings[b.id] = copy;
+        }
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * seconds;
           const capacity = getCapacity(state, res);
-          const entry = resources[res] || { amount: 0, discovered: false };
-          const next = clampResource(entry.amount - amt, capacity);
+          const entryRes = resources[res] || { amount: 0, discovered: false };
+          const next = clampResource(entryRes.amount - amt, capacity);
           resources[res] = {
-            ...entry,
+            ...entryRes,
             amount: next,
-            discovered: entry.discovered || next > 0,
+            discovered: entryRes.discovered || next > 0,
           };
         });
         factor = 1;
@@ -54,20 +74,33 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
           const need = base * count * seconds;
           const have = resources[res]?.amount || 0;
           const ratio = need > 0 ? have / need : 1;
+          if (res === 'power' && ratio < 1) powerShortage = true;
           factor = Math.min(factor, ratio);
         });
-        factor = Math.min(1, factor);
+        if (b.inputsPerSecBase.power && powerShortage) {
+          factor = 0;
+        } else {
+          factor = Math.min(1, factor);
+        }
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * seconds * factor;
           const capacity = getCapacity(state, res);
-          const entry = resources[res] || { amount: 0, discovered: false };
-          const next = clampResource(entry.amount - amt, capacity);
+          const entryRes = resources[res] || { amount: 0, discovered: false };
+          const next = clampResource(entryRes.amount - amt, capacity);
           resources[res] = {
-            ...entry,
+            ...entryRes,
             amount: next,
-            discovered: entry.discovered || next > 0,
+            discovered: entryRes.discovered || next > 0,
           };
         });
+        const entry = buildings[b.id] || { count };
+        if (powerShortage)
+          buildings[b.id] = { ...entry, offlineReason: 'power' };
+        else if (entry.offlineReason) {
+          const copy = { ...entry };
+          delete copy.offlineReason;
+          buildings[b.id] = copy;
+        }
       }
     }
     if (b.outputsPerSecBase) {
@@ -103,7 +136,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     const entry = resources[res];
     if (entry.amount > 0) entry.discovered = true;
   });
-  return { ...state, resources };
+  return { ...state, resources, buildings };
 }
 
 export function processTick(state, seconds = 1, roleBonuses = {}) {

@@ -24,6 +24,7 @@ function BuildingRow({ building }) {
   const season = getSeason(state);
   const scaledCost = getBuildingCost(building, count);
   const costEntries = Object.entries(scaledCost);
+  const offlineReason = state.buildings[building.id]?.offlineReason;
   const completedResearch = state.research.completed || [];
   const unlocked =
     !building.requiresResearch ||
@@ -85,12 +86,19 @@ function BuildingRow({ building }) {
   return (
     <div className="p-2 rounded border border-stroke bg-bg2 space-y-1">
       <div className="flex items-center justify-between">
-        <span>
-          {building.name}{' '}
-          {building.maxCount != null
-            ? `${count}/${building.maxCount}`
-            : `(${count})`}
-        </span>
+        <div className="flex items-center gap-2">
+          <span>
+            {building.name}{' '}
+            {building.maxCount != null
+              ? `${count}/${building.maxCount}`
+              : `(${count})`}
+          </span>
+          {offlineReason && (
+            <span className="px-1 text-xs text-white bg-red-600 rounded">
+              {offlineReason === 'power' ? 'No Power' : 'Offline'}
+            </span>
+          )}
+        </div>
         <div className="space-x-2">
           <button
             className="px-2 py-1 border border-stroke rounded disabled:opacity-50"
