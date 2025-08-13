@@ -136,7 +136,7 @@ export const BUILDINGS = [
     costGrowth: SHELTER_COST_GROWTH,
     refund: 0.5,
     maxCount: SHELTER_MAX,
-    description: 'Houses one settler. Max: 5',
+    description: 'Houses one settler.',
   },
   {
     id: 'radio',
