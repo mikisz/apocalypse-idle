@@ -3,6 +3,7 @@ import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import {
   getResourceSections as getResourceSectionsSelector,
   getSettlerCapacity,
+  getPowerStatus,
 } from '../state/selectors.js';
 
 export function useResourceSections(state) {
@@ -19,6 +20,13 @@ export function useResourceSections(state) {
       state.foodPool,
     ],
   );
+
+  const powerStatus = getPowerStatus(state);
+  let powerMessage = 'charging';
+  if (powerStatus.stored >= powerStatus.capacity) powerMessage = 'full';
+  else if (powerStatus.stored <= 0) powerMessage = 'empty';
+  else if (powerStatus.supply < powerStatus.demand)
+    powerMessage = 'discharging';
 
   const totalSettlers = settlers.length;
   const capacity = getSettlerCapacity(state);
@@ -54,7 +62,25 @@ export function useResourceSections(state) {
   const sections = useMemo(() => {
     const rendered = [];
     resourceSections.forEach((g) => {
-      rendered.push(g);
+      let section = g;
+      if (g.title === 'Energy') {
+        section = {
+          ...g,
+          items: g.items.map((i) =>
+            i.id === 'power'
+              ? {
+                  ...i,
+                  supply: powerStatus.supply,
+                  demand: powerStatus.demand,
+                  stored: powerStatus.stored,
+                  capacity: powerStatus.capacity,
+                  status: powerMessage,
+                }
+              : i,
+          ),
+        };
+      }
+      rendered.push(section);
       if (hasRadioResearch && g.title === 'Science')
         rendered.push({ title: 'Settlers', settlers: true });
     });
@@ -62,7 +88,7 @@ export function useResourceSections(state) {
       rendered.push({ title: 'Settlers', settlers: true });
     rendered.push({ title: 'Happiness', happiness: true });
     return rendered;
-  }, [resourceSections, hasRadioResearch]);
+  }, [resourceSections, hasRadioResearch, powerStatus, powerMessage]);
 
   const settlersInfo = {
     total: totalSettlers,
