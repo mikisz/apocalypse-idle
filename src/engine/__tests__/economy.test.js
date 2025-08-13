@@ -46,6 +46,18 @@ describe('economy basics', () => {
     expect(next.resources.planks.amount).toBeCloseTo(0, 5);
   });
 
+  test('sawmill respects plank capacity and partial runs', () => {
+    const state = deepClone(defaultState);
+    state.resources.wood.amount = 10;
+    state.resources.planks.amount = 139.75;
+    state.buildings.loggingCamp.count = 0;
+    state.buildings.sawmill = { count: 1 };
+    state.buildings.materialsDepot = { count: 1 };
+    const next = processTick(state, 1);
+    expect(next.resources.planks.amount).toBeCloseTo(140, 5);
+    expect(next.resources.wood.amount).toBeCloseTo(9.6, 5);
+  });
+
   test('removing last required building unassigns settlers', () => {
     const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
