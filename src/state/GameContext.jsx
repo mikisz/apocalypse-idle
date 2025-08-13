@@ -5,8 +5,11 @@ import { defaultState } from './defaultState.js';
 import { prepareLoadedState } from './prepareLoadedState.ts';
 import useGameTick from './hooks/useGameTick.tsx';
 import useAutosave from './hooks/useAutosave.tsx';
-import useGameActions from './hooks/useGameActions.tsx';
 import useNotifications from './hooks/useNotifications.tsx';
+import useUiActions from './hooks/useUiActions.tsx';
+import usePopulationActions from './hooks/usePopulationActions.tsx';
+import useResearchActions from './hooks/useResearchActions.tsx';
+import usePersistenceActions from './hooks/usePersistenceActions.tsx';
 
 export function GameProvider({ children }) {
   const { state: loaded, error: loadErr } = loadGame();
@@ -24,7 +27,15 @@ export function GameProvider({ children }) {
   useAutosave(state, setState);
   useNotifications(state);
 
-  const actions = useGameActions(setState, setLoadError);
+  const ui = useUiActions(setState);
+  const population = usePopulationActions(setState);
+  const research = useResearchActions(setState);
+  const persistence = usePersistenceActions(setState, setLoadError);
+
+  const actions = useMemo(
+    () => ({ ...ui, ...population, ...research, ...persistence }),
+    [ui, population, research, persistence],
+  );
 
   const value = useMemo(
     () => ({ state, setState, loadError, ...actions }),
