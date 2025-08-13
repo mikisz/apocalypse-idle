@@ -1,6 +1,6 @@
 {
-  "version": "5e5a6b7d1786bbde7e8dafea4711f644f2d09a5b",
-  "saveVersion": 6,
+  "version": "35f35aa12e885b89cd28e6978415732365573f45",
+  "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
     "spring": {
@@ -13,6 +13,7 @@
         "scrap": 1.1,
         "planks": 1,
         "metalParts": 1,
+        "tools": 1,
         "science": 1,
         "power": 1
       },
@@ -31,6 +32,7 @@
         "scrap": 1,
         "planks": 1,
         "metalParts": 1,
+        "tools": 1,
         "science": 1,
         "power": 1
       },
@@ -49,6 +51,7 @@
         "scrap": 0.9,
         "planks": 1,
         "metalParts": 1,
+        "tools": 1,
         "science": 1,
         "power": 1
       },
@@ -67,6 +70,7 @@
         "scrap": 0.8,
         "planks": 1,
         "metalParts": 1,
+        "tools": 1,
         "science": 1,
         "power": 1
       },
@@ -82,7 +86,7 @@
       "displayName": "Potatoes",
       "category": "FOOD",
       "startingAmount": 0,
-      "startingCapacity": 450,
+      "startingCapacity": 200,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -94,7 +98,7 @@
       "displayName": "Meat",
       "category": "FOOD",
       "startingAmount": 0,
-      "startingCapacity": 150,
+      "startingCapacity": 100,
       "unit": "",
       "origin": {
         "file": "resources.js",
@@ -106,7 +110,7 @@
       "displayName": "Wood",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 150,
+      "startingCapacity": 80,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -118,7 +122,7 @@
       "displayName": "Stone",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 80,
+      "startingCapacity": 50,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -130,7 +134,7 @@
       "displayName": "Scrap",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 80,
+      "startingCapacity": 60,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -142,7 +146,7 @@
       "displayName": "Planks",
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
-      "startingCapacity": 50,
+      "startingCapacity": 40,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -154,11 +158,23 @@
       "displayName": "Metal Parts",
       "category": "CONSTRUCTION_MATERIALS",
       "startingAmount": 0,
-      "startingCapacity": 20,
+      "startingCapacity": 24,
       "unit": null,
       "origin": {
         "file": "resources.js",
         "path": "RESOURCES.metalParts"
+      }
+    },
+    {
+      "key": "tools",
+      "displayName": "Tools",
+      "category": "CONSTRUCTION_MATERIALS",
+      "startingAmount": 0,
+      "startingCapacity": 24,
+      "unit": null,
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.tools"
       }
     },
     {
@@ -178,7 +194,7 @@
       "displayName": "Power",
       "category": "ENERGY",
       "startingAmount": 0,
-      "startingCapacity": 2,
+      "startingCapacity": 20,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -194,7 +210,7 @@
       "cost": {
         "wood": 17
       },
-      "costGrowth": 1.13,
+      "costGrowth": 1.12,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -226,10 +242,10 @@
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "meat": 0.19
+        "meat": 0.22
       },
       "inputsPerSec": {},
-      "requiresResearch": "hunting1",
+      "requiresResearch": "huntingHut",
       "seasonMults": {
         "spring": 1.1,
         "summer": 1,
@@ -248,7 +264,7 @@
       "cost": {
         "scrap": 15
       },
-      "costGrowth": 1.13,
+      "costGrowth": 1.12,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -274,7 +290,7 @@
       "cost": {
         "wood": 12
       },
-      "costGrowth": 1.13,
+      "costGrowth": 1.12,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
@@ -301,11 +317,11 @@
         "wood": 20,
         "scrap": 5
       },
-      "costGrowth": 1.13,
+      "costGrowth": 1.12,
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "stone": 0.104
+        "stone": 0.12
       },
       "inputsPerSec": {},
       "requiresResearch": "",
@@ -325,9 +341,9 @@
       "name": "Sawmill",
       "type": "processing",
       "cost": {
-        "wood": 48,
-        "scrap": 18,
-        "stone": 12
+        "wood": 53,
+        "scrap": 20,
+        "stone": 13
       },
       "costGrowth": 1.13,
       "refund": 0.5,
@@ -382,6 +398,40 @@
       }
     },
     {
+      "id": "toolsmithy",
+      "name": "Toolsmithy",
+      "type": "processing",
+      "cost": {
+        "wood": 50,
+        "scrap": 30,
+        "stone": 20,
+        "planks": 25,
+        "metalParts": 15
+      },
+      "costGrowth": 1.13,
+      "refund": 0.5,
+      "storage": {},
+      "outputsPerSec": {
+        "tools": 0.18
+      },
+      "inputsPerSec": {
+        "planks": 0.25,
+        "metalParts": 0.15,
+        "power": 0.4
+      },
+      "requiresResearch": "industry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[7]"
+      }
+    },
+    {
       "id": "school",
       "name": "School",
       "type": "production",
@@ -406,7 +456,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[7]"
+        "path": "BUILDINGS[8]"
       }
     },
     {
@@ -415,7 +465,9 @@
       "type": "production",
       "cost": {
         "wood": 50,
-        "stone": 10
+        "stone": 10,
+        "planks": 20,
+        "metalParts": 10
       },
       "costGrowth": 1.13,
       "refund": 0.5,
@@ -435,7 +487,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[8]"
+        "path": "BUILDINGS[9]"
       }
     },
     {
@@ -460,7 +512,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[9]"
+        "path": "BUILDINGS[10]"
       }
     },
     {
@@ -471,7 +523,8 @@
         "wood": 80,
         "scrap": 40,
         "stone": 20,
-        "planks": 20
+        "planks": 20,
+        "metalParts": 10
       },
       "costGrowth": 1,
       "refund": 0.5,
@@ -489,7 +542,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[10]"
+        "path": "BUILDINGS[11]"
       }
     },
     {
@@ -501,41 +554,11 @@
         "scrap": 5,
         "stone": 5
       },
-      "costGrowth": 1.2,
+      "costGrowth": 1.22,
       "refund": 0.5,
       "storage": {
-        "potatoes": 300,
-        "meat": 150
-      },
-      "outputsPerSec": {},
-      "inputsPerSec": {},
-      "requiresResearch": "",
-      "seasonMults": {
-        "spring": 1,
-        "summer": 1,
-        "autumn": 1,
-        "winter": 1
-      },
-      "origin": {
-        "file": "buildings.js",
-        "path": "BUILDINGS[11]"
-      }
-    },
-    {
-      "id": "rawStorage",
-      "name": "Warehouse",
-      "type": "storage",
-      "cost": {
-        "wood": 25,
-        "scrap": 10,
-        "stone": 10
-      },
-      "costGrowth": 1.2,
-      "refund": 0.5,
-      "storage": {
-        "wood": 200,
-        "stone": 80,
-        "scrap": 90
+        "potatoes": 150,
+        "meat": 75
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -552,23 +575,24 @@
       }
     },
     {
-      "id": "materialsDepot",
-      "name": "Materials Depot",
+      "id": "rawStorage",
+      "name": "Warehouse",
       "type": "storage",
       "cost": {
         "wood": 25,
         "scrap": 10,
-        "stone": 5
+        "stone": 10
       },
-      "costGrowth": 1.2,
+      "costGrowth": 1.22,
       "refund": 0.5,
       "storage": {
-        "planks": 300,
-        "metalParts": 240
+        "wood": 120,
+        "scrap": 80,
+        "stone": 60
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
-      "requiresResearch": "industry1",
+      "requiresResearch": "",
       "seasonMults": {
         "spring": 1,
         "summer": 1,
@@ -581,17 +605,48 @@
       }
     },
     {
+      "id": "materialsDepot",
+      "name": "Materials Depot",
+      "type": "storage",
+      "cost": {
+        "wood": 25,
+        "scrap": 10,
+        "stone": 5
+      },
+      "costGrowth": 1.22,
+      "refund": 0.5,
+      "storage": {
+        "planks": 100,
+        "metalParts": 40
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "industry1",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[14]"
+      }
+    },
+    {
       "id": "battery",
       "name": "Battery",
       "type": "storage",
       "cost": {
         "wood": 40,
-        "stone": 20
+        "stone": 20,
+        "planks": 20,
+        "metalParts": 10
       },
-      "costGrowth": 1.2,
+      "costGrowth": 1.22,
       "refund": 0.5,
       "storage": {
-        "power": 600
+        "power": 40
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -604,43 +659,16 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[14]"
+        "path": "BUILDINGS[15]"
       }
     }
   ],
   "research": [
     {
-      "id": "basicEnergy",
-      "name": "Basic Energy",
-      "scienceCost": 80,
-      "timeSec": 120,
-      "prereqs": [
-        "industry1"
-      ],
-      "milestones": null,
-      "unlocks": {
-        "resources": [
-          "power"
-        ],
-        "buildings": [
-          "woodGenerator",
-          "battery"
-        ],
-        "categories": [
-          "Energy"
-        ]
-      },
-      "effects": [],
-      "origin": {
-        "file": "research.js",
-        "path": "RESEARCH[0]"
-      }
-    },
-    {
       "id": "industry1",
       "name": "Industry I",
       "scienceCost": 60,
-      "timeSec": 90,
+      "timeSec": 120,
       "prereqs": [],
       "milestones": null,
       "unlocks": {
@@ -660,52 +688,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[1]"
-      }
-    },
-    {
-      "id": "hunting1",
-      "name": "Hunting I",
-      "scienceCost": 50,
-      "timeSec": 90,
-      "prereqs": [],
-      "milestones": null,
-      "unlocks": {
-        "resources": [
-          "meat"
-        ],
-        "buildings": [
-          "huntersHut"
-        ],
-        "categories": []
-      },
-      "effects": [],
-      "origin": {
-        "file": "research.js",
-        "path": "RESEARCH[2]"
-      }
-    },
-    {
-      "id": "radio",
-      "name": "Radio",
-      "scienceCost": 150,
-      "timeSec": 240,
-      "prereqs": [
-        "industry1",
-        "basicEnergy"
-      ],
-      "milestones": null,
-      "unlocks": {
-        "resources": [],
-        "buildings": [
-          "radio"
-        ],
-        "categories": []
-      },
-      "effects": [],
-      "origin": {
-        "file": "research.js",
-        "path": "RESEARCH[3]"
+        "path": "RESEARCH[0]"
       }
     },
     {
@@ -731,7 +714,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[4]"
+        "path": "RESEARCH[1]"
       }
     },
     {
@@ -757,7 +740,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[5]"
+        "path": "RESEARCH[2]"
       }
     },
     {
@@ -788,7 +771,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[6]"
+        "path": "RESEARCH[3]"
       }
     },
     {
@@ -797,7 +780,9 @@
       "scienceCost": 200,
       "timeSec": 240,
       "prereqs": [
-        "industry1"
+        "woodworking1",
+        "salvaging1",
+        "logistics1"
       ],
       "milestones": {
         "produced": {
@@ -815,17 +800,48 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[7]"
+        "path": "RESEARCH[4]"
+      }
+    },
+    {
+      "id": "industryProduction",
+      "name": "Industry Production",
+      "scienceCost": 170,
+      "timeSec": 270,
+      "prereqs": [
+        "woodworking1",
+        "salvaging1",
+        "logistics1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [],
+        "categories": []
+      },
+      "effects": [
+        {
+          "category": "CONSTRUCTION_MATERIALS",
+          "percent": 0.05,
+          "type": "output"
+        }
+      ],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[5]"
       }
     },
     {
       "id": "woodworking2",
       "name": "Woodworking II",
-      "scienceCost": 140,
-      "timeSec": 240,
+      "scienceCost": 220,
+      "timeSec": 360,
       "prereqs": [
+        "industry2",
+        "industryProduction",
         "woodworking1",
-        "industry2"
+        "salvaging1",
+        "logistics1"
       ],
       "milestones": null,
       "unlocks": {
@@ -842,17 +858,20 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[8]"
+        "path": "RESEARCH[6]"
       }
     },
     {
       "id": "salvaging2",
       "name": "Salvaging II",
-      "scienceCost": 140,
-      "timeSec": 240,
+      "scienceCost": 220,
+      "timeSec": 360,
       "prereqs": [
+        "industry2",
+        "industryProduction",
+        "woodworking1",
         "salvaging1",
-        "industry2"
+        "logistics1"
       ],
       "milestones": null,
       "unlocks": {
@@ -869,17 +888,20 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[9]"
+        "path": "RESEARCH[7]"
       }
     },
     {
       "id": "logistics2",
       "name": "Logistics II",
-      "scienceCost": 150,
-      "timeSec": 270,
+      "scienceCost": 230,
+      "timeSec": 360,
       "prereqs": [
-        "logistics1",
-        "industry2"
+        "industry2",
+        "industryProduction",
+        "woodworking1",
+        "salvaging1",
+        "logistics1"
       ],
       "milestones": null,
       "unlocks": {
@@ -901,42 +923,107 @@
       ],
       "origin": {
         "file": "research.js",
+        "path": "RESEARCH[8]"
+      }
+    },
+    {
+      "id": "basicEnergy",
+      "name": "Basic Energy",
+      "scienceCost": 150,
+      "timeSec": 210,
+      "prereqs": [
+        "industry2"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [
+          "power"
+        ],
+        "buildings": [
+          "woodGenerator",
+          "battery"
+        ],
+        "categories": [
+          "Energy"
+        ]
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[9]"
+      }
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "scienceCost": 150,
+      "timeSec": 240,
+      "prereqs": [
+        "basicEnergy"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [
+          "radio"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
         "path": "RESEARCH[10]"
       }
     },
     {
-      "id": "hunting2",
-      "name": "Hunting II",
-      "scienceCost": 130,
-      "timeSec": 240,
-      "prereqs": [
-        "hunting1"
-      ],
+      "id": "food1",
+      "name": "Food I",
+      "scienceCost": 50,
+      "timeSec": 90,
+      "prereqs": [],
       "milestones": null,
       "unlocks": {
         "resources": [],
         "buildings": [],
         "categories": []
       },
-      "effects": [
-        {
-          "category": "FOOD",
-          "percent": 0.1,
-          "type": "output"
-        }
-      ],
+      "effects": [],
       "origin": {
         "file": "research.js",
         "path": "RESEARCH[11]"
       }
     },
     {
-      "id": "industryProduction",
-      "name": "Industry Production",
-      "scienceCost": 130,
+      "id": "huntingHut",
+      "name": "Hunting Hut",
+      "scienceCost": 60,
+      "timeSec": 90,
+      "prereqs": [
+        "food1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [
+          "meat"
+        ],
+        "buildings": [
+          "huntersHut"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[12]"
+      }
+    },
+    {
+      "id": "food2",
+      "name": "Food II",
+      "scienceCost": 150,
       "timeSec": 240,
       "prereqs": [
-        "industry1"
+        "huntingHut"
       ],
       "milestones": null,
       "unlocks": {
@@ -946,14 +1033,14 @@
       },
       "effects": [
         {
-          "category": "CONSTRUCTION_MATERIALS",
-          "percent": 0.1,
+          "resource": "meat",
+          "percent": 0.04,
           "type": "output"
         }
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[12]"
+        "path": "RESEARCH[13]"
       }
     }
   ],
@@ -962,8 +1049,6 @@
       "id": "farmer",
       "name": "Farmer",
       "skill": "Farming",
-      "resource": "potatoes",
-      "building": "potatoField",
       "origin": {
         "file": "roles.js",
         "path": "ROLES.farmer"
@@ -973,52 +1058,60 @@
       "id": "hunter",
       "name": "Hunter",
       "skill": "Hunting",
-      "resource": "meat",
-      "building": "huntersHut",
       "origin": {
         "file": "roles.js",
         "path": "ROLES.hunter"
       }
     },
     {
-      "id": "woodcutter",
-      "name": "Woodcutter",
-      "skill": "Woodcutting",
-      "resource": "wood",
-      "building": "loggingCamp",
+      "id": "gatherer",
+      "name": "Gatherer",
+      "skill": "Gathering",
       "origin": {
         "file": "roles.js",
-        "path": "ROLES.woodcutter"
+        "path": "ROLES.gatherer"
       }
     },
     {
-      "id": "scavenger",
-      "name": "Scavenger",
-      "skill": "Scavenging",
-      "resource": "scrap",
-      "building": "scrapyard",
+      "id": "carpenter",
+      "name": "Carpenter",
+      "skill": "Carpentry",
       "origin": {
         "file": "roles.js",
-        "path": "ROLES.scavenger"
+        "path": "ROLES.carpenter"
       }
     },
     {
-      "id": "quarryWorker",
-      "name": "Quarry Worker",
-      "skill": "Quarrying",
-      "resource": "stone",
-      "building": "quarry",
+      "id": "metalworker",
+      "name": "Metalworker",
+      "skill": "Metalworking",
       "origin": {
         "file": "roles.js",
-        "path": "ROLES.quarryWorker"
+        "path": "ROLES.metalworker"
+      }
+    },
+    {
+      "id": "toolsmith",
+      "name": "Toolsmith",
+      "skill": "Toolsmithing",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.toolsmith"
+      }
+    },
+    {
+      "id": "engineer",
+      "name": "Engineer",
+      "skill": "Engineering",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.engineer"
       }
     },
     {
       "id": "scientist",
       "name": "Scientist",
       "skill": "Scientist",
-      "resource": "science",
-      "building": "school",
       "origin": {
         "file": "roles.js",
         "path": "ROLES.scientist"
@@ -1083,31 +1176,35 @@
   "startingResources": {
     "potatoes": {
       "amount": 0,
-      "capacity": 450
+      "capacity": 200
     },
     "meat": {
       "amount": 0,
-      "capacity": 150
+      "capacity": 100
     },
     "wood": {
       "amount": 0,
-      "capacity": 150
+      "capacity": 80
     },
     "stone": {
       "amount": 0,
-      "capacity": 80
+      "capacity": 50
     },
     "scrap": {
       "amount": 0,
-      "capacity": 80
+      "capacity": 60
     },
     "planks": {
       "amount": 0,
-      "capacity": 50
+      "capacity": 40
     },
     "metalParts": {
       "amount": 0,
-      "capacity": 20
+      "capacity": 24
+    },
+    "tools": {
+      "amount": 0,
+      "capacity": 24
     },
     "science": {
       "amount": 0,
@@ -1115,7 +1212,7 @@
     },
     "power": {
       "amount": 0,
-      "capacity": 2
+      "capacity": 20
     }
   },
   "startingBuildings": {
