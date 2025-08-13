@@ -6,6 +6,7 @@ import Accordion from '../components/Accordion.jsx';
 import CandidateBox from '../components/CandidateBox.tsx';
 import ProductionSection from '../components/ProductionSection.jsx';
 import { useBuildingGroups } from '../components/useBuildingGroups.tsx';
+import { Container } from '../components/ui/container';
 
 export default function BaseView() {
   const { state } = useGame();
@@ -24,11 +25,15 @@ export default function BaseView() {
           storageBuildings={storageBuildings}
           completedResearch={completedResearch}
         />
-        <div className="border border-border rounded-xl overflow-hidden">
-          <Accordion title="Change Log" contentClassName="p-0" noBottomBorder={true}>
+        <Container className="overflow-hidden p-0 shadow-none">
+          <Accordion
+            title="Change Log"
+            contentClassName="p-0"
+            noBottomBorder={true}
+          >
             <EventLog log={state.log} />
           </Accordion>
-        </div>
+        </Container>
       </div>
     </div>
   );

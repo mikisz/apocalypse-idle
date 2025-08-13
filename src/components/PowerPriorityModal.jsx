@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from './ui/dialog';
+import { Container } from './ui/container';
 
 export default function PowerPriorityModal({ onClose }) {
   const { state, setState } = useGame();
@@ -61,9 +62,10 @@ export default function PowerPriorityModal({ onClose }) {
             const b = BUILDING_MAP[id];
             const count = state.buildings?.[id]?.count || 0;
             return (
-              <li
+              <Container
+                as="li"
                 key={id}
-                className="flex items-center justify-between border border-border rounded px-2 py-1"
+                className="flex items-center justify-between px-2 py-1"
                 draggable
                 onDragStart={onDragStart(idx)}
                 onDragOver={onDragOver(idx)}
@@ -92,7 +94,7 @@ export default function PowerPriorityModal({ onClose }) {
                     ↓
                   </Button>
                 </div>
-              </li>
+              </Container>
             );
           })}
         </ul>

@@ -6,6 +6,7 @@ import ResourceRow from './ResourceRow.jsx';
 import SettlerSection from './SettlerSection.jsx';
 import { useResourceSections } from './useResourceSections.js';
 import { Button } from './Button';
+import { Container } from './ui/container';
 
 export default function ResourceSidebar() {
   const { state } = useGame();
@@ -13,7 +14,7 @@ export default function ResourceSidebar() {
   const { sections, settlersInfo, happinessInfo } = useResourceSections(state);
 
   return (
-    <div className="border border-border rounded-xl overflow-hidden bg-card">
+    <Container className="overflow-hidden p-0">
       {sections.map((g, i) =>
         g.settlers ? (
           <SettlerSection
@@ -93,6 +94,6 @@ export default function ResourceSidebar() {
       {showPowerModal && (
         <PowerPriorityModal onClose={() => setShowPowerModal(false)} />
       )}
-    </div>
+    </Container>
   );
 }
