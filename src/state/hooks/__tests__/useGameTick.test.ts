@@ -12,6 +12,7 @@ vi.mock('../../../engine/settlers.js', () => ({
 }));
 vi.mock('../../selectors.js', () => ({
   getResourceRates: vi.fn(),
+  getCapacity: vi.fn(),
 }));
 vi.mock('../../../data/resources.js', () => ({
   RESOURCES: {},
@@ -28,7 +29,7 @@ import { applyProduction, applySettlers, applyYearUpdate } from '../useGameTick'
 import { processTick } from '../../../engine/production.js';
 import { processResearchTick } from '../../../engine/research.js';
 import { processSettlersTick, computeRoleBonuses } from '../../../engine/settlers.js';
-import { getResourceRates } from '../../selectors.js';
+import { getResourceRates, getCapacity } from '../../selectors.js';
 import { updateRadio } from '../../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../../engine/time.js';
 import { RESOURCES } from '../../../data/resources.js';
@@ -39,14 +40,18 @@ beforeEach(() => {
 });
 
 describe('applyProduction', () => {
-  it('calculates bonuses and bonus food', () => {
+  it('calculates bonuses and adds farmer bonus after consumption', () => {
     (computeRoleBonuses as any).mockReturnValue({ farmer: 10, builder: 5 });
     (processTick as any).mockReturnValue('after');
-    (processResearchTick as any).mockReturnValue('withResearch');
+    (processResearchTick as any).mockReturnValue({
+      resources: { potatoes: { amount: 1, produced: 0, discovered: true } },
+      population: { settlers: [] },
+    });
     (getResourceRates as any).mockReturnValue({
       potatoes: { perSec: 2 },
       metal: { perSec: 4 },
     });
+    (getCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
     (RESOURCES as any).metal = { category: 'METAL' };
 
@@ -58,10 +63,31 @@ describe('applyProduction', () => {
       { builder: 5 },
     );
     expect(result).toEqual({
-      state: 'withResearch',
+      state: {
+        resources: { potatoes: { amount: 1.2, produced: 0, discovered: true } },
+        population: { settlers: [] },
+      },
       roleBonuses: { farmer: 10, builder: 5 },
       bonusFoodPerSec: 0.2,
     });
+  });
+
+  it('clamps bonus food to capacity', () => {
+    (computeRoleBonuses as any).mockReturnValue({ farmer: 100 });
+    (processTick as any).mockReturnValue('after');
+    (processResearchTick as any).mockReturnValue({
+      resources: { potatoes: { amount: 99.5, produced: 0, discovered: true } },
+      population: { settlers: [] },
+    });
+    (getResourceRates as any).mockReturnValue({
+      potatoes: { perSec: 1 },
+    });
+    (getCapacity as any).mockReturnValue(100);
+    (RESOURCES as any).potatoes = { category: 'FOOD' };
+
+    const result = applyProduction({ population: { settlers: [] } }, 1);
+
+    expect(result.state.resources.potatoes.amount).toBe(100);
   });
 });
 
@@ -72,13 +98,13 @@ describe('applySettlers', () => {
       telemetry: 'tele',
     });
     const rng = () => 0.5;
-    const result = applySettlers('withResearch', 1, 0.2, { farmer: 10 }, rng);
+    const result = applySettlers('stateBefore', 1, rng);
     expect(processSettlersTick).toHaveBeenCalledWith(
-      'withResearch',
+      'stateBefore',
       1,
-      0.2,
+      0,
       rng,
-      { farmer: 10 },
+      null,
     );
     expect(result).toEqual({ state: 'settlersProcessed', telemetry: 'tele' });
   });
