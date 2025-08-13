@@ -4,14 +4,24 @@ import {
   getBuildingCost,
 } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
-import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
+import {
+  ROLE_BY_RESOURCE,
+  BUILDING_ROLES,
+  ROLE_BUILDINGS,
+} from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { clampResource } from './resources.js';
 import { setOfflineReason } from './powerHandling.js';
 import { getTypeOrderIndex } from './power.js';
 
-function getOutputCapacityFactor(state, resources, outputs = {}, count, seconds) {
+function getOutputCapacityFactor(
+  state,
+  resources,
+  outputs = {},
+  count,
+  seconds,
+) {
   let f = 1;
   Object.entries(outputs).forEach(([res, base]) => {
     const capacity = getCapacity(state, res);
@@ -165,9 +175,11 @@ export function demolishBuilding(state, buildingId) {
     if (entry.amount > 0) entry.discovered = true;
   });
   let settlers = state.population?.settlers || [];
-  if ((buildings[buildingId]?.count || 0) <= 0) {
-    const role = BUILDING_ROLES[buildingId];
-    if (role) {
+  const role = BUILDING_ROLES[buildingId];
+  if (role) {
+    const relevant = ROLE_BUILDINGS[role].filter((b) => b !== buildingId);
+    const hasOther = relevant.some((b) => (buildings[b]?.count || 0) > 0);
+    if ((buildings[buildingId]?.count || 0) <= 0 && !hasOther) {
       settlers = settlers.map((s) =>
         s.role === role ? { ...s, role: null } : s,
       );

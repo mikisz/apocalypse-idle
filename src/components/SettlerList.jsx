@@ -30,7 +30,7 @@ export default function SettlerList({
     settlers.map((s) => {
       const { years, days } = formatAge(s.ageDays);
       const skillEntries = Object.entries(s.skills || {})
-        .filter(([, sk]) => sk.level > 0)
+        .filter(([, sk]) => sk.level > 0 || (sk.xp || 0) > 0)
         .sort((a, b) => b[1].level - a[1].level);
       return (
         <Card key={s.id}>
