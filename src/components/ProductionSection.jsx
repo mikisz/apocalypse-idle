@@ -1,6 +1,6 @@
 import React from 'react';
 import Accordion from './Accordion.jsx';
-import BuildingRow from './BuildingRow.jsx';
+import BuildingRow from './BuildingRowContainer.jsx';
 import { Card, CardContent } from './ui/card';
 
 export default function ProductionSection({
