@@ -68,8 +68,13 @@ export default function ResourceSidebar() {
           >
             <ul className="mt-2 space-y-3">
               {g.items.map((r) => (
-                <li key={r.id}>
+                <li key={r.id} className="flex flex-col">
                   <ResourceRow {...r} />
+                  {r.status && (
+                    <span className="text-xs text-right text-muted-foreground">
+                      {r.status}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

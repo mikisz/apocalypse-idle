@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatAmount } from '../utils/format.js';
+import { formatAmount, formatRate } from '../utils/format.js';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 export default function ResourceRow({
@@ -10,6 +10,9 @@ export default function ResourceRow({
   capped,
   rate,
   tooltip,
+  supply,
+  demand,
+  stored,
 }) {
   const content = (
     <li className="flex items-center justify-between text-sm tabular-nums">
@@ -18,13 +21,24 @@ export default function ResourceRow({
         <span>{name}</span>
       </span>
       <span className="flex flex-col items-end">
-        <span className={capped ? 'text-orange-500' : undefined}>
-          {formatAmount(amount)}
-          {capacity != null && ` / ${formatAmount(capacity)}`}
-        </span>
-        {rate != null && (
-          <span className="text-xs text-muted-foreground">{rate}</span>
+        {supply != null && demand != null ? (
+          <span>
+            {formatRate(supply)} / {formatRate(demand)}
+          </span>
+        ) : (
+          <span className={capped ? 'text-orange-500' : undefined}>
+            {formatAmount(amount)}
+            {capacity != null && ` / ${formatAmount(capacity)}`}
+          </span>
         )}
+        {supply != null && demand != null ? (
+          <span className="text-xs text-muted-foreground">
+            {formatAmount(stored ?? amount)}
+            {capacity != null && ` / ${formatAmount(capacity)}`}
+          </span>
+        ) : rate != null ? (
+          <span className="text-xs text-muted-foreground">{rate}</span>
+        ) : null}
       </span>
     </li>
   );
