@@ -4,7 +4,7 @@ import { deepClone } from '../utils/clone.ts';
 
 const STORAGE_KEY = 'apocalypse-idle-save';
 
-export const CURRENT_SAVE_VERSION = 6;
+export const CURRENT_SAVE_VERSION = 7;
 
 export const migrations = [
   {
@@ -119,6 +119,20 @@ export const migrations = [
       return save;
     },
   },
+  {
+    from: 6,
+    to: 7,
+    up(save) {
+      if (save.buildings && typeof save.buildings === 'object') {
+        Object.values(save.buildings).forEach((b) => {
+          if (b && typeof b === 'object' && !('isDesiredOn' in b)) {
+            b.isDesiredOn = true;
+          }
+        });
+      }
+      return save;
+    },
+  },
 ];
 
 export function applyMigrations(save) {
@@ -200,6 +214,15 @@ export function validateSave(obj) {
       if (!('colony' in obj) || typeof obj.colony !== 'object')
         throw new Error('Invalid save: missing colony');
     }
+    if (
+      obj.version >= 7 &&
+      !Object.values(obj.buildings).every(
+        (b) => b && typeof b === 'object' && typeof b.isDesiredOn === 'boolean',
+      )
+    )
+      throw new Error(
+        'Invalid save: building entries must include isDesiredOn flag',
+      );
   }
   return true;
 }
