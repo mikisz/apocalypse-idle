@@ -14,12 +14,16 @@ import { RESEARCH_MAP } from '../../data/research.js';
 export default function useBuilding(building: any, completedResearch: string[] = []) {
   const { state, setState } = useGame();
   const count = state.buildings[building.id]?.count || 0;
+  const isDesiredOn = state.buildings[building.id]?.isDesiredOn ?? true;
   const atMax = building.maxCount != null && count >= building.maxCount;
   const costEntries = getBuildingCostEntries(state, building);
   const perOutputs = getBuildingOutputs(state, building);
   const perInputs = getBuildingInputs(state, building);
   const canAfford = canAffordBuilding(state, building);
   const offlineReason = state.buildings[building.id]?.offlineReason;
+  const resourceShortage = isDesiredOn && perInputs.some(
+    (i) => i.res !== 'power' && (state.resources[i.res]?.amount || 0) <= 0,
+  );
   const unlocked =
     !building.requiresResearch || completedResearch.includes(building.requiresResearch);
   const buildTooltip = !unlocked
@@ -63,6 +67,22 @@ export default function useBuilding(building: any, completedResearch: string[] =
     setState((prev) => demolishBuilding(prev, building.id));
   }, [count, setState, building.id]);
 
+  const onToggle = useCallback(
+    (on: boolean) => {
+      setState((prev) => {
+        const prevEntry = prev.buildings[building.id] || { count: 0 };
+        return {
+          ...prev,
+          buildings: {
+            ...prev.buildings,
+            [building.id]: { ...prevEntry, isDesiredOn: on },
+          },
+        } as any;
+      });
+    },
+    [setState, building.id],
+  );
+
   return {
     count,
     atMax,
@@ -72,9 +92,12 @@ export default function useBuilding(building: any, completedResearch: string[] =
     canAfford,
     unlocked,
     offlineReason,
+    isDesiredOn,
+    resourceShortage,
     buildTooltip,
     showPowerWarning,
     onBuild,
     onDemolish,
+    onToggle,
   };
 }
