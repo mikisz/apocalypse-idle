@@ -145,4 +145,22 @@ describe('useNotifications', () => {
     rerender(<Wrapper state={offline} />);
     expect(toast).toHaveBeenCalledTimes(1);
   });
+
+  it('does not toast power loss when building is off', () => {
+    const initial = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: { radio: { isDesiredOn: false } },
+    };
+    const offline = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: { radio: { isDesiredOn: false, offlineReason: 'power' } },
+    };
+    const { rerender } = render(<Wrapper state={initial} />);
+    rerender(<Wrapper state={offline} />);
+    expect(toast).not.toHaveBeenCalled();
+  });
 });

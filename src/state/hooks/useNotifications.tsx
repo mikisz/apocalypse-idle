@@ -46,6 +46,7 @@ export default function useNotifications(state: GameState): void {
       if (
         currReason === 'power' &&
         prevReason !== 'power' &&
+        b?.isDesiredOn !== false &&
         !powerNotified.current.has(id)
       ) {
         const name = BUILDING_MAP[id]?.name || id;
