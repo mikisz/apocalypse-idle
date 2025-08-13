@@ -9,6 +9,15 @@ import { getSettlerCapacity } from '../state/selectors.js';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Accordion from '@/components/Accordion.jsx';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectTrigger,
@@ -22,10 +31,17 @@ const BONUS_LABELS = ROLE_LIST.reduce((acc, r) => {
   return acc;
 }, {});
 
+const HAPPINESS_ICONS = {
+  Base: '😁',
+  Overcrowding: '👬',
+  'Food variety': '🥗',
+};
+
 export default function PopulationView() {
-  const { state, setSettlerRole } = useGame();
+  const { state, setSettlerRole, banishSettler } = useGame();
   const [onlyLiving, setOnlyLiving] = useState(true);
   const [unassignedOnly, setUnassignedOnly] = useState(false);
+  const [banishing, setBanishing] = useState(null);
   const settlers = state.population?.settlers ?? [];
   const availableRoles = ROLE_LIST.filter(
     (r) => (state.buildings?.[r.building]?.count || 0) > 0,
@@ -94,84 +110,140 @@ export default function PopulationView() {
                   <CardTitle className="flex items-center gap-2">
                     {s.firstName} {s.lastName}
                     <span className="px-1 border rounded text-xs">{s.sex}</span>
+                    {s.isDead && (
+                      <span className="px-1 bg-red-600 text-white rounded text-xs">
+                        Dead
+                      </span>
+                    )}
                   </CardTitle>
                   <div className="text-sm text-muted-foreground">
                     {years}y, {days}d
                   </div>
                 </div>
-                <Select
-                  value={s.role || 'idle'}
-                  onValueChange={(v) => setSettlerRole(s.id, v)}
-                >
-                  <SelectTrigger className="w-36">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="idle">Idle</SelectItem>
-                    {availableRoles.map((r) => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-start gap-2">
+                  <Select
+                    value={s.role || 'idle'}
+                    onValueChange={(v) => setSettlerRole(s.id, v)}
+                    disabled={s.isDead}
+                  >
+                    <SelectTrigger className="w-36">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="idle">Idle</SelectItem>
+                      {availableRoles.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setBanishing(s)}
+                  >
+                    Banish
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border rounded">
+                <div className="border rounded-lg shadow-none">
                   <Accordion
                     title={`Happiness: ${Math.round(s.happiness || 0)}%`}
-                    contentClassName="p-2 space-y-0.5"
+                    contentClassName="p-0"
                   >
-                    <ul className="space-y-0.5 text-xs">
+                    <ul className="mt-2 space-y-1 text-xs">
                       {(s.happinessBreakdown || []).map((b, idx) => (
-                        <li key={idx}>
-                          {b.label}: {b.value >= 0 ? '+' : ''}
-                          {b.value}
+                        <li
+                          key={idx}
+                          className="flex justify-between px-2"
+                        >
+                          <span>
+                            {HAPPINESS_ICONS[b.label] || ''} {b.label}
+                          </span>
+                          <span>
+                            {b.value >= 0 ? '+' : ''}
+                            {b.value}
+                          </span>
                         </li>
                       ))}
                     </ul>
                   </Accordion>
                 </div>
-                <Accordion title="Skills" contentClassName="p-2 space-y-2">
-                  <ul className="space-y-2">
-                    {skillEntries.map(([role, skill]) => {
-                      const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(
-                        skill.level,
-                      );
-                      const prog =
-                        threshold > 0 ? Math.min(skill.xp / threshold, 1) : 0;
-                      return (
-                        <li
-                          key={role}
-                          className="flex items-center justify-between text-sm"
-                        >
-                          <span className="flex items-center gap-1">
-                            {SKILL_LABELS[role] || role}
-                            <span className="px-1 bg-muted rounded text-xs">
-                              [{skill.level}]
+                <div className="border rounded-lg">
+                  <Accordion title="Skills" contentClassName="p-2 space-y-2">
+                    <ul className="space-y-2">
+                      {skillEntries.map(([role, skill]) => {
+                        const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(
+                          skill.level,
+                        );
+                        const prog =
+                          threshold > 0 ? Math.min(skill.xp / threshold, 1) : 0;
+                        return (
+                          <li
+                            key={role}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span className="flex items-center gap-1">
+                              {SKILL_LABELS[role] || role}
+                              <span className="px-1 bg-muted rounded text-xs">
+                                [{skill.level}]
+                              </span>
                             </span>
-                          </span>
-                          <div className="flex items-center gap-1 w-32">
-                            <span className="text-xs">{skill.level}</span>
-                            <div className="flex-1 h-2 bg-border rounded">
-                              <div
-                                className="h-full bg-green-600 rounded"
-                                style={{ width: `${prog * 100}%` }}
-                              />
+                            <div className="flex items-center gap-1 w-32">
+                              <span className="text-xs">{skill.level}</span>
+                              <div className="flex-1 h-2 bg-border rounded">
+                                <div
+                                  className="h-full bg-green-600 rounded"
+                                  style={{ width: `${prog * 100}%` }}
+                                />
+                              </div>
+                              <span className="text-xs">{skill.level + 1}</span>
                             </div>
-                            <span className="text-xs">{skill.level + 1}</span>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </Accordion>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </Accordion>
+                </div>
               </CardContent>
             </Card>
           );
         })
       ) : (
         <div className="text-center text-muted-foreground">No survivors</div>
+      )}
+      {banishing && (
+        <Dialog open onOpenChange={(open) => !open && setBanishing(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Banish settler?</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to banish {banishing.firstName}{' '}
+                {banishing.lastName}? {banishing.sex === 'M' ? 'He' : 'She'} will
+                be lost forever.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setBanishing(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  banishSettler(banishing.id);
+                  setBanishing(null);
+                }}
+              >
+                Banish
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

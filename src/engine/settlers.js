@@ -9,6 +9,7 @@ import { getCapacity, getSettlerCapacity } from '../state/selectors.js';
 import { clampResource } from './production.js';
 import { SECONDS_PER_DAY } from './time.js';
 import { RESOURCES } from '../data/resources.js';
+import { createLogEntry } from '../utils/log.js';
 
 export function computeRoleBonuses(settlers) {
   const bonuses = {};
@@ -37,6 +38,7 @@ export function processSettlersTick(
   const settlers = state.population?.settlers
     ? [...state.population.settlers]
     : [];
+  const events = [];
   const living = settlers.filter((s) => !s.isDead);
 
   // Happiness calculation
@@ -109,11 +111,17 @@ export function processSettlersTick(
         const victim = victims[idx];
         const victimIndex = settlers.findIndex((s) => s.id === victim.id);
         if (victimIndex >= 0) {
-          settlers[victimIndex] = {
+          const updated = {
             ...settlers[victimIndex],
             isDead: true,
             role: null,
           };
+          settlers[victimIndex] = updated;
+          events.push(
+            createLogEntry(
+              `${updated.firstName} ${updated.lastName} died`,
+            ),
+          );
         }
       }
       starvationTimer = 0;
@@ -172,13 +180,20 @@ export function processSettlersTick(
     roleBonuses: bonuses,
   };
 
+  const log =
+    events.length > 0
+      ? [...events, ...(state.log || [])].slice(0, 100)
+      : state.log;
+
   return {
     state: {
       ...state,
       colony,
       resources,
       population: { ...state.population, settlers },
+      log,
     },
     telemetry,
+    events,
   };
 }
