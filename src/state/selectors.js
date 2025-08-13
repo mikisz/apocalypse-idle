@@ -95,8 +95,10 @@ function aggregateBuildingRates(state, roleBonuses) {
   const season = getSeason(state);
   const rates = {};
   PRODUCTION_BUILDINGS.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
-    if (count <= 0) return;
+    const entry = state.buildings?.[b.id];
+    const count = entry?.count || 0;
+    const on = entry?.isDesiredOn !== false;
+    if (count <= 0 || !on) return;
     let factor = 1;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
