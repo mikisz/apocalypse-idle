@@ -202,7 +202,7 @@ describe('useNotifications', () => {
             firstName: 'Ann',
             lastName: 'Lee',
             isDead: false,
-            skills: { scavenger: { level: 3 } },
+            skills: { gatherer: { level: 3 } },
           },
         ],
       },
@@ -219,7 +219,7 @@ describe('useNotifications', () => {
             firstName: 'Ann',
             lastName: 'Lee',
             isDead: false,
-            skills: { scavenger: { level: 4 } },
+            skills: { gatherer: { level: 4 } },
           },
         ],
       },
@@ -228,7 +228,7 @@ describe('useNotifications', () => {
     const { rerender } = render(<Wrapper state={before} />);
     rerender(<Wrapper state={after} />);
     expect(toast).toHaveBeenCalledWith({
-      description: `Ann Lee reached ${SKILL_LABELS.scavenger} level 4`,
+      description: `Ann Lee reached ${SKILL_LABELS.gatherer} level 4`,
     });
   });
 

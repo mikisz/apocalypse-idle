@@ -18,11 +18,13 @@ export default function usePopulationActions(
         if (!settler) return prev;
         const normalized = role === 'idle' ? null : role;
         if (normalized) {
-          const building = ROLE_BUILDINGS[
+          const buildings = ROLE_BUILDINGS[
             normalized as keyof typeof ROLE_BUILDINGS
-          ] as keyof GameState['buildings'];
-          const count = prev.buildings[building]?.count || 0;
-          if (count <= 0) return prev;
+          ] as Array<keyof GameState['buildings']>;
+          const hasBuilding = buildings.some(
+            (b) => (prev.buildings[b]?.count || 0) > 0,
+          );
+          if (!hasBuilding) return prev;
         }
         const settlers = prev.population.settlers.map((s) =>
           s.id === id ? { ...s, role: normalized } : s,

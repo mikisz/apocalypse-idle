@@ -3,57 +3,80 @@ export const ROLES = {
     id: 'farmer',
     name: 'Farmer',
     skill: 'Farming',
-    resource: 'potatoes',
-    building: 'potatoField',
+    resources: ['potatoes'],
+    buildings: ['potatoField'],
   },
   hunter: {
     id: 'hunter',
     name: 'Hunter',
     skill: 'Hunting',
-    resource: 'meat',
-    building: 'huntersHut',
+    resources: ['meat'],
+    buildings: ['huntersHut'],
   },
-  woodcutter: {
-    id: 'woodcutter',
-    name: 'Woodcutter',
-    skill: 'Woodcutting',
-    resource: 'wood',
-    building: 'loggingCamp',
+  gatherer: {
+    id: 'gatherer',
+    name: 'Gatherer',
+    skill: 'Gathering',
+    resources: ['wood', 'scrap', 'stone'],
+    buildings: ['loggingCamp', 'scrapyard', 'quarry'],
   },
-  scavenger: {
-    id: 'scavenger',
-    name: 'Scavenger',
-    skill: 'Scavenging',
-    resource: 'scrap',
-    building: 'scrapyard',
+  carpenter: {
+    id: 'carpenter',
+    name: 'Carpenter',
+    skill: 'Carpentry',
+    resources: ['planks'],
+    buildings: ['sawmill'],
   },
-  quarryWorker: {
-    id: 'quarryWorker',
-    name: 'Quarry Worker',
-    skill: 'Quarrying',
-    resource: 'stone',
-    building: 'quarry',
+  metalworker: {
+    id: 'metalworker',
+    name: 'Metalworker',
+    skill: 'Metalworking',
+    resources: ['metalParts'],
+    buildings: ['metalWorkshop'],
+  },
+  toolsmith: {
+    id: 'toolsmith',
+    name: 'Toolsmith',
+    skill: 'Toolsmithing',
+    resources: ['tools'],
+    buildings: ['toolsmithy'],
+  },
+  engineer: {
+    id: 'engineer',
+    name: 'Engineer',
+    skill: 'Engineering',
+    resources: ['power'],
+    buildings: ['woodGenerator'],
   },
   scientist: {
     id: 'scientist',
     name: 'Scientist',
     skill: 'Scientist',
-    resource: 'science',
-    building: 'school',
+    resources: ['science'],
+    buildings: ['school'],
   },
 };
 
 export const ROLE_LIST = Object.values(ROLES);
-export const ROLE_BY_RESOURCE = Object.fromEntries(
-  ROLE_LIST.map((r) => [r.resource, r.id]),
-);
+
+export const ROLE_BY_RESOURCE = ROLE_LIST.reduce((acc, r) => {
+  r.resources.forEach((res) => {
+    acc[res] = r.id;
+  });
+  return acc;
+}, {});
+
 export const SKILL_LABELS = Object.fromEntries(
   ROLE_LIST.map((r) => [r.id, r.skill]),
 );
 
 export const ROLE_BUILDINGS = Object.fromEntries(
-  ROLE_LIST.map((r) => [r.id, r.building]),
+  ROLE_LIST.map((r) => [r.id, r.buildings]),
 );
-export const BUILDING_ROLES = Object.fromEntries(
-  ROLE_LIST.map((r) => [r.building, r.id]),
-);
+
+export const BUILDING_ROLES = ROLE_LIST.reduce((acc, r) => {
+  r.buildings.forEach((b) => {
+    acc[b] = r.id;
+  });
+  return acc;
+}, {});

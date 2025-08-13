@@ -2,17 +2,11 @@ import React, { useState } from 'react';
 import { useGame } from '../state/useGame.tsx';
 import { computeRoleBonuses } from '../engine/settlers.js';
 import { ROLE_LIST } from '../data/roles.js';
-import { RESOURCES } from '../data/resources.js';
 import { getSettlerCapacity } from '../state/selectors.js';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import SettlerFilters from '../components/SettlerFilters.jsx';
 import SettlerList from '../components/SettlerList.jsx';
 import BanishSettlerModal from '../components/BanishSettlerModal.jsx';
-
-const BONUS_LABELS = ROLE_LIST.reduce((acc, r) => {
-  acc[r.id] = RESOURCES[r.resource].name;
-  return acc;
-}, {});
 
 export default function PopulationView() {
   const { state, setSettlerRole, banishSettler } = useGame();
@@ -20,8 +14,8 @@ export default function PopulationView() {
   const [unassignedOnly, setUnassignedOnly] = useState(false);
   const [banishing, setBanishing] = useState(null);
   const settlers = state.population?.settlers ?? [];
-  const availableRoles = ROLE_LIST.filter(
-    (r) => (state.buildings?.[r.building]?.count || 0) > 0,
+  const availableRoles = ROLE_LIST.filter((r) =>
+    r.buildings.some((b) => (state.buildings?.[b]?.count || 0) > 0),
   );
   const filtered = settlers
     .filter((s) => !onlyLiving || !s.isDead)
@@ -43,15 +37,15 @@ export default function PopulationView() {
             {living}/{capacity}
           </CardContent>
         </Card>
-        {Object.entries(BONUS_LABELS).map(([role, label]) => (
-          <Card key={role} className="text-center">
+        {availableRoles.map((r) => (
+          <Card key={r.id} className="text-center">
             <CardHeader className="p-0">
               <CardTitle className="text-sm font-normal text-muted-foreground">
-                {label} bonus
+                {r.name} bonus
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 text-lg font-semibold">
-              +{Math.round(bonuses[role] || 0)}%
+              +{Math.round(bonuses[r.id] || 0)}%
             </CardContent>
           </Card>
         ))}
