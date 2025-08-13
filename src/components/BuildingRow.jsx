@@ -5,6 +5,7 @@ import { RESEARCH_MAP } from '../data/research.js';
 import { Button } from './Button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { Container } from './ui/container';
+import { Switch } from './ui/switch';
 
 export default function BuildingRow({
   building,
@@ -16,10 +17,13 @@ export default function BuildingRow({
   canAfford = false,
   unlocked = false,
   offlineReason,
+  isDesiredOn = true,
+  resourceShortage = false,
   buildTooltip,
   showPowerWarning = false,
   onBuild,
   onDemolish,
+  onToggle,
 }) {
   const formatPerSec = (perSec, res) => {
     const sign = perSec >= 0 ? '+' : '-';
@@ -47,13 +51,24 @@ export default function BuildingRow({
               ? `${count}/${building.maxCount}`
               : `(${count})`}
           </span>
-          {offlineReason && (
+          {!isDesiredOn && (
+            <span className="px-1 text-xs text-white bg-gray-600 rounded">
+              Off
+            </span>
+          )}
+          {isDesiredOn && offlineReason === 'power' && (
             <span className="px-1 text-xs text-white bg-red-600 rounded">
-              {offlineReason === 'power' ? 'No Power' : 'Offline'}
+              No Power
+            </span>
+          )}
+          {isDesiredOn && (resourceShortage || offlineReason === 'resources') && (
+            <span className="px-1 text-xs text-white bg-red-600 rounded">
+              No Resources
             </span>
           )}
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center">
+          <Switch checked={isDesiredOn} onCheckedChange={onToggle} />
           <Button
             variant="outline"
             size="sm"
