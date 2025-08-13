@@ -9,9 +9,7 @@ import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { BALANCE } from '../data/balance.js';
 import { updateRadio } from './radio.js';
-
-const structuredClone =
-  globalThis.structuredClone || ((obj) => JSON.parse(JSON.stringify(obj)));
+import { deepClone } from '../utils/clone.ts';
 
 export function clampResource(value, capacity) {
   let v = Number.isFinite(value) ? value : 0;
@@ -145,7 +143,7 @@ export function processTick(state, seconds = 1, roleBonuses = {}) {
 
 export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
   if (elapsedSeconds <= 0) return { state, gains: {} };
-  const before = structuredClone(state.resources);
+  const before = deepClone(state.resources);
   let current = applyProduction({ ...state }, elapsedSeconds, roleBonuses);
   const settlers =
     state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;

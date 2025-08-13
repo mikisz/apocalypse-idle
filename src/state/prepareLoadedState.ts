@@ -6,15 +6,16 @@ import { createLogEntry } from '../utils/log.js';
 import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';
 import { buildInitialPowerTypeOrder } from '../engine/power.js';
+import { deepClone } from '../utils/clone.ts';
 
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded: any) {
-  const cloned = structuredClone(loaded || {});
+  const cloned = deepClone(loaded || {});
   const gameTime =
     typeof cloned.gameTime === 'number'
       ? { seconds: cloned.gameTime }
       : cloned.gameTime || { seconds: 0 };
-  const base = structuredClone(defaultState);
+  const base = deepClone(defaultState);
   base.version = cloned.version ?? base.version;
   base.gameTime = { ...base.gameTime, ...gameTime };
   base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
