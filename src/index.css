@@ -62,7 +62,9 @@
 }
 
 @layer base {
-  * {
+  [class*='border'],
+  [class*='divide-x'] > :not([hidden]) ~ :not([hidden]),
+  [class*='divide-y'] > :not([hidden]) ~ :not([hidden]) {
     @apply border-border;
   }
 }
