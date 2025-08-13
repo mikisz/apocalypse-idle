@@ -11,6 +11,7 @@ import {
   SelectItem,
 } from './ui/select';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
+import { Container } from './ui/container';
 import Accordion from './Accordion.jsx';
 
 const HAPPINESS_ICONS = {
@@ -76,7 +77,7 @@ export default function SettlerList({
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="border rounded-lg shadow-none">
+            <Container className="shadow-none p-0">
               <Accordion
                 title={`Happiness: ${Math.round(s.happiness || 0)}%`}
                 contentClassName="p-0"
@@ -95,8 +96,8 @@ export default function SettlerList({
                   ))}
                 </ul>
               </Accordion>
-            </div>
-            <div className="border rounded-lg">
+            </Container>
+            <Container className="shadow-none p-0">
               <Accordion title="Skills" contentClassName="p-2 space-y-2">
                 <ul className="space-y-2">
                   {skillEntries.map(([role, skill]) => {
@@ -131,7 +132,7 @@ export default function SettlerList({
                   })}
                 </ul>
               </Accordion>
-            </div>
+            </Container>
           </CardContent>
         </Card>
       );

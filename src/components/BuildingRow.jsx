@@ -4,6 +4,7 @@ import { formatAmount } from '../utils/format.js';
 import { RESEARCH_MAP } from '../data/research.js';
 import { Button } from './Button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { Container } from './ui/container';
 
 export default function BuildingRow({
   building,
@@ -26,7 +27,7 @@ export default function BuildingRow({
   };
 
   return (
-    <div className="p-4 rounded-lg border border-border bg-card space-y-3">
+    <Container className="space-y-3 shadow-none">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg font-semibold">{building.name}</span>
@@ -88,7 +89,8 @@ export default function BuildingRow({
             <div className="mt-2 flex flex-wrap gap-3">
               {costEntries.map(([res, amt]) => (
                 <span key={res} className="flex items-center gap-1">
-                  {RESOURCES[res].icon} {formatAmount(amt)} {RESOURCES[res].name}
+                  {RESOURCES[res].icon} {formatAmount(amt)}{' '}
+                  {RESOURCES[res].name}
                 </span>
               ))}
             </div>
@@ -139,6 +141,6 @@ export default function BuildingRow({
           <div className="text-xs">No Power storage. Excess is lost.</div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }
