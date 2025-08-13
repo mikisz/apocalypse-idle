@@ -168,11 +168,16 @@ export function useResourceSections(state) {
     powered,
   };
 
+  const happinessBreakdown = state.colony?.happiness?.breakdown || [];
   const happinessInfo = {
     avg: Math.round(state.colony?.happiness?.value || 0),
     total: totalSettlers,
     capacity,
-    breakdown: state.colony?.happiness?.breakdown || [],
+    breakdown: happinessBreakdown,
+    overcrowding:
+      happinessBreakdown.find((b) => b.label === 'Overcrowding')?.value || 0,
+    foodVariety:
+      happinessBreakdown.find((b) => b.label === 'Food variety')?.value || 0,
   };
 
   return { sections, settlersInfo, happinessInfo };
