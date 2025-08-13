@@ -1,4 +1,8 @@
-import { BUILDINGS, PRODUCTION_BUILDINGS, getBuildingCost } from '../data/buildings.js';
+import {
+  BUILDINGS,
+  PRODUCTION_BUILDINGS,
+  getBuildingCost,
+} from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { RESEARCH_MAP } from '../data/research.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
@@ -8,6 +12,12 @@ import { BALANCE } from '../data/balance.js';
 import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { SHELTER_MAX } from '../data/settlement.js';
 
+/** @typedef {import('./useGame.tsx').GameState} GameState */
+
+/**
+ * @param {GameState} state
+ * @param {string} resourceId
+ */
 export function getCapacity(state, resourceId) {
   const base = RESOURCES[resourceId]?.startingCapacity || 0;
   let fromBuildings = 0;
@@ -21,23 +31,38 @@ export function getCapacity(state, resourceId) {
   return Math.floor((base + fromBuildings) * (1 + bonus));
 }
 
+/**
+ * @param {GameState} state
+ */
 export function getSettlerCapacity(state) {
   const count = state.buildings?.shelter?.count || 0;
   return Math.min(count, SHELTER_MAX);
 }
 
+/**
+ * @param {GameState} state
+ * @param {any} building
+ */
 export function getBuildingCostEntries(state, building) {
   const count = state.buildings?.[building.id]?.count || 0;
   const scaledCost = getBuildingCost(building, count);
   return Object.entries(scaledCost);
 }
 
+/**
+ * @param {GameState} state
+ * @param {any} building
+ */
 export function canAffordBuilding(state, building) {
   return getBuildingCostEntries(state, building).every(
     ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
   );
 }
 
+/**
+ * @param {GameState} state
+ * @param {any} building
+ */
 export function getBuildingOutputs(state, building) {
   const season = getSeason(state);
   return Object.entries(building.outputsPerSecBase || {}).map(([res, base]) => {
@@ -50,6 +75,10 @@ export function getBuildingOutputs(state, building) {
   });
 }
 
+/**
+ * @param {GameState} state
+ * @param {any} building
+ */
 export function getBuildingInputs(state, building) {
   return Object.entries(building.inputsPerSecBase || {}).map(([res, base]) => ({
     res,
@@ -57,11 +86,12 @@ export function getBuildingInputs(state, building) {
   }));
 }
 
-export function getResourceRates(
-  state,
-  includeConsumption = false,
-  roleBonuses = {},
-) {
+/**
+ * @param {GameState} state
+ * @param {Record<string, number>} roleBonuses
+ * @returns {Record<string, number>}
+ */
+function aggregateBuildingRates(state, roleBonuses) {
   const season = getSeason(state);
   const rates = {};
   PRODUCTION_BUILDINGS.forEach((b) => {
@@ -82,7 +112,6 @@ export function getResourceRates(
           const amt = base * count;
           rates[res] = (rates[res] || 0) - amt;
         });
-        factor = 1;
       } else {
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const need = base * count;
@@ -118,20 +147,47 @@ export function getResourceRates(
       });
     }
   });
+  return rates;
+}
 
-  if (includeConsumption) {
-    const settlers =
-      state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
-    const consumption = settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
-    rates.potatoes = (rates.potatoes || 0) - consumption;
-  }
+/**
+ * @param {GameState} state
+ * @param {Record<string, number>} rates
+ */
+function applyConsumption(state, rates) {
+  const settlers =
+    state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
+  const consumption = settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
+  rates.potatoes = (rates.potatoes || 0) - consumption;
+}
 
+/**
+ * @param {Record<string, number>} rates
+ * @returns {Record<string, {perSec:number,label:string}>}
+ */
+function formatRates(rates) {
   const formatted = {};
   Object.keys(RESOURCES).forEach((id) => {
     const perSec = rates[id] || 0;
     formatted[id] = { perSec, label: formatRate(perSec) };
   });
   return formatted;
+}
+
+/**
+ * @param {GameState} state
+ * @param {boolean} [includeConsumption=false]
+ * @param {Record<string, number>} [roleBonuses={}]
+ * @returns {Record<string, {perSec:number,label:string}>}
+ */
+export function getResourceRates(
+  state,
+  includeConsumption = false,
+  roleBonuses = {},
+) {
+  const rates = aggregateBuildingRates(state, roleBonuses);
+  if (includeConsumption) applyConsumption(state, rates);
+  return formatRates(rates);
 }
 
 function gatherEffects(state, type) {
@@ -186,12 +242,13 @@ const CATEGORY_LABELS = {
   ENERGY: 'Energy',
 };
 
-export function getResourceSections(state) {
-  const settlers = state.population?.settlers?.filter((s) => !s.isDead) || [];
-  const roleBonuses = computeRoleBonuses(settlers);
-  const netRates = getResourceRates(state, true, roleBonuses);
-  const prodRates = getResourceRates(state, false, roleBonuses);
-
+/**
+ * @param {GameState} state
+ * @param {Record<string,{perSec:number,label:string}>} netRates
+ * @param {Record<string,{perSec:number,label:string}>} prodRates
+ * @returns {{groups: Record<string, any[]>, foodIds: string[]}}
+ */
+function buildResourceGroups(state, netRates, prodRates) {
   const groups = {};
   const foodIds = [];
   Object.values(RESOURCES).forEach((r) => {
@@ -222,26 +279,48 @@ export function getResourceSections(state) {
       });
     }
   });
+  return { groups, foodIds };
+}
+
+/**
+ * @param {GameState} state
+ * @param {string[]} foodIds
+ * @param {Record<string,{perSec:number,label:string}>} netRates
+ */
+function createFoodTotalRow(state, foodIds, netRates) {
+  const totalAmount = foodIds.reduce(
+    (sum, id) => sum + (state.resources[id]?.amount || 0),
+    0,
+  );
+  const totalCapacity =
+    state.foodPool?.capacity ??
+    foodIds.reduce((sum, id) => sum + getCapacity(state, id), 0);
+  const totalNetRate = foodIds.reduce(
+    (sum, id) => sum + (netRates[id]?.perSec || 0),
+    0,
+  );
+  return {
+    id: 'food-total',
+    name: 'Total',
+    amount: state.foodPool?.amount ?? totalAmount,
+    capacity: totalCapacity,
+    rate: formatRate(totalNetRate),
+  };
+}
+
+/**
+ * @param {GameState} state
+ */
+export function getResourceSections(state) {
+  const settlers = state.population?.settlers?.filter((s) => !s.isDead) || [];
+  const roleBonuses = computeRoleBonuses(settlers);
+  const netRates = getResourceRates(state, true, roleBonuses);
+  const prodRates = getResourceRates(state, false, roleBonuses);
+
+  const { groups, foodIds } = buildResourceGroups(state, netRates, prodRates);
 
   if (groups.FOOD) {
-    const totalAmount = foodIds.reduce(
-      (sum, id) => sum + (state.resources[id]?.amount || 0),
-      0,
-    );
-    const totalCapacity =
-      state.foodPool?.capacity ??
-      foodIds.reduce((sum, id) => sum + getCapacity(state, id), 0);
-    const totalNetRate = foodIds.reduce(
-      (sum, id) => sum + (netRates[id]?.perSec || 0),
-      0,
-    );
-    const totalRow = {
-      id: 'food-total',
-      name: 'Total',
-      amount: state.foodPool?.amount ?? totalAmount,
-      capacity: totalCapacity,
-      rate: formatRate(totalNetRate),
-    };
+    const totalRow = createFoodTotalRow(state, foodIds, netRates);
     groups.FOOD = [totalRow, ...groups.FOOD];
   }
 
