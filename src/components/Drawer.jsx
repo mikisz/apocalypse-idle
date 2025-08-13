@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { exportSaveFile, load } from '../engine/persistence.js';
 import { createLogEntry } from '../utils/log.js';
 import { Button } from './Button';

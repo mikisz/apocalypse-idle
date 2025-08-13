@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 
 const tabs = [

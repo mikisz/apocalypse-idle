@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { GameContext } from './useGame.ts';
+import { GameContext } from './useGame.tsx';
 import { loadGame } from '../engine/persistence.js';
 import { defaultState } from './defaultState.js';
 import { prepareLoadedState } from './prepareLoadedState.ts';
-import useGameTick from './hooks/useGameTick.ts';
-import useAutosave from './hooks/useAutosave.ts';
-import useGameActions from './hooks/useGameActions.ts';
+import useGameTick from './hooks/useGameTick.tsx';
+import useAutosave from './hooks/useAutosave.tsx';
+import useGameActions from './hooks/useGameActions.tsx';
 
 export function GameProvider({ children }) {
   const { state: loaded, error: loadErr } = loadGame();

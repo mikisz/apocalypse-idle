@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
-import useGameLoop from '../useGameLoop.ts';
+import useGameLoop from '../useGameLoop.tsx';
 
 function TestComponent({ cb }) {
   useGameLoop(cb, 1000);

@@ -1,8 +1,7 @@
-import { useGame } from '../state/useGame.ts';
-import {
-  PRODUCTION_BUILDINGS,
-  STORAGE_BUILDINGS,
-} from '../data/buildings.js';
+import { useGame } from '../state/useGame.tsx';
+import { PRODUCTION_BUILDINGS, STORAGE_BUILDINGS } from '../data/buildings.js';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const GROUP_ORDER = [
   'Food',
@@ -45,4 +44,3 @@ export function useBuildingGroups() {
 
   return { productionGroups, storageBuildings, completedResearch };
 }
-

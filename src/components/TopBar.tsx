@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { getSeasonModifiers, getTimeBreakdown } from '../engine/time.js';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { Button } from './Button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 

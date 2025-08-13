@@ -24,11 +24,13 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': [
+      '@typescript-eslint/no-unused-vars': [
         'error',
         { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' },
       ],
       semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'jsx-quotes': ['error', 'prefer-double'],
     },
   },
 ]);

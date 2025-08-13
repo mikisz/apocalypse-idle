@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import BuildingRow from './BuildingRow.jsx';
 import { BUILDING_MAP } from '../data/buildings.js';
-import { GameContext } from '../state/useGame.ts';
+import { GameContext } from '../state/useGame.tsx';
 import { defaultState } from '../state/defaultState.js';
 
 describe('BuildingRow', () => {
@@ -36,4 +36,3 @@ describe('BuildingRow', () => {
     expect(screen.getByText(/🥔 \+300 Potatoes capacity/)).toBeTruthy();
   });
 });
-

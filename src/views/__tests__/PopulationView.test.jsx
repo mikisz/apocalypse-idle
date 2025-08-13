@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PopulationView from '../PopulationView.jsx';
-import { GameContext } from '../../state/useGame.ts';
+import { GameContext } from '../../state/useGame.tsx';
 
 // JSDOM doesn't implement scrollIntoView which Radix Select relies on
 window.HTMLElement.prototype.scrollIntoView = () => {};

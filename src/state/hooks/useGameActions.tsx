@@ -5,7 +5,7 @@ import { startResearch, cancelResearch } from '../../engine/research.js';
 import { loadGame, deleteSave, saveGame } from '../../engine/persistence.js';
 import { defaultState } from '../defaultState.js';
 import { prepareLoadedState } from '../prepareLoadedState.ts';
-import type { GameState } from '../useGame.ts';
+import type { GameState } from '../useGame.tsx';
 
 export interface GameActions {
   setActiveTab: (tab: string) => void;
@@ -46,8 +46,9 @@ export default function useGameActions(
         if (!settler) return prev;
         const normalized = role === 'idle' ? null : role;
         if (normalized) {
-          const building =
-            ROLE_BUILDINGS[normalized as keyof typeof ROLE_BUILDINGS] as keyof GameState['buildings'];
+          const building = ROLE_BUILDINGS[
+            normalized as keyof typeof ROLE_BUILDINGS
+          ] as keyof GameState['buildings'];
           const count = prev.buildings[building]?.count || 0;
           if (count <= 0) return prev;
         }

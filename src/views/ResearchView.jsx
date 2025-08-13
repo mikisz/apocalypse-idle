@@ -1,4 +1,4 @@
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import ResearchTree from './research/ResearchTree.jsx';
 import { RESEARCH_MAP } from '../data/research.js';
 import { formatTime } from '../utils/time.js';

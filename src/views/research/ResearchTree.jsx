@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { RESEARCH, RESEARCH_MAP } from '../../data/research.js';
 import ResearchNode from './ResearchNode.jsx';
-import { useGame } from '../../state/useGame.ts';
+import { useGame } from '../../state/useGame.tsx';
 import { RESOURCES } from '../../data/resources.js';
 
 const RESEARCH_ROWS = RESEARCH.reduce((acc, r) => {

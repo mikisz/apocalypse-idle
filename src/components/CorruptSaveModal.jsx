@@ -1,4 +1,4 @@
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { Button } from './Button';
 import {
   Dialog,

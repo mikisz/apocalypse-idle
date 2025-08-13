@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { GameProvider } from '../GameContext.jsx';
-import { useGame } from '../useGame.ts';
+import { useGame } from '../useGame.tsx';
 import { loadGame } from '../../engine/persistence.js';
 
 vi.mock('../../engine/persistence.js', () => ({
@@ -12,7 +12,7 @@ vi.mock('../../engine/persistence.js', () => ({
   CURRENT_SAVE_VERSION: 6,
 }));
 
-vi.mock('../../engine/useGameLoop.ts', () => ({
+vi.mock('../../engine/useGameLoop.tsx', () => ({
   default: vi.fn(),
 }));
 

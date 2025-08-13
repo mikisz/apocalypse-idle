@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BUILDING_MAP } from '../data/buildings.js';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import {
   buildInitialPowerTypeOrder,
   getPoweredConsumerTypeIds,

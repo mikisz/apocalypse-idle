@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { formatAge } from '../utils/format.js';
 import { computeRoleBonuses } from '../engine/settlers.js';
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
