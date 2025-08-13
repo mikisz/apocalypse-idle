@@ -5,12 +5,11 @@ import { getResourceRates } from '../../state/selectors.js';
 import { defaultState } from '../../state/defaultState.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BALANCE } from '../../data/balance.js';
-
-const clone = (obj) => structuredClone(obj);
+import { deepClone } from '../../utils/clone.ts';
 
 describe('settlers tick', () => {
   it('keeps potato totals consistent with farming bonus and consumption', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     state.resources.potatoes.amount = 0;
     state.population.settlers = [

@@ -3,12 +3,11 @@ import { processTick, demolishBuilding } from '../production.js';
 import { defaultState } from '../../state/defaultState.js';
 import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
 import { SEASON_DURATION } from '../time.js';
-
-const clone = (obj) => structuredClone(obj);
+import { deepClone } from '../../utils/clone.ts';
 
 describe('economy basics', () => {
   test('spring potato field output', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     const next = processTick(state, 1);
     const potatoes = next.resources.potatoes.amount;
@@ -16,7 +15,7 @@ describe('economy basics', () => {
   });
 
   test('demolition refunds half last cost', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.buildings.potatoField.count = 2;
     const after = demolishBuilding(state, 'potatoField');
     const blueprint = BUILDING_MAP['potatoField'];
@@ -28,7 +27,7 @@ describe('economy basics', () => {
   });
 
   test('sawmill processes wood into planks when inputs available', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.resources.wood.amount = 10;
     state.buildings.loggingCamp.count = 0;
     state.buildings.sawmill = { count: 1 };
@@ -38,7 +37,7 @@ describe('economy basics', () => {
   });
 
   test('sawmill halts without enough wood', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.resources.wood.amount = 0.5;
     state.buildings.loggingCamp.count = 0;
     state.buildings.sawmill = { count: 1 };
@@ -48,7 +47,7 @@ describe('economy basics', () => {
   });
 
   test('removing last required building unassigns settlers', () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     state.population = {
       settlers: [
@@ -69,7 +68,7 @@ describe('economy basics', () => {
   });
 
   test("hunter's hut produces meat in winter", () => {
-    const state = clone(defaultState);
+    const state = deepClone(defaultState);
     state.gameTime.seconds = SEASON_DURATION * 3;
     state.buildings.huntersHut = { count: 1 };
     const next = processTick(state, 1);
