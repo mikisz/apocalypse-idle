@@ -182,22 +182,33 @@ export default function ResearchTree({ onStart }) {
         ))}
       </svg>
       <div className="flex flex-col gap-16 relative z-10 p-4">
-        {RESEARCH_TRACKS.map((nodes, idx) => (
-          <div key={idx} className="flex gap-8">
-            {nodes.map((node) => {
-              const { status } = evaluate(node, state);
-              return (
-                <ResearchNode
-                  key={node.id}
-                  node={node}
-                  status={status}
-                  onStart={onStart}
-                  ref={(el) => (nodeRefs.current[node.id] = el)}
-                />
-              );
-            })}
-          </div>
-        ))}
+        {RESEARCH_TRACKS.map((nodes, idx) => {
+          const cols = nodes.reduce((acc, n) => {
+            acc[n.row] = acc[n.row] || [];
+            acc[n.row].push(n);
+            return acc;
+          }, []);
+          return (
+            <div key={idx} className="flex gap-8 items-center">
+              {cols.map((col, cIdx) => (
+                <div key={cIdx} className="flex flex-col gap-8 items-center">
+                  {col.map((node) => {
+                    const { status } = evaluate(node, state);
+                    return (
+                      <ResearchNode
+                        key={node.id}
+                        node={node}
+                        status={status}
+                        onStart={onStart}
+                        ref={(el) => (nodeRefs.current[node.id] = el)}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
