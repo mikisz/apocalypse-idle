@@ -16,9 +16,9 @@ const initResources = () => {
 };
 
 const initBuildings = () => ({
-  potatoField: { count: 2 },
-  loggingCamp: { count: 1 },
-  shelter: { count: 1 },
+  potatoField: { count: 2, isDesiredOn: true },
+  loggingCamp: { count: 1, isDesiredOn: true },
+  shelter: { count: 1, isDesiredOn: true },
 });
 
 const initPowerTypeOrder = () => buildInitialPowerTypeOrder([]);

@@ -5,7 +5,7 @@ vi.mock('../../../engine/persistence.js', () => ({
   loadGame: vi.fn(),
   deleteSave: vi.fn(),
   saveGame: vi.fn(),
-  CURRENT_SAVE_VERSION: 1,
+  CURRENT_SAVE_VERSION: 7,
 }));
 vi.mock('../../prepareLoadedState.ts', () => ({
   prepareLoadedState: vi.fn((s: any) => ({ ...s, prepared: true })),

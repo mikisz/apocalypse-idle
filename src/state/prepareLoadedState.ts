@@ -22,6 +22,9 @@ export function prepareLoadedState(loaded: any) {
   base.ui = { ...base.ui, ...cloned.ui };
   base.resources = { ...base.resources, ...cloned.resources };
   base.buildings = { ...base.buildings, ...cloned.buildings };
+  Object.values(base.buildings).forEach((b: any) => {
+    if (typeof b.isDesiredOn !== 'boolean') b.isDesiredOn = true;
+  });
   base.powerTypeOrder = buildInitialPowerTypeOrder(cloned.powerTypeOrder || []);
   base.research = { ...base.research, ...cloned.research };
   base.population = { ...base.population, ...cloned.population };

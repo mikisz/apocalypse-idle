@@ -11,7 +11,7 @@ vi.mock('../../engine/persistence.js', () => ({
   saveGame: vi.fn((s) => s),
   loadGame: vi.fn(),
   deleteSave: vi.fn(),
-  CURRENT_SAVE_VERSION: 6,
+  CURRENT_SAVE_VERSION: 7,
 }));
 
 vi.mock('../../engine/useGameLoop.tsx', () => ({

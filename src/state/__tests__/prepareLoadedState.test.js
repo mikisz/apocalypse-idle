@@ -13,4 +13,10 @@ describe('prepareLoadedState', () => {
     expect(state.log.length).toBeGreaterThan(0);
     expect(state.log[0].text).toMatch(/while offline/);
   });
+
+  it('defaults missing building flags to true', () => {
+    const loaded = { buildings: { loggingCamp: { count: 3 } } };
+    const state = prepareLoadedState(loaded);
+    expect(state.buildings.loggingCamp.isDesiredOn).toBe(true);
+  });
 });
