@@ -17,7 +17,7 @@ export const BUILDINGS = [
     name: "Hunter's Hut",
     type: 'production',
     category: 'Food',
-    requiresResearch: 'hunting1',
+    requiresResearch: 'huntingHut',
     outputsPerSecBase: { meat: 0.22 }, // changed: 0.19 -> 0.22
     costBase: { wood: 25, scrap: 10, stone: 5 },
     costGrowth: 1.15,
@@ -88,6 +88,21 @@ export const BUILDINGS = [
     description: 'Processes scrap into metal parts.',
   },
   {
+    id: 'toolsmithy',
+    name: 'Toolsmithy',
+    type: 'processing',
+    category: 'Construction Materials',
+    requiresResearch: 'industry2',
+    requiresPower: true,
+    inputsPerSecBase: { planks: 0.25, metalParts: 0.15, power: 0.4 },
+    outputsPerSecBase: { tools: 0.18 },
+    costBase: { wood: 50, scrap: 30, stone: 20, planks: 25, metalParts: 15 },
+    costGrowth: 1.13,
+    refund: 0.5,
+    seasonProfile: 'constant',
+    description: 'Produces tools for advanced construction.',
+  },
+  {
     id: 'school',
     name: 'School',
     type: 'production',
@@ -105,7 +120,7 @@ export const BUILDINGS = [
     category: 'Energy',
     outputsPerSecBase: { power: 1 },
     inputsPerSecBase: { wood: 0.25 },
-    costBase: { wood: 50, stone: 10 },
+    costBase: { wood: 50, stone: 10, planks: 20, metalParts: 10 },
     costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     requiresResearch: 'basicEnergy',
@@ -131,7 +146,7 @@ export const BUILDINGS = [
     requiresResearch: 'radio',
     requiresPower: true,
     inputsPerSecBase: { power: 0.1 },
-    costBase: { wood: 80, scrap: 40, stone: 20, planks: 20 }, // changed: +planks 20
+    costBase: { wood: 80, scrap: 40, stone: 20, planks: 20, metalParts: 10 }, // changed: +planks 20
     costGrowth: 1,
     refund: 0.5,
     maxCount: 1,
@@ -172,7 +187,7 @@ export const BUILDINGS = [
     id: 'battery',
     name: 'Battery',
     type: 'storage',
-    costBase: { wood: 40, stone: 20 },
+    costBase: { wood: 40, stone: 20, planks: 20, metalParts: 10 },
     costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
     capacityAdd: { power: 40 }, // changed: 600->40
