@@ -91,9 +91,38 @@ export function getBuildingInputs(state, building) {
  * @param {Record<string, number>} roleBonuses
  * @returns {Record<string, number>}
  */
+function getOutputCapacityFactorRates(
+  state,
+  resources,
+  outputs = {},
+  count,
+  factor,
+) {
+  let f = factor;
+  Object.entries(outputs || {}).forEach(([res, base]) => {
+    const cap = getCapacity(state, res);
+    if (!Number.isFinite(cap)) return;
+    const current = resources[res] || 0;
+    const room = cap - current;
+    if (room <= 0) {
+      f = 0;
+      return;
+    }
+    const maxGain = base * count * f;
+    if (maxGain > 0) {
+      f = Math.min(f, room / maxGain);
+    }
+  });
+  return Math.max(0, Math.min(1, f));
+}
+
 function aggregateBuildingRates(state, roleBonuses) {
   const season = getSeason(state);
   const rates = {};
+  const resources = {};
+  Object.keys(state.resources || {}).forEach((id) => {
+    resources[id] = state.resources[id]?.amount || 0;
+  });
   PRODUCTION_BUILDINGS.forEach((b) => {
     const entry = state.buildings?.[b.id];
     const count = entry?.count || 0;
@@ -102,31 +131,57 @@ function aggregateBuildingRates(state, roleBonuses) {
     let factor = 1;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
+        factor = getOutputCapacityFactorRates(
+          state,
+          resources,
+          b.outputsPerSecBase,
+          count,
+          factor,
+        );
+        if (factor <= 0) return;
         const canRun = Object.entries(b.inputsPerSecBase).every(
           ([res, base]) => {
-            const need = base * count;
-            const have = state.resources[res]?.amount || 0;
+            const need = base * count * factor;
+            const have = resources[res] || 0;
             return have >= need;
           },
         );
         if (!canRun) return;
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-          const amt = base * count;
+          const amt = base * count * factor;
           rates[res] = (rates[res] || 0) - amt;
+          resources[res] = (resources[res] || 0) - amt;
         });
       } else {
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const need = base * count;
-          const have = state.resources[res]?.amount || 0;
+          const have = resources[res] || 0;
           const ratio = need > 0 ? have / need : 1;
           factor = Math.min(factor, ratio);
         });
-        factor = Math.min(1, factor);
+        factor = getOutputCapacityFactorRates(
+          state,
+          resources,
+          b.outputsPerSecBase,
+          count,
+          factor,
+        );
+        if (factor <= 0) return;
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * factor;
           rates[res] = (rates[res] || 0) - amt;
+          resources[res] = (resources[res] || 0) - amt;
         });
       }
+    } else {
+      factor = getOutputCapacityFactorRates(
+        state,
+        resources,
+        b.outputsPerSecBase,
+        count,
+        factor,
+      );
+      if (factor <= 0) return;
     }
     if (b.outputsPerSecBase) {
       Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
@@ -139,13 +194,20 @@ function aggregateBuildingRates(state, roleBonuses) {
         const role = ROLE_BY_RESOURCE[res];
         const bonusPercent = roleBonuses[role] || 0;
         const researchBonus = getResearchOutputBonus(state, res);
-        const perSec =
+        let gain =
           base *
           mult *
           count *
           (1 + bonusPercent / 100 + researchBonus) *
           factor;
-        rates[res] = (rates[res] || 0) + perSec;
+        const cap = getCapacity(state, res);
+        if (Number.isFinite(cap)) {
+          const current = resources[res] || 0;
+          const room = cap - current;
+          gain = room > 0 ? Math.min(gain, room) : 0;
+        }
+        rates[res] = (rates[res] || 0) + gain;
+        resources[res] = (resources[res] || 0) + gain;
       });
     }
   });
