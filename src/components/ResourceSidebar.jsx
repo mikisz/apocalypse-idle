@@ -16,13 +16,25 @@ export default function ResourceSidebar() {
     <div className="border border-border rounded-xl overflow-hidden bg-card">
       {sections.map((g, i) =>
         g.settlers ? (
-          <SettlerSection key={g.title} title={g.title} info={settlersInfo} noBottomBorder={i === sections.length - 1} />
+          <SettlerSection
+            key={g.title}
+            title={g.title}
+            info={settlersInfo}
+            noBottomBorder={i === sections.length - 1}
+          />
         ) : g.happiness ? (
-          <Accordion key={g.title} title={g.title} contentClassName="p-0" noBottomBorder={i === sections.length - 1}>
+          <Accordion
+            key={g.title}
+            title={g.title}
+            contentClassName="p-0"
+            noBottomBorder={i === sections.length - 1}
+          >
             <ul className="mt-2 px-0 space-y-3">
               <li className="flex justify-between px-0">
                 <span>👥 Settlers</span>
-                <span>{happinessInfo.total} / {happinessInfo.capacity}</span>
+                <span>
+                  {happinessInfo.total} / {happinessInfo.capacity}
+                </span>
               </li>
               <div className="border-t" />
               <li className="flex justify-between px-0">
@@ -31,11 +43,17 @@ export default function ResourceSidebar() {
               </li>
               <li className="flex justify-between px-0">
                 <span>👬 Overcrowding</span>
-                <span>{happinessInfo.overcrowding}</span>
+                <span>
+                  {happinessInfo.overcrowding >= 0 ? '+' : ''}
+                  {happinessInfo.overcrowding}
+                </span>
               </li>
               <li className="flex justify-between px-0">
                 <span>🥗 Food variety</span>
-                <span>{happinessInfo.foodVariety}</span>
+                <span>
+                  {happinessInfo.foodVariety >= 0 ? '+' : ''}
+                  {happinessInfo.foodVariety}
+                </span>
               </li>
             </ul>
           </Accordion>
