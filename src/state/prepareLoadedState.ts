@@ -34,6 +34,13 @@ export function prepareLoadedState(loaded: any) {
     }));
   }
   base.colony = { ...base.colony, ...cloned.colony };
+  base.powerStatus = {
+    supply: 0,
+    demand: 0,
+    stored: 0,
+    capacity: 0,
+    ...cloned.powerStatus,
+  };
   if (Array.isArray(cloned.log)) {
     base.log = [...cloned.log];
   }
