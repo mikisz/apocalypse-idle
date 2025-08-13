@@ -265,12 +265,14 @@ function buildResourceGroups(state, netRates, prodRates) {
     const discovered = state.resources[r.id]?.discovered;
     if (rateInfo.perSec !== 0 || amount > 0 || discovered) {
       if (!groups[r.category]) groups[r.category] = [];
+      const capped = capacity != null && amount >= capacity;
       groups[r.category].push({
         id: r.id,
         name: r.name,
         icon: r.icon,
         amount,
         capacity,
+        capped,
         rate: rateInfo.label,
         tooltip:
           r.id === 'power'

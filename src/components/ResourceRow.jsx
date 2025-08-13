@@ -7,6 +7,7 @@ export default function ResourceRow({
   name,
   amount,
   capacity,
+  capped,
   rate,
   tooltip,
 }) {
@@ -17,7 +18,7 @@ export default function ResourceRow({
         <span>{name}</span>
       </span>
       <span className="flex flex-col items-end">
-        <span>
+        <span className={capped ? 'text-orange-500' : undefined}>
           {formatAmount(amount)}
           {capacity != null && ` / ${formatAmount(capacity)}`}
         </span>

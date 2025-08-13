@@ -10,6 +10,25 @@ import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { clampResource } from './resources.js';
 import { setPowerStatus } from './powerHandling.js';
 
+function getOutputCapacityFactor(state, resources, outputs = {}, count, seconds) {
+  let f = 1;
+  Object.entries(outputs).forEach(([res, base]) => {
+    const capacity = getCapacity(state, res);
+    if (!Number.isFinite(capacity)) return;
+    const current = resources[res]?.amount || 0;
+    const room = capacity - current;
+    if (room <= 0) {
+      f = 0;
+      return;
+    }
+    const maxGain = base * count * seconds;
+    if (maxGain > 0) {
+      f = Math.min(f, room / maxGain);
+    }
+  });
+  return Math.max(0, Math.min(1, f));
+}
+
 export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
   const resources = { ...state.resources };
@@ -21,10 +40,18 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     let powerShortage = false;
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
+        const capFactor = getOutputCapacityFactor(
+          state,
+          resources,
+          b.outputsPerSecBase,
+          count,
+          seconds,
+        );
+        if (capFactor <= 0) return;
         let missingPower = false;
         const canRun = Object.entries(b.inputsPerSecBase).every(
           ([res, base]) => {
-            const need = base * count * seconds;
+            const need = base * count * seconds * capFactor;
             const have = resources[res]?.amount || 0;
             const enough = have >= need;
             if (res === 'power' && !enough) missingPower = true;
@@ -37,7 +64,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         }
         setPowerStatus(buildings, b.id, count, false);
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-          const amt = base * count * seconds;
+          const amt = base * count * seconds * capFactor;
           const capacity = getCapacity(state, res);
           const entryRes = resources[res] || { amount: 0, discovered: false };
           const next = clampResource(entryRes.amount - amt, capacity);
@@ -47,7 +74,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
             discovered: entryRes.discovered || next > 0,
           };
         });
-        factor = 1;
+        factor = capFactor;
       } else {
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const need = base * count * seconds;
@@ -61,6 +88,14 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         } else {
           factor = Math.min(1, factor);
         }
+        const capFactor = getOutputCapacityFactor(
+          state,
+          resources,
+          b.outputsPerSecBase,
+          count,
+          seconds,
+        );
+        factor = Math.min(factor, capFactor);
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * seconds * factor;
           const capacity = getCapacity(state, res);
@@ -74,6 +109,15 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         });
         setPowerStatus(buildings, b.id, count, powerShortage);
       }
+    } else {
+      factor = getOutputCapacityFactor(
+        state,
+        resources,
+        b.outputsPerSecBase,
+        count,
+        seconds,
+      );
+      if (factor <= 0) return;
     }
     if (b.outputsPerSecBase) {
       Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {

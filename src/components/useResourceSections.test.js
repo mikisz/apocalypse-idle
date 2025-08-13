@@ -20,4 +20,23 @@ describe('useResourceSections', () => {
     const totalRow = foodSection.items.find((i) => i.id === 'food-total');
     expect(totalRow.capacity).toBe(200 + 100); // changed: 450+150 -> 200+100
   });
+
+  test('marks resources at capacity', () => {
+    const state = {
+      resources: {
+        wood: { amount: 80, discovered: true },
+      },
+      buildings: {},
+      research: { completed: [] },
+      population: { settlers: [] },
+    };
+    const { result } = renderHook((props) => useResourceSections(props), {
+      initialProps: state,
+    });
+    const rawSection = result.current.sections.find(
+      (s) => s.title === 'Raw Materials',
+    );
+    const woodRow = rawSection.items.find((i) => i.id === 'wood');
+    expect(woodRow.capped).toBe(true);
+  });
 });
