@@ -4,11 +4,12 @@ import ResearchNode from './ResearchNode.jsx';
 import { useGame } from '../../state/useGame.tsx';
 import { RESOURCES } from '../../data/resources.js';
 
-const RESEARCH_ROWS = RESEARCH.reduce((acc, r) => {
-  acc[r.row] = acc[r.row] || [];
-  acc[r.row].push(r);
+const RESEARCH_TRACKS = RESEARCH.reduce((acc, r) => {
+  acc[r.track] = acc[r.track] || [];
+  acc[r.track].push(r);
   return acc;
 }, []);
+RESEARCH_TRACKS.forEach((track) => track.sort((a, b) => a.row - b.row));
 
 function evaluate(node, state) {
   const completed = state.research.completed || [];
@@ -59,14 +60,14 @@ export default function ResearchTree({ onStart }) {
       const toEl = nodeRefs.current[node.id];
       if (!toEl) return;
       const toRect = toEl.getBoundingClientRect();
-      const x2 = toRect.left + toRect.width / 2 - rect.left;
-      const y2 = toRect.top - rect.top;
+      const x2 = toRect.left - rect.left;
+      const y2 = toRect.top + toRect.height / 2 - rect.top;
       (node.prereqs || []).forEach((pr) => {
         const fromEl = nodeRefs.current[pr];
         if (!fromEl) return;
         const fromRect = fromEl.getBoundingClientRect();
-        const x1 = fromRect.left + fromRect.width / 2 - rect.left;
-        const y1 = fromRect.bottom - rect.top;
+        const x1 = fromRect.right - rect.left;
+        const y1 = fromRect.top + fromRect.height / 2 - rect.top;
         newLines.push({ x1, y1, x2, y2 });
       });
     });
@@ -85,7 +86,7 @@ export default function ResearchTree({ onStart }) {
   useEffect(() => {
     const el = containerRef.current;
     if (el) {
-      el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+      el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
     }
   }, []);
 
@@ -180,9 +181,9 @@ export default function ResearchTree({ onStart }) {
           />
         ))}
       </svg>
-      <div className="flex flex-col gap-8 relative z-10 p-4">
-        {RESEARCH_ROWS.map((nodes, idx) => (
-          <div key={idx} className="flex gap-8 justify-center">
+      <div className="flex flex-col gap-16 relative z-10 p-4">
+        {RESEARCH_TRACKS.map((nodes, idx) => (
+          <div key={idx} className="flex gap-8">
             {nodes.map((node) => {
               const { status } = evaluate(node, state);
               return (

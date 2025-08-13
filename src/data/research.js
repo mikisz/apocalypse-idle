@@ -15,6 +15,7 @@ export const RESEARCH = [
       resources: ['planks', 'metalParts'],
     },
     row: 0,
+    track: 0,
     effects: [],
   },
   {
@@ -27,6 +28,7 @@ export const RESEARCH = [
     prereqs: ['industry1'],
     effects: [{ category: 'WOOD', percent: 0.05, type: 'output' }],
     row: 1,
+    track: 0,
   },
   {
     id: 'salvaging1',
@@ -38,6 +40,7 @@ export const RESEARCH = [
     prereqs: ['industry1'],
     effects: [{ category: 'SCRAP', percent: 0.05, type: 'output' }],
     row: 1,
+    track: 0,
   },
   {
     id: 'logistics1',
@@ -53,6 +56,7 @@ export const RESEARCH = [
       { category: 'CONSTRUCTION_MATERIALS', percent: 0.05, type: 'storage' },
     ],
     row: 1,
+    track: 0,
   },
   {
     id: 'industry2',
@@ -65,6 +69,7 @@ export const RESEARCH = [
     milestones: { produced: { planks: 50, metalParts: 30 } },
     unlocks: { buildings: ['toolsmithy'] },
     row: 2,
+    track: 0,
     effects: [],
   },
   {
@@ -79,6 +84,7 @@ export const RESEARCH = [
       { category: 'CONSTRUCTION_MATERIALS', percent: 0.05, type: 'output' },
     ],
     row: 2,
+    track: 0,
   },
   {
     id: 'woodworking2',
@@ -96,6 +102,7 @@ export const RESEARCH = [
     ],
     effects: [{ category: 'WOOD', percent: 0.05, type: 'output' }],
     row: 3,
+    track: 0,
   },
   {
     id: 'salvaging2',
@@ -113,6 +120,7 @@ export const RESEARCH = [
     ],
     effects: [{ category: 'SCRAP', percent: 0.05, type: 'output' }],
     row: 3,
+    track: 0,
   },
   {
     id: 'logistics2',
@@ -134,6 +142,7 @@ export const RESEARCH = [
       { category: 'CONSTRUCTION_MATERIALS', percent: 0.05, type: 'storage' },
     ],
     row: 3,
+    track: 0,
   },
   // Power track
   {
@@ -151,6 +160,7 @@ export const RESEARCH = [
       categories: ['Energy'],
     },
     row: 3,
+    track: 2,
     effects: [],
   },
   {
@@ -163,6 +173,7 @@ export const RESEARCH = [
     prereqs: ['basicEnergy'],
     unlocks: { buildings: ['radio'] },
     row: 4,
+    track: 2,
     effects: [],
   },
   // Food track
@@ -176,6 +187,7 @@ export const RESEARCH = [
     prereqs: [],
     unlocks: {},
     row: 0,
+    track: 1,
     effects: [],
   },
   {
@@ -188,6 +200,7 @@ export const RESEARCH = [
     prereqs: ['food1'],
     unlocks: { buildings: ['huntersHut'], resources: ['meat'] },
     row: 1,
+    track: 1,
     effects: [],
   },
   {
@@ -200,6 +213,7 @@ export const RESEARCH = [
     prereqs: ['huntingHut'],
     effects: [{ resource: 'meat', percent: 0.04, type: 'output' }],
     row: 2,
+    track: 1,
   },
 ];
 
