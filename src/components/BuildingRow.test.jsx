@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import BuildingRow from './BuildingRow.jsx';
+import BuildingRow from './BuildingRowContainer.jsx';
 import { BUILDING_MAP } from '../data/buildings.js';
 import { GameContext } from '../state/useGame.tsx';
 import { defaultState } from '../state/defaultState.js';

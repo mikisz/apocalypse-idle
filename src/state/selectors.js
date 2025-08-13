@@ -1,4 +1,4 @@
-import { BUILDINGS, PRODUCTION_BUILDINGS } from '../data/buildings.js';
+import { BUILDINGS, PRODUCTION_BUILDINGS, getBuildingCost } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { RESEARCH_MAP } from '../data/research.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
@@ -23,6 +23,37 @@ export function getCapacity(state, resourceId) {
 export function getSettlerCapacity(state) {
   const count = state.buildings?.shelter?.count || 0;
   return Math.min(count, SHELTER_MAX);
+}
+
+export function getBuildingCostEntries(state, building) {
+  const count = state.buildings?.[building.id]?.count || 0;
+  const scaledCost = getBuildingCost(building, count);
+  return Object.entries(scaledCost);
+}
+
+export function canAffordBuilding(state, building) {
+  return getBuildingCostEntries(state, building).every(
+    ([res, amt]) => (state.resources[res]?.amount || 0) >= amt,
+  );
+}
+
+export function getBuildingOutputs(state, building) {
+  const season = getSeason(state);
+  return Object.entries(building.outputsPerSecBase || {}).map(([res, base]) => {
+    let mult;
+    if (building.seasonProfile === 'constant') mult = 1;
+    else if (typeof building.seasonProfile === 'object')
+      mult = building.seasonProfile[season.id] ?? 1;
+    else mult = getSeasonMultiplier(season, RESOURCES[res].category);
+    return { res, perSec: base * mult };
+  });
+}
+
+export function getBuildingInputs(state, building) {
+  return Object.entries(building.inputsPerSecBase || {}).map(([res, base]) => ({
+    res,
+    perSec: base,
+  }));
 }
 
 export function getResourceRates(
