@@ -9,6 +9,7 @@ import PopulationView from './views/PopulationView.jsx';
 import ResearchView from './views/ResearchView.jsx';
 import ExpeditionsView from './views/ExpeditionsView.jsx';
 import { useGame } from './state/useGame.tsx';
+import { ToastProvider, Toaster } from './components/ui/toast.tsx';
 
 function ActiveView() {
   const { state } = useGame();
@@ -26,17 +27,20 @@ function ActiveView() {
 
 export default function App() {
   return (
-    <GameProvider>
-      <div className="min-h-screen flex flex-col bg-background text-foreground">
-        <TopBar />
-        <div className="flex-1">
-          <ActiveView />
+    <ToastProvider>
+      <GameProvider>
+        <div className="min-h-screen flex flex-col bg-background text-foreground">
+          <TopBar />
+          <div className="flex-1">
+            <ActiveView />
+          </div>
+          <BottomDock />
+          <Drawer />
+          <OfflineProgressModal />
+          <CorruptSaveModal />
+          <Toaster />
         </div>
-        <BottomDock />
-        <Drawer />
-        <OfflineProgressModal />
-        <CorruptSaveModal />
-      </div>
-    </GameProvider>
+      </GameProvider>
+    </ToastProvider>
   );
 }
