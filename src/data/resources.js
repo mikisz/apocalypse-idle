@@ -56,6 +56,14 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 24, // changed: 20 -> 24
   },
+  tools: {
+    id: 'tools',
+    name: 'Tools',
+    icon: '\u{1F6E0}\uFE0F',
+    category: 'CONSTRUCTION_MATERIALS',
+    startingAmount: 0,
+    startingCapacity: 24,
+  },
   science: {
     id: 'science',
     name: 'Science',

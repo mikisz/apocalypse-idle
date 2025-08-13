@@ -51,17 +51,25 @@ describe('research engine', () => {
     }));
     let s = startResearch(state, 'industry1');
     const bonuses = computeRoleBonuses(state.population.settlers);
-    s = processResearchTick(s, 80, bonuses); // changed: 40 -> 80
+    s = processResearchTick(s, 100, bonuses);
     expect(s.research.current).not.toBe(null);
-    s = processResearchTick(s, 2, bonuses); // changed: 1 -> 2
+    s = processResearchTick(s, 10, bonuses);
     expect(s.research.current).toBe(null);
   });
 
   it('unlocks radio after industry research', () => {
     const state = deepClone(defaultState);
-    state.resources.science.amount = 300;
+    state.resources.science.amount = 1000;
     let s = startResearch(state, 'industry1');
     s = processResearchTick(s, RESEARCH_MAP['industry1'].timeSec);
+    s = startResearch(s, 'woodworking1');
+    s = processResearchTick(s, RESEARCH_MAP['woodworking1'].timeSec);
+    s = startResearch(s, 'salvaging1');
+    s = processResearchTick(s, RESEARCH_MAP['salvaging1'].timeSec);
+    s = startResearch(s, 'logistics1');
+    s = processResearchTick(s, RESEARCH_MAP['logistics1'].timeSec);
+    s = startResearch(s, 'industry2');
+    s = processResearchTick(s, RESEARCH_MAP['industry2'].timeSec);
     s = startResearch(s, 'basicEnergy');
     s = processResearchTick(s, RESEARCH_MAP['basicEnergy'].timeSec);
     s = startResearch(s, 'radio');
