@@ -3,21 +3,25 @@ import { Dispatch, SetStateAction } from 'react';
 import useGameLoop from '../../engine/useGameLoop.tsx';
 import { processTick } from '../../engine/production.js';
 import { processResearchTick } from '../../engine/research.js';
-import { getResourceRates } from '../selectors.js';
+import { getResourceRates, getCapacity } from '../selectors.js';
 import { RESOURCES } from '../../data/resources.js';
 import {
   processSettlersTick,
   computeRoleBonuses,
 } from '../../engine/settlers.js';
+import { clampResource } from '../../engine/resources.js';
 import { updateRadio } from '../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../engine/time.js';
 
 export function applyProduction(prev: any, dt: number) {
   const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
   const productionBonuses = { ...roleBonuses };
+  const farmerBonus = productionBonuses.farmer || 0;
   delete productionBonuses.farmer;
+
   const afterTick = processTick(prev, dt, productionBonuses);
   const withResearch = processResearchTick(afterTick, dt, roleBonuses);
+
   const rates = getResourceRates(withResearch);
   let totalFoodProdBase = 0;
   Object.keys(RESOURCES).forEach((id) => {
@@ -25,19 +29,38 @@ export function applyProduction(prev: any, dt: number) {
       totalFoodProdBase += rates[id]?.perSec || 0;
     }
   });
-  const bonusFoodPerSec =
-    totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
-  return { state: withResearch, roleBonuses, bonusFoodPerSec };
+  const bonusFoodPerSec = totalFoodProdBase * (farmerBonus / 100);
+
+  let state = withResearch;
+  if (bonusFoodPerSec) {
+    const capacity = getCapacity(withResearch, 'potatoes');
+    const currentEntry = withResearch.resources?.potatoes || {
+      amount: 0,
+      discovered: false,
+      produced: 0,
+    };
+    const nextAmount = clampResource(
+      currentEntry.amount + bonusFoodPerSec * dt,
+      capacity,
+    );
+    state = {
+      ...withResearch,
+      resources: {
+        ...withResearch.resources,
+        potatoes: {
+          ...currentEntry,
+          amount: nextAmount,
+          discovered: currentEntry.discovered || nextAmount > 0,
+        },
+      },
+    };
+  }
+
+  return { state, roleBonuses, bonusFoodPerSec };
 }
 
-export function applySettlers(
-  state: any,
-  dt: number,
-  bonusFoodPerSec: number,
-  roleBonuses: any,
-  rng = Math.random,
-) {
-  return processSettlersTick(state, dt, bonusFoodPerSec, rng, roleBonuses);
+export function applySettlers(state: any, dt: number, rng = Math.random) {
+  return processSettlersTick(state, dt, 0, rng, null);
 }
 
 export function applyYearUpdate(state: any, dt: number, telemetry: any) {
@@ -75,18 +98,17 @@ export function applyYearUpdate(state: any, dt: number, telemetry: any) {
 export default function useGameTick(setState: Dispatch<SetStateAction<any>>) {
   useGameLoop((dt) => {
     setState((prev) => {
+      const { state: settlersProcessed, telemetry } = applySettlers(prev, dt);
       const {
-        state: withResearch,
-        roleBonuses,
+        state: withProduction,
         bonusFoodPerSec,
-      } = applyProduction(prev, dt);
-      const { state: settlersProcessed, telemetry } = applySettlers(
-        withResearch,
-        dt,
+      } = applyProduction(settlersProcessed, dt);
+      const updatedTelemetry = {
+        ...telemetry,
         bonusFoodPerSec,
-        roleBonuses,
-      );
-      return applyYearUpdate(settlersProcessed, dt, telemetry);
+        netFoodPerSec: (telemetry.netFoodPerSec || 0) + bonusFoodPerSec,
+      };
+      return applyYearUpdate(withProduction, dt, updatedTelemetry);
     });
   }, 1000);
 }
