@@ -6,6 +6,7 @@ import { prepareLoadedState } from './prepareLoadedState.ts';
 import useGameTick from './hooks/useGameTick.tsx';
 import useAutosave from './hooks/useAutosave.tsx';
 import useGameActions from './hooks/useGameActions.tsx';
+import useNotifications from './hooks/useNotifications.tsx';
 
 export function GameProvider({ children }) {
   const { state: loaded, error: loadErr } = loadGame();
@@ -21,6 +22,7 @@ export function GameProvider({ children }) {
 
   useGameTick(setState);
   useAutosave(state, setState);
+  useNotifications(state);
 
   const actions = useGameActions(setState, setLoadError);
 

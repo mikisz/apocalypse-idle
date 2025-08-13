@@ -5,6 +5,8 @@ import { GameProvider } from '../GameContext.jsx';
 import { useGame } from '../useGame.tsx';
 import { loadGame } from '../../engine/persistence.js';
 
+vi.mock('../hooks/useNotifications.tsx', () => ({ default: vi.fn() }));
+
 vi.mock('../../engine/persistence.js', () => ({
   saveGame: vi.fn((s) => s),
   loadGame: vi.fn(),
