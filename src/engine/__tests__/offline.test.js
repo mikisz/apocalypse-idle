@@ -7,6 +7,7 @@ vi.mock('../candidates.js', () => ({
 
 import { applyOfflineProgress } from '../offline.js';
 import { generateCandidate } from '../candidates.js';
+import { processTick } from '../production.js';
 
 describe('applyOfflineProgress', () => {
   it('uses post-production state to update radio', () => {
@@ -59,5 +60,32 @@ describe('applyOfflineProgress', () => {
     expect(next.resources.power.amount).toBe(0);
     expect(next.buildings.woodGenerator.offlineReason).toBe('resources');
     expect(gains).toEqual({});
+  });
+
+  it('updates power storage like live ticks', () => {
+    const createState = () => ({
+      buildings: {
+        woodGenerator: { count: 1 },
+        toolsmithy: { count: 1 },
+        battery: { count: 1 },
+      },
+      resources: {
+        wood: { amount: 100 },
+        planks: { amount: 100 },
+        metalParts: { amount: 100 },
+        power: { amount: 0 },
+        tools: { amount: 0 },
+      },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0, starvationTimerSeconds: 0 },
+    });
+    const seconds = 10;
+    const { state: offline } = applyOfflineProgress(createState(), seconds);
+    let online = createState();
+    for (let i = 0; i < seconds; i += 1) {
+      online = processTick(online, 1);
+    }
+    expect(offline.resources.power).toEqual(online.resources.power);
+    expect(offline.powerStatus).toEqual(online.powerStatus);
   });
 });
