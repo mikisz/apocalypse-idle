@@ -1,8 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { saveGame } from '../../engine/persistence.js';
+import type { GameState } from '../useGame.ts';
 
-export default function useAutosave(state: any, setState: any) {
-  const stateRef = useRef(state);
+export default function useAutosave(
+  state: GameState,
+  setState: Dispatch<SetStateAction<GameState>>,
+): void {
+  const stateRef = useRef<GameState>(state);
   useEffect(() => {
     stateRef.current = state;
   }, [state]);

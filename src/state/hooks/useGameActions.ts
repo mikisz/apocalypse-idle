@@ -1,18 +1,30 @@
-import { useCallback } from 'react';
+import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import { ROLE_BUILDINGS } from '../../data/roles.js';
 import { createLogEntry } from '../../utils/log.js';
 import { startResearch, cancelResearch } from '../../engine/research.js';
 import { loadGame, deleteSave, saveGame } from '../../engine/persistence.js';
 import { defaultState } from '../defaultState.js';
 import { prepareLoadedState } from '../prepareLoadedState.ts';
+import type { GameState } from '../useGame.ts';
+
+export interface GameActions {
+  setActiveTab: (tab: string) => void;
+  toggleDrawer: () => void;
+  setSettlerRole: (id: string, role: string | null) => void;
+  beginResearch: (id: string) => void;
+  abortResearch: () => void;
+  dismissOfflineModal: () => void;
+  retryLoad: () => void;
+  resetGame: () => void;
+}
 
 export default function useGameActions(
-  setState: any,
+  setState: Dispatch<SetStateAction<GameState>>,
   setLoadError: (err: boolean) => void,
-) {
+): GameActions {
   const setActiveTab = useCallback(
     (tab: string) => {
-      setState((prev: any) => ({
+      setState((prev: GameState) => ({
         ...prev,
         ui: { ...prev.ui, activeTab: tab },
       }));
@@ -21,7 +33,7 @@ export default function useGameActions(
   );
 
   const toggleDrawer = useCallback(() => {
-    setState((prev: any) => ({
+    setState((prev: GameState) => ({
       ...prev,
       ui: { ...prev.ui, drawerOpen: !prev.ui.drawerOpen },
     }));
@@ -29,25 +41,29 @@ export default function useGameActions(
 
   const setSettlerRole = useCallback(
     (id: string, role: string | null) => {
-      setState((prev: any) => {
-        const settler = prev.population.settlers.find((s: any) => s.id === id);
+      setState((prev: GameState) => {
+        const settler = prev.population.settlers.find((s) => s.id === id);
         if (!settler) return prev;
         const normalized = role === 'idle' ? null : role;
         if (normalized) {
           const building =
-            ROLE_BUILDINGS[normalized as keyof typeof ROLE_BUILDINGS];
-          const count = prev.buildings?.[building]?.count || 0;
+            ROLE_BUILDINGS[normalized as keyof typeof ROLE_BUILDINGS] as keyof GameState['buildings'];
+          const count = prev.buildings[building]?.count || 0;
           if (count <= 0) return prev;
         }
-        const settlers = prev.population.settlers.map((s: any) =>
+        const settlers = prev.population.settlers.map((s) =>
           s.id === id ? { ...s, role: normalized } : s,
-        );
+        ) as GameState['population']['settlers'];
         const roleName = normalized ?? 'idle';
         const entry = createLogEntry(
           `${settler.firstName} ${settler.lastName} is now ${roleName}`,
         );
         const log = [entry, ...prev.log].slice(0, 100);
-        return { ...prev, population: { ...prev.population, settlers }, log };
+        return {
+          ...prev,
+          population: { ...prev.population, settlers },
+          log,
+        } as GameState;
       });
     },
     [setState],
@@ -55,17 +71,17 @@ export default function useGameActions(
 
   const beginResearch = useCallback(
     (id: string) => {
-      setState((prev: any) => startResearch(prev, id));
+      setState((prev: GameState) => startResearch(prev, id));
     },
     [setState],
   );
 
   const abortResearch = useCallback(() => {
-    setState((prev: any) => cancelResearch(prev));
+    setState((prev: GameState) => cancelResearch(prev));
   }, [setState]);
 
   const dismissOfflineModal = useCallback(() => {
-    setState((prev: any) => ({
+    setState((prev: GameState) => ({
       ...prev,
       ui: { ...prev.ui, offlineProgress: null },
     }));
