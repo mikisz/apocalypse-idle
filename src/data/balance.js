@@ -8,13 +8,14 @@ export const BALANCE = {
   HAPPINESS_OVERCR_PENALTY_PER: 5,
 };
 
+export const ROLE_LINE_BONUS_CAP = 0.3; // added cap per line
+
 export function XP_TIME_TO_NEXT_LEVEL_SECONDS(level) {
-  return Math.round(15 * Math.pow(1.8, level - 1));
+  return Math.round(22.5 * Math.pow(1.8, level - 1)); // changed: 15 -> 22.5
 }
 
 export function ROLE_BONUS_PER_SETTLER(level) {
-  if (level <= 10) return 0.02 * level; // changed: 0.1*level→0.02*level
-  return 0.2 + 0.01 * (level - 10); // changed: 1+0.05*(level-10)→0.2+0.01*(level-10)
+  return Math.min(0.005 * level, 0.025); // changed: 0.02*level→min(0.005*level,0.025)
 }
 
 export function FOOD_VARIETY_BONUS(count) {

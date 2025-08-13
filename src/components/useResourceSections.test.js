@@ -18,6 +18,6 @@ describe('useResourceSections', () => {
     });
     const foodSection = result.current.sections.find((s) => s.title === 'Food');
     const totalRow = foodSection.items.find((i) => i.id === 'food-total');
-    expect(totalRow.capacity).toBe(450 + 150);
+    expect(totalRow.capacity).toBe(200 + 100); // changed: 450+150 -> 200+100
   });
 });

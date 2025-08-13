@@ -32,7 +32,7 @@ describe('BuildingRow', () => {
     );
 
     expect(screen.getByText('Increase:')).toBeTruthy();
-    expect(screen.getByText(/🍖 \+150 Meat capacity/)).toBeTruthy();
-    expect(screen.getByText(/🥔 \+300 Potatoes capacity/)).toBeTruthy();
+    expect(screen.getByText(/🍖 \+75 Meat capacity/)).toBeTruthy(); // changed: 150 -> 75
+    expect(screen.getByText(/🥔 \+150 Potatoes capacity/)).toBeTruthy(); // changed: 300 -> 150
   });
 });
