@@ -1,16 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { setPowerStatus } from '../powerHandling.js';
+import { setOfflineReason } from '../powerHandling.js';
 
-describe('setPowerStatus', () => {
+describe('setOfflineReason', () => {
   it('marks building offline on power shortage', () => {
     const buildings = {};
-    setPowerStatus(buildings, 'radio', 1, true);
+    setOfflineReason(buildings, 'radio', 1, 'power');
     expect(buildings.radio.offlineReason).toBe('power');
   });
 
-  it('clears offline flag when power is restored', () => {
+  it('marks building offline on resource shortage', () => {
+    const buildings = {};
+    setOfflineReason(buildings, 'sawmill', 1, 'resources');
+    expect(buildings.sawmill.offlineReason).toBe('resources');
+  });
+
+  it('clears offline flag when shortage is resolved', () => {
     const buildings = { radio: { count: 1, offlineReason: 'power' } };
-    setPowerStatus(buildings, 'radio', 1, false);
+    setOfflineReason(buildings, 'radio', 1, null);
     expect(buildings.radio.offlineReason).toBeUndefined();
   });
 });

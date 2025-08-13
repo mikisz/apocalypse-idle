@@ -1,10 +1,12 @@
-export function setPowerStatus(buildings, id, count, shortage) {
+export function setOfflineReason(buildings, id, count, reason) {
   const entry = buildings[id] || { count };
-  if (shortage) {
-    buildings[id] = { ...entry, offlineReason: 'power' };
+  if (reason) {
+    buildings[id] = { ...entry, offlineReason: reason };
   } else if (entry.offlineReason) {
     const copy = { ...entry };
     delete copy.offlineReason;
     buildings[id] = copy;
+  } else if (!buildings[id]) {
+    buildings[id] = entry;
   }
 }

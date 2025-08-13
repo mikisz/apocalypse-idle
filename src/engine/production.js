@@ -8,7 +8,8 @@ import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
 import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
 import { clampResource } from './resources.js';
-import { setPowerStatus } from './powerHandling.js';
+import { setOfflineReason } from './powerHandling.js';
+import { getTypeOrderIndex } from './power.js';
 
 function getOutputCapacityFactor(state, resources, outputs = {}, count, seconds) {
   let f = 1;
@@ -33,92 +34,68 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
   const resources = { ...state.resources };
   const buildings = { ...state.buildings };
-  PRODUCTION_BUILDINGS.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
-    if (count <= 0) return;
-    let factor = 1;
-    let powerShortage = false;
-    if (b.inputsPerSecBase) {
-      if (b.type === 'processing') {
-        const capFactor = getOutputCapacityFactor(
-          state,
-          resources,
-          b.outputsPerSecBase,
-          count,
-          seconds,
-        );
-        if (capFactor <= 0) return;
-        let missingPower = false;
-        const canRun = Object.entries(b.inputsPerSecBase).every(
-          ([res, base]) => {
-            const need = base * count * seconds * capFactor;
-            const have = resources[res]?.amount || 0;
-            const enough = have >= need;
-            if (res === 'power' && !enough) missingPower = true;
-            return enough;
-          },
-        );
-        if (!canRun) {
-          setPowerStatus(buildings, b.id, count, missingPower);
-          return;
-        }
-        setPowerStatus(buildings, b.id, count, false);
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-          const amt = base * count * seconds * capFactor;
-          const capacity = getCapacity(state, res);
-          const entryRes = resources[res] || { amount: 0, discovered: false };
-          const next = clampResource(entryRes.amount - amt, capacity);
-          resources[res] = {
-            ...entryRes,
-            amount: next,
-            discovered: entryRes.discovered || next > 0,
-          };
-        });
-        factor = capFactor;
-      } else {
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-          const need = base * count * seconds;
-          const have = resources[res]?.amount || 0;
-          const ratio = need > 0 ? have / need : 1;
-          if (res === 'power' && ratio < 1) powerShortage = true;
-          factor = Math.min(factor, ratio);
-        });
-        if (b.inputsPerSecBase.power && powerShortage) {
-          factor = 0;
-        } else {
-          factor = Math.min(1, factor);
-        }
-        const capFactor = getOutputCapacityFactor(
-          state,
-          resources,
-          b.outputsPerSecBase,
-          count,
-          seconds,
-        );
-        factor = Math.min(factor, capFactor);
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-          const amt = base * count * seconds * factor;
-          const capacity = getCapacity(state, res);
-          const entryRes = resources[res] || { amount: 0, discovered: false };
-          const next = clampResource(entryRes.amount - amt, capacity);
-          resources[res] = {
-            ...entryRes,
-            amount: next,
-            discovered: entryRes.discovered || next > 0,
-          };
-        });
-        setPowerStatus(buildings, b.id, count, powerShortage);
-      }
-    } else {
-      factor = getOutputCapacityFactor(
-        state,
-        resources,
-        b.outputsPerSecBase,
-        count,
-        seconds,
-      );
-      if (factor <= 0) return;
+
+  const active = PRODUCTION_BUILDINGS.filter((b) => {
+    const entry = state.buildings?.[b.id];
+    const count = entry?.count || 0;
+    const on = entry?.isDesiredOn !== false;
+    if (count <= 0 || !on) {
+      if (count > 0) setOfflineReason(buildings, b.id, count, null);
+      return false;
     }
+    return true;
+  });
+
+  const powerOrder = state.powerTypeOrder || [];
+  const consumers = active
+    .filter((b) => b.inputsPerSecBase?.power)
+    .sort(
+      (a, b) =>
+        getTypeOrderIndex(a.id, powerOrder) -
+        getTypeOrderIndex(b.id, powerOrder),
+    );
+  const nonConsumers = active.filter((b) => !b.inputsPerSecBase?.power);
+
+  const process = (b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    setOfflineReason(buildings, b.id, count, null);
+
+    const capFactor = getOutputCapacityFactor(
+      state,
+      resources,
+      b.outputsPerSecBase,
+      count,
+      seconds,
+    );
+    if (capFactor <= 0) return;
+
+    if (b.inputsPerSecBase) {
+      let shortage = null;
+      for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
+        const need = base * count * seconds * capFactor;
+        const have = resources[res]?.amount || 0;
+        if (have < need) {
+          shortage = res === 'power' ? 'power' : 'resources';
+          break;
+        }
+      }
+      if (shortage) {
+        setOfflineReason(buildings, b.id, count, shortage);
+        return;
+      }
+      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        const amt = base * count * seconds * capFactor;
+        const capacity = getCapacity(state, res);
+        const entryRes = resources[res] || { amount: 0, discovered: false };
+        const next = clampResource(entryRes.amount - amt, capacity);
+        resources[res] = {
+          ...entryRes,
+          amount: next,
+          discovered: entryRes.discovered || next > 0,
+        };
+      });
+    }
+
     if (b.outputsPerSecBase) {
       Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
         const category = RESOURCES[res].category;
@@ -136,7 +113,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
           count *
           (1 + bonusPercent / 100 + researchBonus) *
           seconds *
-          factor;
+          capFactor;
         const capacity = getCapacity(state, res);
         const currentEntry = resources[res] || { amount: 0, discovered: false };
         const next = clampResource(currentEntry.amount + gain, capacity);
@@ -147,7 +124,10 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         };
       });
     }
-  });
+  };
+
+  nonConsumers.forEach(process);
+  consumers.forEach(process);
   Object.keys(resources).forEach((res) => {
     const entry = resources[res];
     if (entry.amount > 0) entry.discovered = true;
