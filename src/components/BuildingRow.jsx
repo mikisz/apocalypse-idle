@@ -135,19 +135,24 @@ export default function BuildingRow({ building, completedResearch }) {
       </div>
       <div className="space-y-2 text-sm">
         <div>{building.description}</div>
-        <div className="grid grid-cols-2 gap-4 text-xs">
+        <div
+          className={`grid gap-4 text-xs ${
+            perOutputs.length > 0 || building.capacityAdd
+              ? 'grid-cols-2'
+              : 'grid-cols-1'
+          }`}
+        >
           <div>
             <div className="font-medium">Cost:</div>
             <div className="mt-1 flex flex-wrap gap-2">
               {costEntries.map(([res, amt]) => (
                 <span key={res} className="flex items-center gap-1">
-                  {RESOURCES[res].icon} {formatAmount(amt)}{' '}
-                  {RESOURCES[res].name}
+                  {RESOURCES[res].icon} {formatAmount(amt)} {RESOURCES[res].name}
                 </span>
               ))}
             </div>
           </div>
-          {perOutputs.length > 0 && (
+          {perOutputs.length > 0 ? (
             <div>
               <div className="font-medium">Produces:</div>
               <div className="mt-1 flex flex-wrap gap-2">
@@ -158,6 +163,19 @@ export default function BuildingRow({ building, completedResearch }) {
                 ))}
               </div>
             </div>
+          ) : (
+            building.capacityAdd && (
+              <div>
+                <div className="font-medium">Increase:</div>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {Object.entries(building.capacityAdd).map(([res, cap]) => (
+                    <span key={res} className="flex items-center gap-1">
+                      {RESOURCES[res].icon} +{formatAmount(cap)} {RESOURCES[res].name} capacity
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
           )}
         </div>
         {perInputs.map((i) => (
@@ -165,16 +183,6 @@ export default function BuildingRow({ building, completedResearch }) {
             Consumes: {formatPerSec(-i.perSec, i.res)}
           </div>
         ))}
-        {building.capacityAdd && (
-          <div className="text-xs">
-            {Object.entries(building.capacityAdd)
-              .map(
-                ([res, cap]) =>
-                  `+${formatAmount(cap)} ${RESOURCES[res].name} capacity`,
-              )
-              .join(', ')}
-          </div>
-        )}
         {!unlocked && building.requiresResearch && (
           <div className="text-xs text-red-400">
             Requires:{' '}
