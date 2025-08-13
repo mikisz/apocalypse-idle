@@ -51,9 +51,9 @@ describe('research engine', () => {
     }));
     let s = startResearch(state, 'industry1');
     const bonuses = computeRoleBonuses(state.population.settlers);
-    s = processResearchTick(s, 40, bonuses); // changed: 12→40
+    s = processResearchTick(s, 80, bonuses); // changed: 40 -> 80
     expect(s.research.current).not.toBe(null);
-    s = processResearchTick(s, 1, bonuses);
+    s = processResearchTick(s, 2, bonuses); // changed: 1 -> 2
     expect(s.research.current).toBe(null);
   });
 

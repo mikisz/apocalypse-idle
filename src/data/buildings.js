@@ -8,7 +8,7 @@ export const BUILDINGS = [
     category: 'Food',
     outputsPerSecBase: { potatoes: 0.375 },
     costBase: { wood: 17 }, // changed: 15→17
-    costGrowth: 1.13, // changed: 1.15→1.13
+    costGrowth: 1.12, // changed: 1.13 -> 1.12
     refund: 0.5,
     description: 'Reliable staple crop. Strongly affected by seasons.',
   },
@@ -18,7 +18,7 @@ export const BUILDINGS = [
     type: 'production',
     category: 'Food',
     requiresResearch: 'hunting1',
-    outputsPerSecBase: { meat: 0.19 }, // changed: 0.15→0.19
+    outputsPerSecBase: { meat: 0.22 }, // changed: 0.19 -> 0.22
     costBase: { wood: 25, scrap: 10, stone: 5 },
     costGrowth: 1.15,
     refund: 0.5,
@@ -33,7 +33,7 @@ export const BUILDINGS = [
     category: 'Raw Materials',
     outputsPerSecBase: { wood: 0.3 }, // changed: 0.25→0.3
     costBase: { scrap: 15 },
-    costGrowth: 1.13, // changed: 1.15→1.13
+    costGrowth: 1.12, // changed: 1.13 -> 1.12
     refund: 0.5,
     description: 'Steady wood income. Slight weather impact.',
   },
@@ -44,7 +44,7 @@ export const BUILDINGS = [
     category: 'Raw Materials',
     outputsPerSecBase: { scrap: 0.08 },
     costBase: { wood: 12 },
-    costGrowth: 1.13, // changed: 1.15→1.13
+    costGrowth: 1.12, // changed: 1.13 -> 1.12
     refund: 0.5,
     description: 'Collects scrap from nearby ruins.',
   },
@@ -53,9 +53,9 @@ export const BUILDINGS = [
     name: 'Quarry',
     type: 'production',
     category: 'Raw Materials',
-    outputsPerSecBase: { stone: 0.104 }, // changed: 0.08→0.104
+    outputsPerSecBase: { stone: 0.12 }, // changed: 0.104 -> 0.12
     costBase: { wood: 20, scrap: 5 },
-    costGrowth: 1.13, // changed: 1.15→1.13
+    costGrowth: 1.12, // changed: 1.13 -> 1.12
     refund: 0.5,
     description: 'Extracts stone slowly but steadily.',
   },
@@ -67,7 +67,7 @@ export const BUILDINGS = [
     requiresResearch: 'industry1',
     inputsPerSecBase: { wood: 0.8 },
     outputsPerSecBase: { planks: 0.5 },
-    costBase: { wood: 48, scrap: 18, stone: 12 }, // changed: wood 40→48, scrap 15→18, stone 10→12
+    costBase: { wood: 53, scrap: 20, stone: 13 }, // changed: wood 48 -> 53, scrap 18 -> 20, stone 12 -> 13
     costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,
     seasonProfile: 'constant',
@@ -142,9 +142,9 @@ export const BUILDINGS = [
     name: 'Granary',
     type: 'storage',
     costBase: { wood: 20, scrap: 5, stone: 5 },
-    costGrowth: 1.2, // changed: 1.15→1.2
+    costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { potatoes: 300, meat: 150 },
+    capacityAdd: { potatoes: 150, meat: 75 }, // changed: potatoes 300->150, meat 150->75
     description: 'Increases storage for harvested crops.',
   },
   {
@@ -152,9 +152,9 @@ export const BUILDINGS = [
     name: 'Warehouse',
     type: 'storage',
     costBase: { wood: 25, scrap: 10, stone: 10 },
-    costGrowth: 1.2, // changed: 1.15→1.2
+    costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { wood: 200, stone: 80, scrap: 90 }, // changed: scrap 120→90
+    capacityAdd: { wood: 120, scrap: 80, stone: 60 }, // changed: wood 200->120, scrap 90->80, stone 80->60
     description: 'Increases storage for wood, stone and scrap.',
   },
   {
@@ -163,9 +163,9 @@ export const BUILDINGS = [
     type: 'storage',
     requiresResearch: 'industry1',
     costBase: { wood: 25, scrap: 10, stone: 5 },
-    costGrowth: 1.2, // changed: 1.15→1.2
+    costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { planks: 300, metalParts: 240 }, // changed: planks 150→300, metalParts 60→240
+    capacityAdd: { planks: 100, metalParts: 40 }, // changed: planks 300->100, metalParts 240->40
     description: 'Stores processed construction materials.',
   },
   {
@@ -173,9 +173,9 @@ export const BUILDINGS = [
     name: 'Battery',
     type: 'storage',
     costBase: { wood: 40, stone: 20 },
-    costGrowth: 1.2, // changed: 1.15→1.2
+    costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { power: 600 }, // changed: 40→600
+    capacityAdd: { power: 40 }, // changed: 600->40
     requiresResearch: 'basicEnergy',
     description: 'Allows storing more generated Power.',
   },

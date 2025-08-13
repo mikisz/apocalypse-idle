@@ -72,6 +72,6 @@ describe('economy basics', () => {
     state.gameTime.seconds = SEASON_DURATION * 3;
     state.buildings.huntersHut = { count: 1 };
     const next = processTick(state, 1);
-    expect(next.resources.meat.amount).toBeCloseTo(0.19 * 0.6, 5); // changed: 0.15*0.8→0.19*0.6
+    expect(next.resources.meat.amount).toBeCloseTo(0.22 * 0.6, 5); // changed: 0.19*0.6 -> 0.22*0.6
   });
 });
