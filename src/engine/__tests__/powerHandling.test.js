@@ -19,4 +19,10 @@ describe('setOfflineReason', () => {
     setOfflineReason(buildings, 'radio', 1, null);
     expect(buildings.radio.offlineReason).toBeUndefined();
   });
+
+  it('ignores unrecognised reasons', () => {
+    const buildings = { radio: { count: 1 } };
+    setOfflineReason(buildings, 'radio', 1, 'foo');
+    expect(buildings.radio.offlineReason).toBeUndefined();
+  });
 });
