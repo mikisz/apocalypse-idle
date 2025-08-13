@@ -47,6 +47,10 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   });
 
   const powerOrder = state.powerTypeOrder || [];
+  const generators = active.filter((b) => b.outputsPerSecBase?.power);
+  const others = active.filter(
+    (b) => !b.inputsPerSecBase?.power && !b.outputsPerSecBase?.power,
+  );
   const consumers = active
     .filter((b) => b.inputsPerSecBase?.power)
     .sort(
@@ -54,12 +58,92 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         getTypeOrderIndex(a.id, powerOrder) -
         getTypeOrderIndex(b.id, powerOrder),
     );
-  const nonConsumers = active.filter((b) => !b.inputsPerSecBase?.power);
 
-  const process = (b) => {
+  let supplyTotal = 0;
+  let supplyRemaining = 0;
+
+  const runOutputs = (b, count, capFactor) => {
+    if (!b.outputsPerSecBase) return;
+    Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
+      if (res === 'power') return;
+      const category = RESOURCES[res].category;
+      let mult;
+      if (b.seasonProfile === 'constant') mult = 1;
+      else if (typeof b.seasonProfile === 'object')
+        mult = b.seasonProfile[season.id] ?? 1;
+      else mult = getSeasonMultiplier(season, category);
+      const role = ROLE_BY_RESOURCE[res];
+      const bonusPercent = roleBonuses[role] || 0;
+      const researchBonus = getResearchOutputBonus(state, res);
+      const gain =
+        base *
+        mult *
+        count *
+        (1 + bonusPercent / 100 + researchBonus) *
+        seconds *
+        capFactor;
+      const capacity = getCapacity(state, res);
+      const currentEntry = resources[res] || { amount: 0, discovered: false };
+      const next = clampResource(currentEntry.amount + gain, capacity);
+      resources[res] = {
+        amount: next,
+        discovered: currentEntry.discovered || count > 0 || next > 0,
+        produced: (currentEntry.produced || 0) + Math.max(0, gain),
+      };
+    });
+  };
+
+  const runInputs = (b, count, capFactor) => {
+    if (!b.inputsPerSecBase) return;
+    Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+      if (res === 'power') return;
+      const amt = base * count * seconds * capFactor;
+      const capacity = getCapacity(state, res);
+      const entryRes = resources[res] || { amount: 0, discovered: false };
+      const next = clampResource(entryRes.amount - amt, capacity);
+      resources[res] = {
+        ...entryRes,
+        amount: next,
+        discovered: entryRes.discovered || next > 0,
+      };
+    });
+  };
+
+  generators.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
 
+    if (b.inputsPerSecBase) {
+      for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
+        if (res === 'power') continue;
+        const need = base * count * seconds;
+        const have = resources[res]?.amount || 0;
+        if (have < need) {
+          setOfflineReason(buildings, b.id, count, 'resources');
+          return;
+        }
+      }
+      runInputs(b, count, 1);
+    }
+
+    const base = b.outputsPerSecBase?.power || 0;
+    let mult;
+    const category = RESOURCES.power.category;
+    if (b.seasonProfile === 'constant') mult = 1;
+    else if (typeof b.seasonProfile === 'object')
+      mult = b.seasonProfile[season.id] ?? 1;
+    else mult = getSeasonMultiplier(season, category);
+    const researchBonus = getResearchOutputBonus(state, 'power');
+    const gain = base * count * (1 + researchBonus) * mult * seconds;
+    supplyTotal += gain;
+    supplyRemaining += gain;
+
+    runOutputs(b, count, 1);
+  });
+
+  others.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    setOfflineReason(buildings, b.id, count, null);
     const capFactor = getOutputCapacityFactor(
       state,
       resources,
@@ -70,69 +154,81 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     if (capFactor <= 0) return;
 
     if (b.inputsPerSecBase) {
-      let shortage = null;
       for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
         const need = base * count * seconds * capFactor;
         const have = resources[res]?.amount || 0;
         if (have < need) {
-          shortage = res === 'power' ? 'power' : 'resources';
-          break;
+          setOfflineReason(buildings, b.id, count, 'resources');
+          return;
         }
       }
-      if (shortage) {
-        setOfflineReason(buildings, b.id, count, shortage);
-        return;
-      }
-      Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
-        const amt = base * count * seconds * capFactor;
-        const capacity = getCapacity(state, res);
-        const entryRes = resources[res] || { amount: 0, discovered: false };
-        const next = clampResource(entryRes.amount - amt, capacity);
-        resources[res] = {
-          ...entryRes,
-          amount: next,
-          discovered: entryRes.discovered || next > 0,
-        };
-      });
+      runInputs(b, count, capFactor);
     }
 
-    if (b.outputsPerSecBase) {
-      Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
-        const category = RESOURCES[res].category;
-        let mult;
-        if (b.seasonProfile === 'constant') mult = 1;
-        else if (typeof b.seasonProfile === 'object')
-          mult = b.seasonProfile[season.id] ?? 1;
-        else mult = getSeasonMultiplier(season, category);
-        const role = ROLE_BY_RESOURCE[res];
-        const bonusPercent = roleBonuses[role] || 0;
-        const researchBonus = getResearchOutputBonus(state, res);
-        const gain =
-          base *
-          mult *
-          count *
-          (1 + bonusPercent / 100 + researchBonus) *
-          seconds *
-          capFactor;
-        const capacity = getCapacity(state, res);
-        const currentEntry = resources[res] || { amount: 0, discovered: false };
-        const next = clampResource(currentEntry.amount + gain, capacity);
-        resources[res] = {
-          amount: next,
-          discovered: currentEntry.discovered || count > 0 || next > 0,
-          produced: (currentEntry.produced || 0) + Math.max(0, gain),
-        };
-      });
+    runOutputs(b, count, capFactor);
+  });
+
+  let stored = resources.power?.amount || 0;
+  const capacity = getCapacity(state, 'power');
+  let demandTotal = 0;
+
+  consumers.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    setOfflineReason(buildings, b.id, count, null);
+    const capFactor = getOutputCapacityFactor(
+      state,
+      resources,
+      b.outputsPerSecBase,
+      count,
+      seconds,
+    );
+    if (capFactor <= 0) return;
+
+    if (b.inputsPerSecBase) {
+      for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
+        if (res === 'power') continue;
+        const need = base * count * seconds * capFactor;
+        const have = resources[res]?.amount || 0;
+        if (have < need) {
+          setOfflineReason(buildings, b.id, count, 'resources');
+          return;
+        }
+      }
     }
+
+    const powerNeed = (b.inputsPerSecBase?.power || 0) * count * seconds * capFactor;
+    demandTotal += powerNeed;
+    let available = supplyRemaining + stored;
+    if (available >= powerNeed) {
+      if (supplyRemaining >= powerNeed) supplyRemaining -= powerNeed;
+      else {
+        const fromStored = powerNeed - supplyRemaining;
+        supplyRemaining = 0;
+        stored -= fromStored;
+      }
+      runInputs(b, count, capFactor);
+      runOutputs(b, count, capFactor);
+    } else {
+      setOfflineReason(buildings, b.id, count, 'power');
+    }
+  });
+
+  stored = clampResource(stored + supplyRemaining, capacity);
+  const powerEntry = resources.power || { amount: 0, discovered: false };
+  resources.power = {
+    ...powerEntry,
+    amount: stored,
+    discovered: powerEntry.discovered || stored > 0,
+    produced: (powerEntry.produced || 0) + Math.max(0, supplyTotal),
   };
 
-  nonConsumers.forEach(process);
-  consumers.forEach(process);
   Object.keys(resources).forEach((res) => {
     const entry = resources[res];
     if (entry.amount > 0) entry.discovered = true;
   });
-  return { ...state, resources, buildings };
+
+  const powerStatus = { supply: supplyTotal, demand: demandTotal, stored, capacity };
+  return { ...state, resources, buildings, powerStatus };
 }
 
 export function processTick(state, seconds = 1, roleBonuses = {}) {
