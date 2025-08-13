@@ -26,6 +26,17 @@ export default function BuildingRow({
     return `${sign}${Math.abs(perSec).toFixed(2)} ${RESOURCES[res].name}/s`;
   };
 
+  const columnCount =
+    1 +
+    (perOutputs.length > 0 || building.capacityAdd ? 1 : 0) +
+    (perInputs.length > 0 ? 1 : 0);
+  const gridColsClass =
+    columnCount === 3
+      ? 'grid-cols-3'
+      : columnCount === 2
+        ? 'grid-cols-2'
+        : 'grid-cols-1';
+
   return (
     <Container className="space-y-3 shadow-none">
       <div className="flex items-center justify-between">
@@ -77,16 +88,10 @@ export default function BuildingRow({
       </div>
       <div className="space-y-6 text-sm">
         <div>{building.description}</div>
-        <div
-          className={`grid gap-6 text-xs ${
-            perOutputs.length > 0 || building.capacityAdd
-              ? 'grid-cols-2'
-              : 'grid-cols-1'
-          }`}
-        >
+        <div className={`grid gap-6 text-xs ${gridColsClass}`}>
           <div>
-            <div className="font-medium">Cost:</div>
-            <div className="mt-2 flex flex-wrap gap-3">
+            <div className="text-xs font-medium">Cost:</div>
+            <div className="mt-2 flex flex-wrap gap-3 text-sm">
               {costEntries.map(([res, amt]) => (
                 <span key={res} className="flex items-center gap-1">
                   {RESOURCES[res].icon} {formatAmount(amt)}{' '}
@@ -97,8 +102,8 @@ export default function BuildingRow({
           </div>
           {perOutputs.length > 0 ? (
             <div>
-              <div className="font-medium">Produces:</div>
-              <div className="mt-2 flex flex-wrap gap-3">
+              <div className="text-xs font-medium">Produces:</div>
+              <div className="mt-2 flex flex-wrap gap-3 text-sm">
                 {perOutputs.map((o) => (
                   <span key={o.res} className="flex items-center gap-1">
                     {RESOURCES[o.res].icon} {formatPerSec(o.perSec, o.res)}
@@ -109,8 +114,8 @@ export default function BuildingRow({
           ) : (
             building.capacityAdd && (
               <div>
-                <div className="font-medium">Increase:</div>
-                <div className="mt-2 flex flex-wrap gap-3">
+                <div className="text-xs font-medium">Increase:</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-sm">
                   {Object.entries(building.capacityAdd).map(([res, cap]) => (
                     <span key={res} className="flex items-center gap-1">
                       {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
@@ -121,21 +126,25 @@ export default function BuildingRow({
               </div>
             )
           )}
+          {perInputs.length > 0 && (
+            <div>
+              <div className="text-xs font-medium">Consume:</div>
+              <div className="mt-2 flex flex-wrap gap-3 text-sm">
+                {perInputs.map((i) => (
+                  <span key={i.res} className="flex items-center gap-1">
+                    {RESOURCES[i.res].icon} {formatPerSec(-i.perSec, i.res)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        {perInputs.map((i) => (
-          <div key={`in-${i.res}`} className="text-xs mt-2">
-            Consumes: {formatPerSec(-i.perSec, i.res)}
-          </div>
-        ))}
         {!unlocked && building.requiresResearch && (
           <div className="text-xs text-red-400">
             Requires:{' '}
             {RESEARCH_MAP[building.requiresResearch]?.name ||
               building.requiresResearch}
           </div>
-        )}
-        {building.maxCount != null && (
-          <div className="text-xs">Max: {building.maxCount}</div>
         )}
         {showPowerWarning && (
           <div className="text-xs">No Power storage. Excess is lost.</div>
