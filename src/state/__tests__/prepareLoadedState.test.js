@@ -19,4 +19,10 @@ describe('prepareLoadedState', () => {
     const state = prepareLoadedState(loaded);
     expect(state.buildings.loggingCamp.isDesiredOn).toBe(true);
   });
+
+  it('preserves existing isDesiredOn flags', () => {
+    const loaded = { buildings: { loggingCamp: { count: 3, isDesiredOn: false } } };
+    const state = prepareLoadedState(loaded);
+    expect(state.buildings.loggingCamp.isDesiredOn).toBe(false);
+  });
 });
