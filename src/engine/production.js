@@ -6,10 +6,14 @@ import {
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
-import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
-import { BALANCE } from '../data/balance.js';
+import {
+  getCapacity,
+  getResearchOutputBonus,
+  getResourceRates,
+} from '../state/selectors.js';
 import { updateRadio } from './radio.js';
 import { deepClone } from '../utils/clone.ts';
+import { processSettlersTick } from './settlers.js';
 
 export function clampResource(value, capacity) {
   let v = Number.isFinite(value) ? value : 0;
@@ -142,25 +146,28 @@ export function processTick(state, seconds = 1, roleBonuses = {}) {
 }
 
 export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
-  if (elapsedSeconds <= 0) return { state, gains: {} };
+  if (elapsedSeconds <= 0) return { state, gains: {}, events: [] };
   const before = deepClone(state.resources);
-  let current = applyProduction({ ...state }, elapsedSeconds, roleBonuses);
-  const settlers =
-    state.population?.settlers?.filter((s) => !s.isDead)?.length || 0;
-  if (settlers > 0) {
-    const consumption =
-      settlers * BALANCE.FOOD_CONSUMPTION_PER_SETTLER * elapsedSeconds;
-    const cap = getCapacity(current, 'potatoes');
-    const entry = current.resources.potatoes || {
-      amount: 0,
-      discovered: false,
-    };
-    const next = clampResource(entry.amount - consumption, cap);
-    current.resources.potatoes = {
-      amount: next,
-      discovered: entry.discovered || next > 0,
-    };
-  }
+  const productionBonuses = { ...roleBonuses };
+  delete productionBonuses.farmer;
+  let current = applyProduction({ ...state }, elapsedSeconds, productionBonuses);
+  const rates = getResourceRates(current);
+  let totalFoodProdBase = 0;
+  Object.keys(RESOURCES).forEach((id) => {
+    if (RESOURCES[id].category === 'FOOD') {
+      totalFoodProdBase += rates[id]?.perSec || 0;
+    }
+  });
+  const bonusFoodPerSec =
+    totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
+  const { state: afterSettlers, events } = processSettlersTick(
+    current,
+    elapsedSeconds,
+    bonusFoodPerSec,
+    Math.random,
+    roleBonuses,
+  );
+  current = afterSettlers;
   Object.keys(current.resources).forEach((res) => {
     if (current.resources[res].amount > 0)
       current.resources[res].discovered = true;
@@ -180,6 +187,7 @@ export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
   return {
     state: current,
     gains,
+    events,
   };
 }
 

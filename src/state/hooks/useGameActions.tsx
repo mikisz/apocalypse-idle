@@ -11,6 +11,7 @@ export interface GameActions {
   setActiveTab: (tab: string) => void;
   toggleDrawer: () => void;
   setSettlerRole: (id: string, role: string | null) => void;
+  banishSettler: (id: string) => void;
   beginResearch: (id: string) => void;
   abortResearch: () => void;
   dismissOfflineModal: () => void;
@@ -70,6 +71,26 @@ export default function useGameActions(
     [setState],
   );
 
+  const banishSettler = useCallback(
+    (id: string) => {
+      setState((prev: GameState) => {
+        const settler = prev.population.settlers.find((s) => s.id === id);
+        if (!settler) return prev;
+        const settlers = prev.population.settlers.filter((s) => s.id !== id) as GameState['population']['settlers'];
+        const entry = createLogEntry(
+          `${settler.firstName} ${settler.lastName} was banished`,
+        );
+        const log = [entry, ...prev.log].slice(0, 100);
+        return {
+          ...prev,
+          population: { ...prev.population, settlers },
+          log,
+        } as GameState;
+      });
+    },
+    [setState],
+  );
+
   const beginResearch = useCallback(
     (id: string) => {
       setState((prev: GameState) => startResearch(prev, id));
@@ -114,6 +135,7 @@ export default function useGameActions(
     setActiveTab,
     toggleDrawer,
     setSettlerRole,
+     banishSettler,
     beginResearch,
     abortResearch,
     dismissOfflineModal,

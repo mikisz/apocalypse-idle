@@ -13,6 +13,7 @@ export interface GameContextValue {
   setActiveTab: (tab: string) => void;
   toggleDrawer: () => void;
   setSettlerRole: (id: string, role: string | null) => void;
+  banishSettler: (id: string) => void;
   beginResearch: (id: string) => void;
   abortResearch: () => void;
   setState: Dispatch<SetStateAction<GameState>>;

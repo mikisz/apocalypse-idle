@@ -30,6 +30,14 @@ export default function OfflineProgressModal() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1">
+            {info.deaths?.length > 0 && (
+              <div className="mb-2 space-y-1">
+                <div>The following settlers died:</div>
+                {info.deaths.map((d, i) => (
+                  <div key={i}>{d}</div>
+                ))}
+              </div>
+            )}
             {Object.entries(info.gains).map(([res, amt]) => (
               <div key={res}>
                 {res}: {Math.floor(amt)}
