@@ -180,7 +180,7 @@ export default function ResearchTree({ onStart }) {
           />
         ))}
       </svg>
-      <div className="flex flex-col gap-8 relative z-10 py-4">
+      <div className="flex flex-col gap-8 relative z-10 p-4">
         {RESEARCH_ROWS.map((nodes, idx) => (
           <div key={idx} className="flex gap-8 justify-center">
             {nodes.map((node) => {

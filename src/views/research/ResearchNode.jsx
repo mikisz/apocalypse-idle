@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Check, Info, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
@@ -11,6 +11,16 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
+
+const CATEGORY_INFO = {
+  FOOD: { name: 'Food', icon: '🍲' },
+  RAW: { name: 'Raw Materials', icon: '⚒️' },
+  CONSTRUCTION_MATERIALS: { name: 'Construction Materials', icon: '🏗️' },
+  ENERGY: { name: 'Energy', icon: '⚡' },
+  SOCIETY: { name: 'Science', icon: '📚' },
+  WOOD: { name: 'Wood', icon: RESOURCES.wood.icon },
+  SCRAP: { name: 'Scrap', icon: RESOURCES.scrap.icon },
+};
 
 function buildDetails(node) {
   const sections = [];
@@ -24,14 +34,22 @@ function buildDetails(node) {
     });
   }
   if (node.unlocks?.categories?.length) {
+    const names = node.unlocks.categories
+      .map((c) => CATEGORY_INFO[c]?.name || c.replaceAll('_', ' '))
+      .join(', ');
     sections.push({
       title: 'New resource category:',
-      content: node.unlocks.categories.join(', '),
+      content: names,
     });
   }
   if (node.unlocks?.resources?.length) {
     const names = node.unlocks.resources
-      .map((r) => RESOURCES[r]?.name || r)
+      .map(
+        (r) =>
+          `${RESOURCES[r]?.icon ? `${RESOURCES[r].icon} ` : ''}${
+            RESOURCES[r]?.name || r
+          }`,
+      )
       .join(', ');
     sections.push({
       title: `New resource${node.unlocks.resources.length > 1 ? 's' : ''}:`,
@@ -46,9 +64,13 @@ function buildDetails(node) {
   effs.forEach((e) => {
     if (e.percent) {
       const pct = (e.percent * 100).toFixed(0);
-      const target = e.category || e.resource;
-      if (target)
-        sections.push({ title: 'Effect:', content: `+${pct}% ${target}` });
+      const info =
+        (e.resource && RESOURCES[e.resource]) ||
+        CATEGORY_INFO[e.category] ||
+        {};
+      const name = info.name || e.resource || e.category;
+      const icon = info.icon ? `${info.icon} ` : '';
+      sections.push({ title: 'Effect:', content: `${icon}+${pct}% ${name}` });
     }
   });
   if (node.prereqs?.length) {
@@ -101,7 +123,6 @@ const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
         >
           <div className="flex items-center gap-1 font-semibold text-base">
             {node.name}
-            <Info className="w-4 h-4" />
           </div>
           <div className="text-muted-foreground">{node.shortDesc}</div>
           <div className="flex items-center gap-4 text-xs">
@@ -166,8 +187,8 @@ const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
         <div className="space-y-3 pt-2">
           {details.map((d, idx) => (
             <div key={idx} className="text-sm">
-              <p className="font-medium">{d.title}</p>
-              <div className="mt-1">{d.content}</div>
+              <p className="text-muted-foreground">{d.title}</p>
+              <div className="mt-1 text-base font-medium">{d.content}</div>
             </div>
           ))}
         </div>
