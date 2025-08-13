@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { RESEARCH, RESEARCH_MAP } from '../../data/research.js';
 import ResearchNode from './ResearchNode.jsx';
 import { useGame } from '../../state/useGame.tsx';
@@ -10,6 +10,9 @@ const RESEARCH_TRACKS = RESEARCH.reduce((acc, r) => {
   return acc;
 }, []);
 RESEARCH_TRACKS.forEach((track) => track.sort((a, b) => a.row - b.row));
+
+// Column offsets for each track to allow shifting entire tracks horizontally
+const TRACK_OFFSETS = [0, 0, 2];
 
 function evaluate(node, state) {
   const completed = state.research.completed || [];
@@ -46,42 +49,8 @@ function evaluate(node, state) {
 export default function ResearchTree({ onStart }) {
   const { state } = useGame();
   const containerRef = useRef(null);
-  const nodeRefs = useRef({});
-  const [lines, setLines] = useState([]);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0, left: 0, top: 0 });
-
-  const computeLines = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const newLines = [];
-    RESEARCH.forEach((node) => {
-      const toEl = nodeRefs.current[node.id];
-      if (!toEl) return;
-      const toRect = toEl.getBoundingClientRect();
-      const x2 = toRect.left - rect.left;
-      const y2 = toRect.top + toRect.height / 2 - rect.top;
-      (node.prereqs || []).forEach((pr) => {
-        const fromEl = nodeRefs.current[pr];
-        if (!fromEl) return;
-        const fromRect = fromEl.getBoundingClientRect();
-        const x1 = fromRect.right - rect.left;
-        const y1 = fromRect.top + fromRect.height / 2 - rect.top;
-        newLines.push({ x1, y1, x2, y2 });
-      });
-    });
-    setLines(newLines);
-  }, []);
-
-  useEffect(() => {
-    computeLines();
-  }, [computeLines, state.research]);
-
-  useEffect(() => {
-    window.addEventListener('resize', computeLines);
-    return () => window.removeEventListener('resize', computeLines);
-  }, [computeLines]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -152,35 +121,8 @@ export default function ResearchTree({ onStart }) {
   return (
     <div
       ref={containerRef}
-      onScroll={computeLines}
       className="relative h-full overflow-auto cursor-grab [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      <svg className="absolute inset-0 pointer-events-none">
-        <defs>
-          <marker
-            id="arrowhead"
-            markerWidth="6"
-            markerHeight="6"
-            refX="5"
-            refY="3"
-            orient="auto"
-          >
-            <polygon points="0 0, 6 3, 0 6" className="fill-muted-foreground" />
-          </marker>
-        </defs>
-        {lines.map((l, i) => (
-          <line
-            key={i}
-            x1={l.x1}
-            y1={l.y1}
-            x2={l.x2}
-            y2={l.y2}
-            className="stroke-muted-foreground"
-            strokeWidth="2"
-            markerEnd="url(#arrowhead)"
-          />
-        ))}
-      </svg>
       <div className="flex flex-col gap-16 relative z-10 p-4">
         {RESEARCH_TRACKS.map((nodes, idx) => {
           const cols = nodes.reduce((acc, n) => {
@@ -188,22 +130,24 @@ export default function ResearchTree({ onStart }) {
             acc[n.row].push(n);
             return acc;
           }, []);
+          const offset = TRACK_OFFSETS[idx] || 0;
+          const paddedCols = [...Array(offset).fill(null), ...cols];
           return (
             <div key={idx} className="flex gap-8 items-center">
-              {cols.map((col, cIdx) => (
+              {paddedCols.map((col, cIdx) => (
                 <div key={cIdx} className="flex flex-col gap-8 items-center">
-                  {col.map((node) => {
-                    const { status } = evaluate(node, state);
-                    return (
-                      <ResearchNode
-                        key={node.id}
-                        node={node}
-                        status={status}
-                        onStart={onStart}
-                        ref={(el) => (nodeRefs.current[node.id] = el)}
-                      />
-                    );
-                  })}
+                  {col &&
+                    col.map((node) => {
+                      const { status } = evaluate(node, state);
+                      return (
+                        <ResearchNode
+                          key={node.id}
+                          node={node}
+                          status={status}
+                          onStart={onStart}
+                        />
+                      );
+                    })}
                 </div>
               ))}
             </div>
