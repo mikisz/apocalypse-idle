@@ -25,4 +25,14 @@ describe('prepareLoadedState', () => {
     const state = prepareLoadedState(loaded);
     expect(state.buildings.loggingCamp.isDesiredOn).toBe(false);
   });
+
+  it('initializes missing powerStatus', () => {
+    const state = prepareLoadedState({});
+    expect(state.powerStatus).toEqual({
+      supply: 0,
+      demand: 0,
+      stored: 0,
+      capacity: 0,
+    });
+  });
 });
