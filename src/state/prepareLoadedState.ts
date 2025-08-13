@@ -1,7 +1,7 @@
 import { defaultState } from './defaultState.js';
 import { getYear, initSeasons, SECONDS_PER_DAY } from '../engine/time.js';
 import { computeRoleBonuses } from '../engine/settlers.js';
-import { applyOfflineProgress } from '../engine/production.js';
+import { applyOfflineProgress } from '../engine/offline.js';
 import { createLogEntry } from '../utils/log.js';
 import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';

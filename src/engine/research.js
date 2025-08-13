@@ -1,5 +1,5 @@
 import { RESEARCH_MAP } from '../data/research.js';
-import { clampResource } from './production.js';
+import { clampResource } from './resources.js';
 import { getCapacity } from '../state/selectors.js';
 
 export function startResearch(state, id) {

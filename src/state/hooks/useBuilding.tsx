@@ -7,7 +7,8 @@ import {
   canAffordBuilding,
   getCapacity,
 } from '../selectors.js';
-import { clampResource, demolishBuilding } from '../../engine/production.js';
+import { clampResource } from '../../engine/resources.js';
+import { demolishBuilding } from '../../engine/production.js';
 import { RESEARCH_MAP } from '../../data/research.js';
 
 export default function useBuilding(building: any, completedResearch: string[] = []) {

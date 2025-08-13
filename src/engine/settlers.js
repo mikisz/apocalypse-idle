@@ -6,7 +6,7 @@ import {
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
 import { getCapacity, getSettlerCapacity } from '../state/selectors.js';
-import { clampResource } from './production.js';
+import { clampResource } from './resources.js';
 import { SECONDS_PER_DAY } from './time.js';
 import { RESOURCES } from '../data/resources.js';
 import { createLogEntry } from '../utils/log.js';

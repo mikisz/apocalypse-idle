@@ -6,21 +6,9 @@ import {
 import { RESOURCES } from '../data/resources.js';
 import { ROLE_BY_RESOURCE, BUILDING_ROLES } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
-import {
-  getCapacity,
-  getResearchOutputBonus,
-  getResourceRates,
-} from '../state/selectors.js';
-import { updateRadio } from './radio.js';
-import { deepClone } from '../utils/clone.ts';
-import { processSettlersTick } from './settlers.js';
-
-export function clampResource(value, capacity) {
-  let v = Number.isFinite(value) ? value : 0;
-  const c = Number.isFinite(capacity) ? Math.max(0, capacity) : 0;
-  const result = Math.max(0, Math.min(c, v));
-  return Math.round(result * 1e6) / 1e6;
-}
+import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
+import { clampResource } from './resources.js';
+import { setPowerStatus } from './powerHandling.js';
 
 export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
@@ -43,22 +31,11 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
             return enough;
           },
         );
-        const entry = buildings[b.id] || { count };
         if (!canRun) {
-          if (missingPower)
-            buildings[b.id] = { ...entry, offlineReason: 'power' };
-          else if (entry.offlineReason) {
-            const copy = { ...entry };
-            delete copy.offlineReason;
-            buildings[b.id] = copy;
-          }
+          setPowerStatus(buildings, b.id, count, missingPower);
           return;
         }
-        if (entry.offlineReason) {
-          const copy = { ...entry };
-          delete copy.offlineReason;
-          buildings[b.id] = copy;
-        }
+        setPowerStatus(buildings, b.id, count, false);
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * seconds;
           const capacity = getCapacity(state, res);
@@ -95,14 +72,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
             discovered: entryRes.discovered || next > 0,
           };
         });
-        const entry = buildings[b.id] || { count };
-        if (powerShortage)
-          buildings[b.id] = { ...entry, offlineReason: 'power' };
-        else if (entry.offlineReason) {
-          const copy = { ...entry };
-          delete copy.offlineReason;
-          buildings[b.id] = copy;
-        }
+        setPowerStatus(buildings, b.id, count, powerShortage);
       }
     }
     if (b.outputsPerSecBase) {
@@ -143,52 +113,6 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
 
 export function processTick(state, seconds = 1, roleBonuses = {}) {
   return applyProduction(state, seconds, roleBonuses);
-}
-
-export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
-  if (elapsedSeconds <= 0) return { state, gains: {}, events: [] };
-  const before = deepClone(state.resources);
-  const productionBonuses = { ...roleBonuses };
-  delete productionBonuses.farmer;
-  let current = applyProduction({ ...state }, elapsedSeconds, productionBonuses);
-  const rates = getResourceRates(current);
-  let totalFoodProdBase = 0;
-  Object.keys(RESOURCES).forEach((id) => {
-    if (RESOURCES[id].category === 'FOOD') {
-      totalFoodProdBase += rates[id]?.perSec || 0;
-    }
-  });
-  const bonusFoodPerSec =
-    totalFoodProdBase * ((roleBonuses['farmer'] || 0) / 100);
-  const { state: afterSettlers, events } = processSettlersTick(
-    current,
-    elapsedSeconds,
-    bonusFoodPerSec,
-    Math.random,
-    roleBonuses,
-  );
-  current = afterSettlers;
-  Object.keys(current.resources).forEach((res) => {
-    if (current.resources[res].amount > 0)
-      current.resources[res].discovered = true;
-  });
-  const { candidate, radioTimer } = updateRadio(current, elapsedSeconds);
-  current = {
-    ...current,
-    population: { ...current.population, candidate },
-    colony: { ...current.colony, radioTimer },
-  };
-  const gains = {};
-  Object.keys(before).forEach((res) => {
-    const gain =
-      (current.resources[res]?.amount || 0) - (before[res]?.amount || 0);
-    if (gain > 0) gains[res] = gain;
-  });
-  return {
-    state: current,
-    gains,
-    events,
-  };
 }
 
 export function demolishBuilding(state, buildingId) {
