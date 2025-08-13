@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { Check, Info } from 'lucide-react';
+import React, { forwardRef, useEffect, useState } from 'react';
+import { Check, Info, X } from 'lucide-react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
@@ -7,40 +7,36 @@ import { formatAmount } from '../../utils/format.js';
 import { formatTime } from '../../utils/time.js';
 import { Button } from '@/components/Button';
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip';
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover';
 
-function buildTooltip(node) {
-  const lines = [];
+function buildDetails(node) {
+  const sections = [];
   if (node.unlocks?.buildings?.length) {
-    if (node.unlocks.buildings.length === 1) {
-      const b = node.unlocks.buildings[0];
-      const name = BUILDING_MAP[b]?.name || b;
-      lines.push(`New building: ${name}`);
-    } else {
-      const names = node.unlocks.buildings
-        .map((b) => BUILDING_MAP[b]?.name || b)
-        .join(', ');
-      lines.push(`New buildings: ${names}`);
-    }
+    const names = node.unlocks.buildings
+      .map((b) => BUILDING_MAP[b]?.name || b)
+      .join(', ');
+    sections.push({
+      title: `New building${node.unlocks.buildings.length > 1 ? 's' : ''}:`,
+      content: names,
+    });
   }
   if (node.unlocks?.categories?.length) {
-    lines.push(`New resource category: ${node.unlocks.categories.join(', ')}`);
+    sections.push({
+      title: 'New resource category:',
+      content: node.unlocks.categories.join(', '),
+    });
   }
   if (node.unlocks?.resources?.length) {
-    if (node.unlocks.resources.length === 1) {
-      const r = node.unlocks.resources[0];
-      const name = RESOURCES[r]?.name || r;
-      const cat = RESOURCES[r]?.category;
-      lines.push(`New ${cat ? `${cat} ` : ''}resource: ${name}`);
-    } else {
-      const names = node.unlocks.resources
-        .map((r) => RESOURCES[r]?.name || r)
-        .join(', ');
-      lines.push(`New resources: ${names}`);
-    }
+    const names = node.unlocks.resources
+      .map((r) => RESOURCES[r]?.name || r)
+      .join(', ');
+    sections.push({
+      title: `New resource${node.unlocks.resources.length > 1 ? 's' : ''}:`,
+      content: names,
+    });
   }
   const effs = Array.isArray(node.effects)
     ? node.effects
@@ -50,32 +46,50 @@ function buildTooltip(node) {
   effs.forEach((e) => {
     if (e.percent) {
       const pct = (e.percent * 100).toFixed(0);
-      if (e.category) lines.push(`+${pct}% ${e.category}`);
-      else if (e.resource) lines.push(`+${pct}% ${e.resource}`);
+      const target = e.category || e.resource;
+      if (target)
+        sections.push({ title: 'Effect:', content: `+${pct}% ${target}` });
     }
   });
   if (node.prereqs?.length) {
     const names = node.prereqs.map((id) => RESEARCH_MAP[id].name).join(', ');
-    lines.push(`Requires: ${names}`);
+    sections.push({ title: 'Requires:', content: names });
   }
   if (node.milestones?.produced) {
-    const parts = Object.entries(node.milestones.produced).map(
-      ([res, amt]) => `${RESOURCES[res]?.name || res} ≥ ${amt}`,
-    );
-    lines.push(`Milestones: ${parts.join(', ')}`);
+    const items = Object.entries(node.milestones.produced).map(([res, amt]) => (
+      <span key={res} className="flex items-center gap-1">
+        {RESOURCES[res]?.icon} {RESOURCES[res]?.name || res} ≥ {amt}
+      </span>
+    ));
+    sections.push({
+      title: 'Milestones:',
+      content: <div className="flex flex-wrap gap-2">{items}</div>,
+    });
   }
-  return lines.join('\n');
+  return sections;
 }
 
 const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
-  const tooltip = buildTooltip(node);
+  const details = buildDetails(node);
   const cost = node.cost?.science || 0;
+  const [open, setOpen] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch(window.matchMedia('(hover: none)').matches);
+  }, []);
+
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        asChild
+        onMouseEnter={() => !isTouch && setOpen(true)}
+        onMouseLeave={() => !isTouch && setOpen(false)}
+        onClick={isTouch ? () => setOpen(!open) : undefined}
+      >
         <div
           ref={ref}
-          className={`relative w-64 p-3 border rounded bg-card text-sm flex flex-col gap-2 ${
+          className={`relative w-80 min-w-[20rem] p-3 border rounded bg-card text-sm flex flex-col gap-2 ${
             status === 'completed'
               ? 'opacity-80 border-border text-muted-foreground'
               : status === 'inProgress'
@@ -103,14 +117,22 @@ const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
               variant="outline"
               size="sm"
               className="mt-1 border-blue-400 text-blue-200 hover:bg-blue-900/20"
-              onClick={() => onStart(node.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onStart(node.id);
+              }}
             >
               Start
             </Button>
           )}
           {status === 'locked' && (
             <div className="mt-1">
-              <Button variant="outline" size="sm" disabled>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                onClick={(e) => e.stopPropagation()}
+              >
                 Locked
               </Button>
             </div>
@@ -127,9 +149,30 @@ const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
             </span>
           )}
         </div>
-      </TooltipTrigger>
-      <TooltipContent>{tooltip}</TooltipContent>
-    </Tooltip>
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="center"
+        onMouseLeave={() => !isTouch && setOpen(false)}
+      >
+        {isTouch && (
+          <button
+            className="absolute right-2 top-2 rounded-md p-1 text-muted-foreground hover:text-foreground"
+            onClick={() => setOpen(false)}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+        <div className="space-y-3 pt-2">
+          {details.map((d, idx) => (
+            <div key={idx} className="text-sm">
+              <p className="font-medium">{d.title}</p>
+              <div className="mt-1">{d.content}</div>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 });
 

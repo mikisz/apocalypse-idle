@@ -84,6 +84,13 @@ export default function ResearchTree({ onStart }) {
 
   useEffect(() => {
     const el = containerRef.current;
+    if (el) {
+      el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
     if (!el) return;
     const onMouseDown = (e) => {
       if (e.button !== 0 || e.target.closest('button')) return;
@@ -108,10 +115,36 @@ export default function ResearchTree({ onStart }) {
     el.addEventListener('mousedown', onMouseDown);
     el.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 1 || e.target.closest('button')) return;
+      isDragging.current = true;
+      dragStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        left: el.scrollLeft,
+        top: el.scrollTop,
+      };
+    };
+    const onTouchMove = (e) => {
+      if (!isDragging.current || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - dragStart.current.x;
+      const dy = e.touches[0].clientY - dragStart.current.y;
+      el.scrollLeft = dragStart.current.left - dx;
+      el.scrollTop = dragStart.current.top - dy;
+    };
+    const onTouchEnd = () => {
+      isDragging.current = false;
+    };
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd);
     return () => {
       el.removeEventListener('mousedown', onMouseDown);
       el.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
 
