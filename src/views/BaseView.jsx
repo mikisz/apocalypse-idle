@@ -24,8 +24,8 @@ export default function BaseView() {
           storageBuildings={storageBuildings}
           completedResearch={completedResearch}
         />
-        <div className="border border-border rounded">
-          <Accordion title="Change Log">
+        <div className="border border-border rounded-xl overflow-hidden">
+          <Accordion title="Change Log" contentClassName="p-0" noBottomBorder={true}>
             <EventLog log={state.log} />
           </Accordion>
         </div>

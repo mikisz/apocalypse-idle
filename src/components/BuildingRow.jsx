@@ -85,7 +85,7 @@ export default function BuildingRow({ building, completedResearch }) {
       : null;
 
   return (
-    <div className="p-4 rounded-lg border border-border bg-card space-y-2">
+    <div className="p-4 rounded-lg border border-border bg-card space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg font-semibold">{building.name}</span>
@@ -133,10 +133,10 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
       </div>
-      <div className="space-y-2 text-sm">
+      <div className="space-y-6 text-sm">
         <div>{building.description}</div>
         <div
-          className={`grid gap-4 text-xs ${
+          className={`grid gap-6 text-xs ${
             perOutputs.length > 0 || building.capacityAdd
               ? 'grid-cols-2'
               : 'grid-cols-1'
@@ -144,7 +144,7 @@ export default function BuildingRow({ building, completedResearch }) {
         >
           <div>
             <div className="font-medium">Cost:</div>
-            <div className="mt-1 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-3">
               {costEntries.map(([res, amt]) => (
                 <span key={res} className="flex items-center gap-1">
                   {RESOURCES[res].icon} {formatAmount(amt)}{' '}
@@ -156,7 +156,7 @@ export default function BuildingRow({ building, completedResearch }) {
           {perOutputs.length > 0 ? (
             <div>
               <div className="font-medium">Produces:</div>
-              <div className="mt-1 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-3">
                 {perOutputs.map((o) => (
                   <span key={o.res} className="flex items-center gap-1">
                     {RESOURCES[o.res].icon} {formatPerSec(o.perSec, o.res)}
@@ -168,7 +168,7 @@ export default function BuildingRow({ building, completedResearch }) {
             building.capacityAdd && (
               <div>
                 <div className="font-medium">Increase:</div>
-                <div className="mt-1 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-3">
                   {Object.entries(building.capacityAdd).map(([res, cap]) => (
                     <span key={res} className="flex items-center gap-1">
                       {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
@@ -181,7 +181,7 @@ export default function BuildingRow({ building, completedResearch }) {
           )}
         </div>
         {perInputs.map((i) => (
-          <div key={`in-${i.res}`} className="text-xs">
+          <div key={`in-${i.res}`} className="text-xs mt-2">
             Consumes: {formatPerSec(-i.perSec, i.res)}
           </div>
         ))}

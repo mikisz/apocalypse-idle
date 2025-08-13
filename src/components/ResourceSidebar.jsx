@@ -13,31 +13,31 @@ export default function ResourceSidebar() {
   const { sections, settlersInfo, happinessInfo } = useResourceSections(state);
 
   return (
-    <div className="border border-border rounded-xl overflow-hidden bg-card space-y-2">
-      {sections.map((g) =>
+    <div className="border border-border rounded-xl overflow-hidden bg-card">
+      {sections.map((g, i) =>
         g.settlers ? (
-          <SettlerSection key={g.title} title={g.title} info={settlersInfo} />
+          <SettlerSection key={g.title} title={g.title} info={settlersInfo} noBottomBorder={i === sections.length - 1} />
         ) : g.happiness ? (
-          <Accordion key={g.title} title={g.title}>
-            <div className="space-y-1 text-sm">
-              <div>Avg Happiness: {happinessInfo.avg}%</div>
-              <div>
-                Settlers {happinessInfo.total}/{happinessInfo.capacity}
-              </div>
-              {happinessInfo.breakdown.length > 0 && (
-                <>
-                  <div className="my-1 border-b" />
-                  <ul className="space-y-0.5 text-xs">
-                    {happinessInfo.breakdown.map((b, idx) => (
-                      <li key={idx}>
-                        {b.label} {b.value >= 0 ? '+' : ''}
-                        {b.value}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
+          <Accordion key={g.title} title={g.title} contentClassName="p-0" noBottomBorder={i === sections.length - 1}>
+            <ul className="mt-2 px-0 space-y-3">
+              <li className="flex justify-between px-0">
+                <span>👥 Settlers</span>
+                <span>{happinessInfo.total} / {happinessInfo.capacity}</span>
+              </li>
+              <div className="border-t" />
+              <li className="flex justify-between px-0">
+                <span>😁 Avg. Happiness</span>
+                <span>{happinessInfo.avg}%</span>
+              </li>
+              <li className="flex justify-between px-0">
+                <span>👬 Overcrowding</span>
+                <span>{happinessInfo.overcrowding}</span>
+              </li>
+              <li className="flex justify-between px-0">
+                <span>🥗 Food variety</span>
+                <span>{happinessInfo.foodVariety}</span>
+              </li>
+            </ul>
           </Accordion>
         ) : (
           <Accordion
@@ -45,10 +45,13 @@ export default function ResourceSidebar() {
             title={g.title}
             defaultOpen={g.defaultOpen}
             contentClassName="p-0"
+            noBottomBorder={i === sections.length - 1}
           >
-            <ul className="divide-y divide-border">
+            <ul className="mt-2 space-y-3">
               {g.items.map((r) => (
-                <ResourceRow key={r.id} {...r} />
+                <li key={r.id}>
+                  <ResourceRow {...r} />
+                </li>
               ))}
             </ul>
             {g.title === 'Energy' && (
