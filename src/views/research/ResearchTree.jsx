@@ -13,6 +13,7 @@ RESEARCH_TRACKS.forEach((track) => track.sort((a, b) => a.row - b.row));
 
 // Column offsets for each track to allow shifting entire tracks horizontally
 const TRACK_OFFSETS = [0, 0, 2];
+const OFFSET_STEP_REM = 22; // width + gap of a research column
 
 function evaluate(node, state) {
   const completed = state.research.completed || [];
@@ -131,10 +132,13 @@ export default function ResearchTree({ onStart }) {
             return acc;
           }, []);
           const offset = TRACK_OFFSETS[idx] || 0;
-          const paddedCols = [...Array(offset).fill(null), ...cols];
+          const style =
+            offset > 0
+              ? { marginLeft: `${offset * OFFSET_STEP_REM}rem` }
+              : undefined;
           return (
-            <div key={idx} className="flex gap-8 items-center">
-              {paddedCols.map((col, cIdx) => (
+            <div key={idx} className="flex gap-8 items-center" style={style}>
+              {cols.map((col, cIdx) => (
                 <div key={cIdx} className="flex flex-col gap-8 items-center">
                   {col &&
                     col.map((node) => {
