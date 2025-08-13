@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import Accordion from './Accordion.jsx';
 import PowerPriorityModal from './PowerPriorityModal.jsx';
 import ResourceRow from './ResourceRow.jsx';

@@ -1,4 +1,9 @@
-import { createContext, useContext, type Dispatch, type SetStateAction } from 'react';
+import {
+  createContext,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { defaultState } from './defaultState.js';
 
 export type GameState = typeof defaultState;

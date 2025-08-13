@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import BottomDock from './BottomDock.jsx';
-import { GameContext } from '../state/useGame.ts';
+import { GameContext } from '../state/useGame.tsx';
 
 describe('BottomDock accessibility', () => {
   it('announces accessible labels for tabs', () => {

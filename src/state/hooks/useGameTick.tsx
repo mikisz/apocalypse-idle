@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dispatch, SetStateAction } from 'react';
-import useGameLoop from '../../engine/useGameLoop.ts';
+import useGameLoop from '../../engine/useGameLoop.tsx';
 import { processTick } from '../../engine/production.js';
 import { processResearchTick } from '../../engine/research.js';
 import { getResourceRates } from '../selectors.js';
@@ -74,8 +75,11 @@ export function applyYearUpdate(state: any, dt: number, telemetry: any) {
 export default function useGameTick(setState: Dispatch<SetStateAction<any>>) {
   useGameLoop((dt) => {
     setState((prev) => {
-      const { state: withResearch, roleBonuses, bonusFoodPerSec } =
-        applyProduction(prev, dt);
+      const {
+        state: withResearch,
+        roleBonuses,
+        bonusFoodPerSec,
+      } = applyProduction(prev, dt);
       const { state: settlersProcessed, telemetry } = applySettlers(
         withResearch,
         dt,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import { getBuildingCost } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { getSeason, getSeasonMultiplier } from '../engine/time.js';
@@ -147,7 +147,8 @@ export default function BuildingRow({ building, completedResearch }) {
             <div className="mt-1 flex flex-wrap gap-2">
               {costEntries.map(([res, amt]) => (
                 <span key={res} className="flex items-center gap-1">
-                  {RESOURCES[res].icon} {formatAmount(amt)} {RESOURCES[res].name}
+                  {RESOURCES[res].icon} {formatAmount(amt)}{' '}
+                  {RESOURCES[res].name}
                 </span>
               ))}
             </div>
@@ -170,7 +171,8 @@ export default function BuildingRow({ building, completedResearch }) {
                 <div className="mt-1 flex flex-wrap gap-2">
                   {Object.entries(building.capacityAdd).map(([res, cap]) => (
                     <span key={res} className="flex items-center gap-1">
-                      {RESOURCES[res].icon} +{formatAmount(cap)} {RESOURCES[res].name} capacity
+                      {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
+                      {RESOURCES[res].name} capacity
                     </span>
                   ))}
                 </div>

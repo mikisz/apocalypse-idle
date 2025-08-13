@@ -1,11 +1,11 @@
 import React from 'react';
-import { useGame } from '../state/useGame.ts';
+import { useGame } from '../state/useGame.tsx';
 import EventLog from '../components/EventLog.jsx';
 import ResourceSidebar from '../components/ResourceSidebar.jsx';
 import Accordion from '../components/Accordion.jsx';
 import CandidateBox from '../components/CandidateBox.tsx';
 import ProductionSection from '../components/ProductionSection.jsx';
-import { useBuildingGroups } from '../components/useBuildingGroups.ts';
+import { useBuildingGroups } from '../components/useBuildingGroups.tsx';
 
 export default function BaseView() {
   const { state } = useGame();
