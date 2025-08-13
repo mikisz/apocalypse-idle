@@ -25,7 +25,7 @@ export function GameProvider({ children }) {
 
   useGameTick(setState);
   useAutosave(state, setState);
-  useNotifications(state);
+  useNotifications(state, setState);
 
   const ui = useUiActions(setState);
   const population = usePopulationActions(setState);

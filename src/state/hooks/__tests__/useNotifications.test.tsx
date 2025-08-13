@@ -11,15 +11,19 @@ import useNotifications from '../useNotifications';
 import { RESEARCH_MAP } from '../../../data/research.js';
 import { RESOURCES } from '../../../data/resources.js';
 import { BUILDING_MAP } from '../../../data/buildings.js';
+import { SKILL_LABELS } from '../../../data/roles.js';
+
+const setState = vi.fn();
 
 function Wrapper({ state }: { state: any }) {
-  useNotifications(state);
+  useNotifications(state, setState);
   return null;
 }
 
 describe('useNotifications', () => {
   beforeEach(() => {
     toast.mockClear();
+    setState.mockClear();
   });
 
   it('toasts when research completes', () => {
@@ -162,5 +166,95 @@ describe('useNotifications', () => {
     const { rerender } = render(<Wrapper state={initial} />);
     rerender(<Wrapper state={offline} />);
     expect(toast).not.toHaveBeenCalled();
+  });
+
+  it('toasts when building lacks resources and dedupes', () => {
+    const initial = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: { sawmill: {} },
+    };
+    const offline = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: { sawmill: { offlineReason: 'resources' } },
+    };
+    const { rerender } = render(<Wrapper state={initial} />);
+    rerender(<Wrapper state={offline} />);
+    expect(toast).toHaveBeenCalledWith({
+      description: `Resource shortage: ${BUILDING_MAP.sawmill.name} offline`,
+    });
+    rerender(<Wrapper state={offline} />);
+    expect(toast).toHaveBeenCalledTimes(1);
+  });
+
+  it('toasts when a settler levels up a skill', () => {
+    const before = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: {
+        candidate: null,
+        settlers: [
+          {
+            id: 's1',
+            firstName: 'Ann',
+            lastName: 'Lee',
+            isDead: false,
+            skills: { scavenger: { level: 3 } },
+          },
+        ],
+      },
+      buildings: {},
+    };
+    const after = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: {
+        candidate: null,
+        settlers: [
+          {
+            id: 's1',
+            firstName: 'Ann',
+            lastName: 'Lee',
+            isDead: false,
+            skills: { scavenger: { level: 4 } },
+          },
+        ],
+      },
+      buildings: {},
+    };
+    const { rerender } = render(<Wrapper state={before} />);
+    rerender(<Wrapper state={after} />);
+    expect(toast).toHaveBeenCalledWith({
+      description: `Ann Lee reached ${SKILL_LABELS.scavenger} level 4`,
+    });
+  });
+
+  it('toasts when happiness crosses 50%', () => {
+    const high = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 60 } },
+    };
+    const low = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 45 } },
+    };
+    const { rerender } = render(<Wrapper state={high} />);
+    rerender(<Wrapper state={low} />);
+    expect(toast).toHaveBeenCalledWith({
+      description: 'Happiness dropped below 50%',
+    });
+    rerender(<Wrapper state={high} />);
+    expect(toast).toHaveBeenCalledWith({
+      description: 'Happiness increased above 50%',
+    });
   });
 });

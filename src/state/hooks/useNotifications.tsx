@@ -1,16 +1,34 @@
-import { useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
+import { SKILL_LABELS } from '../../data/roles.js';
 import { useToast } from '../../components/ui/toast.tsx';
 import { getCapacity } from '../selectors.js';
 import type { GameState } from '../useGame.tsx';
+import { createLogEntry } from '../../utils/log.js';
 
-export default function useNotifications(state: GameState): void {
+export default function useNotifications(
+  state: GameState,
+  setState: Dispatch<SetStateAction<GameState>>,
+): void {
   const prevRef = useRef<GameState>(state);
   const resourceNotified = useRef<Set<string>>(new Set());
   const powerNotified = useRef<Set<string>>(new Set());
+  const resourceShortageNotified = useRef<Set<string>>(new Set());
   const { toast } = useToast();
+
+  const addLog = (text: string): void => {
+    setState((prev) => ({
+      ...prev,
+      log: [createLogEntry(text), ...(prev.log || [])].slice(0, 100),
+    }));
+  };
 
   useEffect(() => {
     const prev = prevRef.current;
@@ -22,21 +40,45 @@ export default function useNotifications(state: GameState): void {
     ) {
       const id = prev.research.current.id;
       const name = RESEARCH_MAP[id]?.name || id;
-      toast({ description: `${name} research complete` });
+      const msg = `${name} research complete`;
+      toast({ description: msg });
+      addLog(msg);
     }
 
     if (!prev.population.candidate && state.population.candidate) {
-      toast({ description: 'New settler candidate available' });
+      const msg = 'New settler candidate available';
+      toast({ description: msg });
+      addLog(msg);
     }
 
     const prevSettlers = prev.population.settlers;
     const alivePrev = new Set(
       prevSettlers.filter((s) => !s.isDead).map((s) => s.id),
     );
+    const prevSettlerMap = new Map(prevSettlers.map((s) => [s.id, s]));
     state.population.settlers.forEach((s) => {
       if (s.isDead && alivePrev.has(s.id)) {
-        const name = s.name ? `${s.name} has died` : 'A settler has died';
+        const name = s.name
+          ? `${s.name} has died`
+          : `${s.firstName || 'A'} ${s.lastName || 'settler'} has died`;
         toast({ description: name });
+      } else {
+        const prevS = prevSettlerMap.get(s.id);
+        if (prevS) {
+          Object.entries(s.skills || {}).forEach(([skill, entry]) => {
+            const prevLvl = prevS.skills?.[skill]?.level || 0;
+            if (entry.level > prevLvl) {
+              const fullName = s.name
+                ? s.name
+                : `${s.firstName || ''} ${s.lastName || ''}`.trim() ||
+                  'A settler';
+              const skillName = SKILL_LABELS[skill] || skill;
+              const msg = `${fullName} reached ${skillName} level ${entry.level}`;
+              toast({ description: msg });
+              addLog(msg);
+            }
+          });
+        }
       }
     });
 
@@ -50,10 +92,25 @@ export default function useNotifications(state: GameState): void {
         !powerNotified.current.has(id)
       ) {
         const name = BUILDING_MAP[id]?.name || id;
-        toast({ description: `Power shortage: ${name} offline` });
+        const msg = `Power shortage: ${name} offline`;
+        toast({ description: msg });
+        addLog(msg);
         powerNotified.current.add(id);
       }
+      if (
+        currReason === 'resources' &&
+        prevReason !== 'resources' &&
+        b?.isDesiredOn !== false &&
+        !resourceShortageNotified.current.has(id)
+      ) {
+        const name = BUILDING_MAP[id]?.name || id;
+        const msg = `Resource shortage: ${name} offline`;
+        toast({ description: msg });
+        addLog(msg);
+        resourceShortageNotified.current.add(id);
+      }
       if (currReason !== 'power') powerNotified.current.delete(id);
+      if (currReason !== 'resources') resourceShortageNotified.current.delete(id);
     });
 
     Object.entries(state.resources).forEach(([id, res]) => {
@@ -66,11 +123,25 @@ export default function useNotifications(state: GameState): void {
         !resourceNotified.current.has(id)
       ) {
         const name = RESOURCES[id]?.name || id;
-        toast({ description: `${name} storage full` });
+        const msg = `${name} storage full`;
+        toast({ description: msg });
+        addLog(msg);
         resourceNotified.current.add(id);
       }
       if (currAmt < cap) resourceNotified.current.delete(id);
     });
+
+    const prevHappy = prev.colony?.happiness?.value || 0;
+    const currHappy = state.colony?.happiness?.value || 0;
+    if (prevHappy >= 50 && currHappy < 50) {
+      const msg = 'Happiness dropped below 50%';
+      toast({ description: msg });
+      addLog(msg);
+    } else if (prevHappy < 50 && currHappy >= 50) {
+      const msg = 'Happiness increased above 50%';
+      toast({ description: msg });
+      addLog(msg);
+    }
 
     prevRef.current = state;
   }, [state, toast]);
