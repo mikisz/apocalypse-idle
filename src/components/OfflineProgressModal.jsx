@@ -38,6 +38,14 @@ export default function OfflineProgressModal() {
                 ))}
               </div>
             )}
+            {info.research?.length > 0 && (
+              <div className="mb-2 space-y-1">
+                <div>Research completed:</div>
+                {info.research.map((r, i) => (
+                  <div key={i}>{r}</div>
+                ))}
+              </div>
+            )}
             {Object.entries(info.gains).map(([res, amt]) => (
               <div key={res}>
                 {res}: {Math.floor(amt)}
