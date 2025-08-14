@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ScrollArea } from './ui/scroll-area';
 import { Card, CardContent } from './ui/card';
 
@@ -22,3 +23,14 @@ export default function EventLog({ log = [] }) {
     </Card>
   );
 }
+
+EventLog.propTypes = {
+  log: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      time: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      text: PropTypes.string.isRequired,
+    }),
+  ),
+};
