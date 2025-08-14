@@ -1,6 +1,6 @@
 import { RESEARCH_MAP } from '../data/research.js';
-import { clampResource } from './resources.ts';
-import { getCapacity, invalidateCapacityCache } from '../state/capacityCache.ts';
+import { addResource, consumeResource } from './resourceOps.ts';
+import { invalidateCapacityCache } from '../state/capacityCache.ts';
 
 export function startResearch(state: any, id: string): any {
   const node = RESEARCH_MAP[id];
@@ -10,7 +10,7 @@ export function startResearch(state: any, id: string): any {
   const have = state.resources.science?.amount || 0;
   if (have < cost) return state;
   const resources = { ...state.resources };
-  resources.science = { ...resources.science, amount: have - cost };
+  consumeResource(state, resources, 'science', cost);
   const progress = { ...state.research.progress, [id]: 0 };
   return {
     ...state,
@@ -25,14 +25,7 @@ export function cancelResearch(state: any): any {
   const node = RESEARCH_MAP[current.id];
   const refund = Math.floor((node.cost?.science || 0) * 0.5);
   const resources = { ...state.resources };
-  const capacity = getCapacity(state, 'science');
-  const entry = resources.science || { amount: 0, discovered: false };
-  const nextAmt = clampResource(entry.amount + refund, capacity);
-  resources.science = {
-    ...entry,
-    amount: nextAmt,
-    discovered: entry.discovered || nextAmt > 0,
-  };
+  addResource(state, resources, 'science', refund);
   const progress = { ...state.research.progress, [current.id]: 0 };
   return {
     ...state,
