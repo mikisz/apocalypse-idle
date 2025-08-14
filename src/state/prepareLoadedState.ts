@@ -81,7 +81,6 @@ export function prepareLoadedState(loaded: any) {
     });
     const settlers = progressed.population.settlers.map((s: any) => ({
       ...s,
-      ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
     }));
     const show =
       Object.keys(gains).length > 0 ||
