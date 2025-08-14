@@ -156,6 +156,22 @@ export function validateSave(obj: any): boolean {
     Array.isArray(obj.resources)
   )
     throw new Error('Invalid save: resources must be object');
+  Object.entries(obj.resources).forEach(([id, r]: [string, any]) => {
+    if (!r || typeof r !== 'object' || Array.isArray(r))
+      throw new Error(`Invalid save: resource "${id}" must be object`);
+    if (typeof r.amount !== 'number')
+      throw new Error(
+        `Invalid save: resource "${id}" has non-numeric amount`,
+      );
+    if ('produced' in r && typeof r.produced !== 'number')
+      throw new Error(
+        `Invalid save: resource "${id}" has non-numeric produced`,
+      );
+    if ('discovered' in r && typeof r.discovered !== 'boolean')
+      throw new Error(
+        `Invalid save: resource "${id}" has invalid discovered flag`,
+      );
+  });
   if (!('buildings' in obj)) throw new Error('Invalid save: missing buildings');
   if (
     typeof obj.buildings !== 'object' ||
@@ -163,6 +179,28 @@ export function validateSave(obj: any): boolean {
     Array.isArray(obj.buildings)
   )
     throw new Error('Invalid save: buildings must be object');
+  Object.entries(obj.buildings).forEach(([id, b]: [string, any]) => {
+    if (!b || typeof b !== 'object' || Array.isArray(b))
+      throw new Error(`Invalid save: building "${id}" must be object`);
+    if (typeof b.count !== 'number')
+      throw new Error(
+        `Invalid save: building "${id}" has non-numeric count`,
+      );
+    if ('isDesiredOn' in b) {
+      if (typeof b.isDesiredOn !== 'boolean')
+        throw new Error(
+          `Invalid save: building "${id}" has invalid isDesiredOn flag`,
+        );
+    } else if (obj.version >= 7) {
+      throw new Error(
+        `Invalid save: building "${id}" missing isDesiredOn flag`,
+      );
+    }
+    if ('offlineReason' in b && typeof b.offlineReason !== 'string')
+      throw new Error(
+        `Invalid save: building "${id}" has invalid offlineReason`,
+      );
+  });
   if (!('population' in obj))
     throw new Error('Invalid save: missing population');
   if (
@@ -215,15 +253,6 @@ export function validateSave(obj: any): boolean {
       if (!('colony' in obj) || typeof obj.colony !== 'object')
         throw new Error('Invalid save: missing colony');
     }
-    if (
-      obj.version >= 7 &&
-      !Object.values(obj.buildings).every(
-        (b) => b && typeof b === 'object' && typeof b.isDesiredOn === 'boolean',
-      )
-    )
-      throw new Error(
-        'Invalid save: building entries must include isDesiredOn flag',
-      );
   }
   return true;
 }
