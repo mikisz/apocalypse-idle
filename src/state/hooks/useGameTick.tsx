@@ -12,8 +12,7 @@ import {
 import { updateRadio } from '../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../engine/time.js';
 
-export function applyProduction(prev: any, dt: number) {
-  const roleBonuses = computeRoleBonuses(prev.population?.settlers || []);
+export function applyProduction(prev: any, dt: number, roleBonuses: any) {
   const productionBonuses = { ...roleBonuses };
   const farmerBonus = productionBonuses.farmer || 0;
   delete productionBonuses.farmer;
@@ -62,7 +61,9 @@ export function applyProduction(prev: any, dt: number) {
 }
 
 export function applySettlers(state: any, dt: number, rng = Math.random) {
-  return processSettlersTick(state, dt, 0, rng, null);
+  const roleBonuses = computeRoleBonuses(state.population?.settlers || []);
+  const result = processSettlersTick(state, dt, 0, rng, roleBonuses);
+  return { ...result, roleBonuses };
 }
 
 export function applyYearUpdate(state: any, dt: number, telemetry: any) {
@@ -100,11 +101,15 @@ export function applyYearUpdate(state: any, dt: number, telemetry: any) {
 export default function useGameTick(setState: Dispatch<SetStateAction<any>>) {
   useGameLoop((dt) => {
     setState((prev) => {
-      const { state: settlersProcessed, telemetry } = applySettlers(prev, dt);
+      const {
+        state: settlersProcessed,
+        telemetry,
+        roleBonuses,
+      } = applySettlers(prev, dt);
       const {
         state: withProduction,
         bonusFoodPerSec,
-      } = applyProduction(settlersProcessed, dt);
+      } = applyProduction(settlersProcessed, dt, roleBonuses);
       const updatedTelemetry = {
         ...telemetry,
         bonusFoodPerSec,
