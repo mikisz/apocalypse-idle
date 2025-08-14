@@ -1,6 +1,6 @@
 import { RESEARCH_MAP } from '../data/research.js';
 import { clampResource } from './resources.ts';
-import { getCapacity } from '../state/selectors.js';
+import { getCapacity, invalidateCapacityCache } from '../state/capacityCache.ts';
 
 export function startResearch(state: any, id: string): any {
   const node = RESEARCH_MAP[id];
@@ -66,11 +66,16 @@ export function processResearchTick(
         resources[resId] = { ...entry, discovered: true };
       });
     }
-    return {
+    const nextState = {
       ...state,
       resources,
       research: { current: null, completed, progress },
     };
+    const effects = Array.isArray(node.effects) ? node.effects : [node.effects];
+    if (effects.some((e: any) => e.type === 'storage')) {
+      invalidateCapacityCache();
+    }
+    return nextState;
   }
   return { ...state, research: { ...state.research, progress, current } };
 }

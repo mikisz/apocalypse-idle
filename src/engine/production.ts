@@ -11,11 +11,13 @@ import {
   ROLE_BUILDINGS,
 } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.ts';
+import { getResearchOutputBonus } from '../state/selectors.js';
 import {
   getCapacity,
   calculateFoodCapacity,
-  getResearchOutputBonus,
-} from '../state/selectors.js';
+  ensureCapacityCache,
+  invalidateCapacityCache,
+} from '../state/capacityCache.ts';
 import { clampResource } from './resources.ts';
 import { setOfflineReason } from './powerHandling.ts';
 import { getTypeOrderIndex } from './power.ts';
@@ -61,6 +63,7 @@ export function applyProduction(
   seconds: number = 1,
   roleBonuses: Record<string, number> = {},
 ): any {
+  ensureCapacityCache(state);
   const season = getSeason(state);
   const resources = { ...state.resources };
   const buildings = { ...state.buildings };
@@ -310,6 +313,7 @@ export function processTick(
 }
 
 export function buildBuilding(state: any, buildingId: string): any {
+  invalidateCapacityCache();
   const blueprint = BUILDING_MAP[buildingId];
   if (!blueprint) return state;
   const count = state.buildings?.[buildingId]?.count || 0;
@@ -331,27 +335,29 @@ export function buildBuilding(state: any, buildingId: string): any {
     ...state.buildings,
     [buildingId]: { count: count + 1 },
   };
+  const newState = { ...state, buildings };
+  ensureCapacityCache(newState);
   Object.keys(resources).forEach((res) => {
-    const cap = getCapacity({ ...state, buildings }, res);
+    const cap = getCapacity(newState, res);
     const entry = resources[res];
     entry.amount = clampResource(entry.amount, cap);
     if (entry.amount > 0) entry.discovered = true;
   });
   let foodPool = state.foodPool;
   if (blueprint.capacityAdd?.FOOD) {
-    const capacity = (foodPool?.capacity || 0) + blueprint.capacityAdd.FOOD;
+    const capacity = calculateFoodCapacity(newState);
     const amount = Math.min(foodPool?.amount || 0, capacity);
     foodPool = { amount, capacity };
   }
   return {
-    ...state,
+    ...newState,
     resources,
-    buildings,
     ...(foodPool ? { foodPool } : {}),
   };
 }
 
 export function demolishBuilding(state: any, buildingId: string): any {
+  invalidateCapacityCache();
   const blueprint = BUILDING_MAP[buildingId];
   const count = state.buildings?.[buildingId]?.count || 0;
   if (!blueprint || count <= 0) return state;
@@ -359,9 +365,11 @@ export function demolishBuilding(state: any, buildingId: string): any {
   const refundRate = blueprint.refund ?? 0;
   const buildings = { ...state.buildings, [buildingId]: { count: count - 1 } };
   const resources = { ...state.resources };
+  const newState = { ...state, buildings };
+  ensureCapacityCache(newState);
   Object.entries(prevCost).forEach(([res, amt]) => {
     const refund = Math.floor(amt * refundRate);
-    const capacity = getCapacity({ ...state, buildings }, res);
+    const capacity = getCapacity(newState, res);
     const currentEntry = resources[res] || { amount: 0, discovered: false };
     const next = clampResource(currentEntry.amount + refund, capacity);
     resources[res] = {
@@ -371,7 +379,7 @@ export function demolishBuilding(state: any, buildingId: string): any {
     };
   });
   Object.keys(resources).forEach((res) => {
-    const capacity = getCapacity({ ...state, buildings }, res);
+    const capacity = getCapacity(newState, res);
     const entry = resources[res];
     entry.amount = clampResource(entry.amount, capacity);
     if (entry.amount > 0) entry.discovered = true;
@@ -389,17 +397,13 @@ export function demolishBuilding(state: any, buildingId: string): any {
   }
   let foodPool = state.foodPool;
   if (blueprint.capacityAdd?.FOOD) {
-    const capacity = Math.max(
-      0,
-      (foodPool?.capacity || 0) - blueprint.capacityAdd.FOOD,
-    );
+    const capacity = calculateFoodCapacity(newState);
     const amount = Math.min(foodPool?.amount || 0, capacity);
     foodPool = { amount, capacity };
   }
   return {
-    ...state,
+    ...newState,
     resources,
-    buildings,
     population: { ...state.population, settlers },
     ...(foodPool ? { foodPool } : {}),
   };
