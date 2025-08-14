@@ -49,7 +49,7 @@ export function getFoodPoolAmount(state) {
 /**
  * @param {GameState} state
  */
-export function getFoodPoolCapacity(state) {
+export function calculateFoodCapacity(state) {
   let total = 0;
   Object.keys(RESOURCES).forEach((id) => {
     if (RESOURCES[id].category !== 'FOOD') return;
@@ -71,13 +71,6 @@ export function getFoodPoolCapacity(state) {
     }
   });
   return total;
-}
-
-/**
- * @param {GameState} state
- */
-export function getFoodCapacity(state) {
-  return getFoodPoolCapacity(state);
 }
 
 /**
@@ -205,7 +198,8 @@ function aggregateBuildingRates(state, roleBonuses) {
         sum + (RESOURCES[id].category === 'FOOD' ? resources[id] : 0),
       0,
     );
-  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
+  const foodCapacity =
+    state.foodPool?.capacity ?? calculateFoodCapacity(state);
   PRODUCTION_BUILDINGS.forEach((b) => {
     const entry = state.buildings?.[b.id];
     const count = entry?.count || 0;

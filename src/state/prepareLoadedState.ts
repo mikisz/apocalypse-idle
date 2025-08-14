@@ -7,7 +7,7 @@ import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';
 import { buildInitialPowerTypeOrder } from '../engine/power.js';
 import { deepClone } from '../utils/clone.ts';
-import { getFoodCapacity } from './selectors.js';
+import { calculateFoodCapacity } from './selectors.js';
 
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded: any) {
@@ -34,7 +34,7 @@ export function prepareLoadedState(loaded: any) {
     }
     return sum;
   }, 0);
-  const foodCapacity = getFoodCapacity(base);
+  const foodCapacity = calculateFoodCapacity(base);
   base.foodPool = { amount: foodAmount, capacity: foodCapacity };
   base.population = { ...base.population, ...cloned.population };
   if (Array.isArray(cloned.population?.settlers)) {

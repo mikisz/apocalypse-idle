@@ -3,7 +3,7 @@ import {
   getResourceRates,
   getResourceSections,
   getPowerStatus,
-  getFoodCapacity,
+  calculateFoodCapacity,
   getCapacity,
 
 } from '../selectors.js';
@@ -76,12 +76,12 @@ describe('capacity calculations', () => {
     expect(getCapacity(state, 'planks')).toBe(140);
   });
 
-  it('getFoodCapacity sums base and storage', () => {
+  it('calculateFoodCapacity sums base and storage', () => {
     const state = deepClone(defaultState);
-    const base = getFoodCapacity(state);
+    const base = calculateFoodCapacity(state);
     expect(base).toBe(300);
     state.buildings.foodStorage = { count: 1 };
-    expect(getFoodCapacity(state)).toBe(525);
+    expect(calculateFoodCapacity(state)).toBe(525);
 
   });
 });

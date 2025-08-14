@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { prepareLoadedState } from '../prepareLoadedState.ts';
 import { defaultState } from '../defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
-import { getFoodCapacity } from '../selectors.js';
+import { calculateFoodCapacity } from '../selectors.js';
 
 // Test that offline gains produce log entries
 
@@ -46,6 +46,6 @@ describe('prepareLoadedState', () => {
     };
     const state = prepareLoadedState(loaded);
     expect(state.foodPool.amount).toBe(15);
-    expect(state.foodPool.capacity).toBe(getFoodCapacity(state));
+    expect(state.foodPool.capacity).toBe(calculateFoodCapacity(state));
   });
 });

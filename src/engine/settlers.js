@@ -5,7 +5,7 @@ import {
   FOOD_VARIETY_BONUS,
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
-import { getFoodCapacity, getSettlerCapacity } from '../state/selectors.js';
+import { calculateFoodCapacity, getSettlerCapacity } from '../state/selectors.js';
 import { SECONDS_PER_DAY } from './time.js';
 import { RESOURCES } from '../data/resources.js';
 import { clampResource } from './resources.js';
@@ -78,7 +78,8 @@ export function processSettlersTick(
   // Final food change per second after bonuses and consumption
   const netFoodPerSec = bonusGainPerSec - totalSettlersConsumption;
 
-  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
+  const foodCapacity =
+    state.foodPool?.capacity ?? calculateFoodCapacity(state);
   let foodAmount =
     state.foodPool?.amount ??
     Object.keys(state.resources).reduce(

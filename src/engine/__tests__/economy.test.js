@@ -6,7 +6,7 @@ import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
 import { SEASON_DURATION } from '../time.js';
 import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';
-import { getFoodCapacity } from '../../state/selectors.js';
+import { calculateFoodCapacity } from '../../state/selectors.js';
 
 describe('economy basics', () => {
   test('spring potato field output', () => {
@@ -105,7 +105,7 @@ describe('economy basics', () => {
   test('food pool capacity shared across food types', () => {
     const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
-    const cap = getFoodCapacity(state);
+    const cap = calculateFoodCapacity(state);
     state.resources.meat.amount = cap - 0.1;
     state.resources.potatoes.amount = 0;
     state.foodPool = { amount: cap - 0.1, capacity: cap };
@@ -116,7 +116,7 @@ describe('economy basics', () => {
 
   test('settlers consume from multiple food resources', () => {
     const state = deepClone(defaultState);
-    const cap = getFoodCapacity(state);
+    const cap = calculateFoodCapacity(state);
     state.resources.potatoes.amount = 0.3;
     state.resources.meat.amount = 1;
     state.foodPool = { amount: 1.3, capacity: cap };

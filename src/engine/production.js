@@ -12,7 +12,7 @@ import {
 import { getSeason, getSeasonMultiplier } from './time.js';
 import {
   getCapacity,
-  getFoodCapacity,
+  calculateFoodCapacity,
   getResearchOutputBonus,
 } from '../state/selectors.js';
 import { clampResource } from './resources.js';
@@ -69,7 +69,8 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
           : 0),
       0,
     );
-  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
+  const foodCapacity =
+    state.foodPool?.capacity ?? calculateFoodCapacity(state);
 
   const active = PRODUCTION_BUILDINGS.filter((b) => {
     const entry = state.buildings?.[b.id];

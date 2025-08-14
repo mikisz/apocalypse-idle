@@ -12,7 +12,7 @@ vi.mock('../../../engine/settlers.js', () => ({
 }));
 vi.mock('../../selectors.js', () => ({
   getResourceRates: vi.fn(),
-  getFoodCapacity: vi.fn(),
+  calculateFoodCapacity: vi.fn(),
 }));
 vi.mock('../../../data/resources.js', () => ({
   RESOURCES: {},
@@ -29,7 +29,7 @@ import { applyProduction, applySettlers, applyYearUpdate } from '../useGameTick'
 import { processTick } from '../../../engine/production.js';
 import { processResearchTick } from '../../../engine/research.js';
 import { processSettlersTick, computeRoleBonuses } from '../../../engine/settlers.js';
-import { getResourceRates, getFoodCapacity } from '../../selectors.js';
+import { getResourceRates, calculateFoodCapacity } from '../../selectors.js';
 import { updateRadio } from '../../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../../engine/time.js';
 import { RESOURCES } from '../../../data/resources.js';
@@ -52,7 +52,7 @@ describe('applyProduction', () => {
       potatoes: { perSec: 2 },
       metal: { perSec: 4 },
     });
-    (getFoodCapacity as any).mockReturnValue(100);
+    (calculateFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
     (RESOURCES as any).metal = { category: 'METAL' };
 
@@ -85,7 +85,7 @@ describe('applyProduction', () => {
     (getResourceRates as any).mockReturnValue({
       potatoes: { perSec: 1 },
     });
-    (getFoodCapacity as any).mockReturnValue(100);
+    (calculateFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
 
     const result = applyProduction({ population: { settlers: [] } }, 1);

@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from 'react';
 import useGameLoop from '../../engine/useGameLoop.tsx';
 import { processTick } from '../../engine/production.js';
 import { processResearchTick } from '../../engine/research.js';
-import { getResourceRates, getFoodCapacity } from '../selectors.js';
+import { getResourceRates, calculateFoodCapacity } from '../selectors.js';
 import { RESOURCES } from '../../data/resources.js';
 import {
   processSettlersTick,
@@ -32,7 +32,7 @@ export function applyProduction(prev: any, dt: number) {
 
   let state = withResearch;
   if (bonusFoodPerSec) {
-    const foodCapacity = getFoodCapacity(withResearch);
+    const foodCapacity = calculateFoodCapacity(withResearch);
     const currentPool = withResearch.foodPool?.amount || 0;
     const room = Math.max(0, foodCapacity - currentPool);
     const bonusGain = Math.min(bonusFoodPerSec * dt, room);
