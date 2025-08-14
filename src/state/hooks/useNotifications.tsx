@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
 import { BUILDING_MAP } from '../../data/buildings.js';
@@ -110,7 +105,8 @@ export default function useNotifications(
         resourceShortageNotified.current.add(id);
       }
       if (currReason !== 'power') powerNotified.current.delete(id);
-      if (currReason !== 'resources') resourceShortageNotified.current.delete(id);
+      if (currReason !== 'resources')
+        resourceShortageNotified.current.delete(id);
     });
 
     Object.entries(state.resources).forEach(([id, res]) => {
@@ -133,11 +129,13 @@ export default function useNotifications(
 
     const prevHappy = prev.colony?.happiness?.value || 0;
     const currHappy = state.colony?.happiness?.value || 0;
-    if (prevHappy >= 50 && currHappy < 50) {
+    const prevHappyRounded = Math.round(prevHappy);
+    const currHappyRounded = Math.round(currHappy);
+    if (prevHappyRounded >= 50 && currHappyRounded < 50) {
       const msg = 'Happiness dropped below 50%';
       toast({ description: msg });
       addLog(msg);
-    } else if (prevHappy < 50 && currHappy >= 50) {
+    } else if (prevHappyRounded < 50 && currHappyRounded >= 50) {
       const msg = 'Happiness increased above 50%';
       toast({ description: msg });
       addLog(msg);
