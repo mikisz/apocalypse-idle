@@ -257,4 +257,24 @@ describe('useNotifications', () => {
       description: 'Happiness increased above 50%',
     });
   });
+
+  it('does not toast for minor happiness fluctuations', () => {
+    const high = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 50.0001 } },
+    };
+    const low = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 49.9999 } },
+    };
+    const { rerender } = render(<Wrapper state={high} />);
+    rerender(<Wrapper state={low} />);
+    expect(toast).not.toHaveBeenCalled();
+  });
 });
