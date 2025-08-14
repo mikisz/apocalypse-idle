@@ -12,7 +12,7 @@ vi.mock('../../../engine/settlers.js', () => ({
 }));
 vi.mock('../../selectors.js', () => ({
   getResourceRates: vi.fn(),
-  getCapacity: vi.fn(),
+  getFoodCapacity: vi.fn(),
 }));
 vi.mock('../../../data/resources.js', () => ({
   RESOURCES: {},
@@ -29,7 +29,7 @@ import { applyProduction, applySettlers, applyYearUpdate } from '../useGameTick'
 import { processTick } from '../../../engine/production.js';
 import { processResearchTick } from '../../../engine/research.js';
 import { processSettlersTick, computeRoleBonuses } from '../../../engine/settlers.js';
-import { getResourceRates, getCapacity } from '../../selectors.js';
+import { getResourceRates, getFoodCapacity } from '../../selectors.js';
 import { updateRadio } from '../../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../../engine/time.js';
 import { RESOURCES } from '../../../data/resources.js';
@@ -46,12 +46,13 @@ describe('applyProduction', () => {
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 1, produced: 0, discovered: true } },
       population: { settlers: [] },
+      foodPool: { amount: 1, capacity: 100 },
     });
     (getResourceRates as any).mockReturnValue({
       potatoes: { perSec: 2 },
       metal: { perSec: 4 },
     });
-    (getCapacity as any).mockReturnValue(100);
+    (getFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
     (RESOURCES as any).metal = { category: 'METAL' };
 
@@ -66,6 +67,7 @@ describe('applyProduction', () => {
       state: {
         resources: { potatoes: { amount: 1.2, produced: 0, discovered: true } },
         population: { settlers: [] },
+        foodPool: { amount: 1.2, capacity: 100 },
       },
       roleBonuses: { farmer: 10, builder: 5 },
       bonusFoodPerSec: 0.2,
@@ -78,11 +80,12 @@ describe('applyProduction', () => {
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 99.5, produced: 0, discovered: true } },
       population: { settlers: [] },
+      foodPool: { amount: 99.5, capacity: 100 },
     });
     (getResourceRates as any).mockReturnValue({
       potatoes: { perSec: 1 },
     });
-    (getCapacity as any).mockReturnValue(100);
+    (getFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
 
     const result = applyProduction({ population: { settlers: [] } }, 1);

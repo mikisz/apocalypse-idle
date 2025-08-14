@@ -1,9 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import { processTick, demolishBuilding } from '../production.js';
+import { processSettlersTick } from '../settlers.js';
 import { defaultState } from '../../state/defaultState.js';
 import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
 import { SEASON_DURATION } from '../time.js';
 import { deepClone } from '../../utils/clone.ts';
+import { BALANCE } from '../../data/balance.js';
+import { getFoodCapacity } from '../../state/selectors.js';
 
 describe('economy basics', () => {
   test('spring potato field output', () => {
@@ -85,5 +88,37 @@ describe('economy basics', () => {
     state.buildings.huntersHut = { count: 1 };
     const next = processTick(state, 1);
     expect(next.resources.meat.amount).toBeCloseTo(0.22 * 0.6, 5); // changed: 0.19*0.6 -> 0.22*0.6
+  });
+
+  test('food pool capacity shared across food types', () => {
+    const state = deepClone(defaultState);
+    state.buildings.potatoField.count = 1;
+    const cap = getFoodCapacity(state);
+    state.resources.meat.amount = cap - 0.1;
+    state.resources.potatoes.amount = 0;
+    state.foodPool = { amount: cap - 0.1, capacity: cap };
+    const next = processTick(state, 1);
+    expect(next.foodPool.amount).toBeCloseTo(cap, 5);
+    expect(next.resources.potatoes.amount).toBeCloseTo(0.1, 5);
+  });
+
+  test('settlers consume from multiple food resources', () => {
+    const state = deepClone(defaultState);
+    const cap = getFoodCapacity(state);
+    state.resources.potatoes.amount = 0.3;
+    state.resources.meat.amount = 1;
+    state.foodPool = { amount: 1.3, capacity: cap };
+    state.population.settlers = [{ id: 's1' }, { id: 's2' }];
+    const { state: after } = processSettlersTick(state, 1, 0);
+    const consumption = 2 * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
+    expect(after.resources.potatoes.amount).toBeCloseTo(
+      Math.max(0, 0.3 - consumption),
+      5,
+    );
+    expect(after.resources.meat.amount).toBeCloseTo(
+      1 - Math.max(0, consumption - 0.3),
+      5,
+    );
+    expect(after.foodPool.amount).toBeCloseTo(1.3 - consumption, 5);
   });
 });

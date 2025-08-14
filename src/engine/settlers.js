@@ -5,8 +5,7 @@ import {
   FOOD_VARIETY_BONUS,
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
-import { getCapacity, getSettlerCapacity } from '../state/selectors.js';
-import { clampResource } from './resources.js';
+import { getFoodCapacity, getSettlerCapacity } from '../state/selectors.js';
 import { SECONDS_PER_DAY } from './time.js';
 import { RESOURCES } from '../data/resources.js';
 import { createLogEntry } from '../utils/log.js';
@@ -78,28 +77,57 @@ export function processSettlersTick(
   // Final food change per second after bonuses and consumption
   const netFoodPerSec = bonusGainPerSec - totalSettlersConsumption;
 
-  const capacity = getCapacity(state, 'potatoes');
+  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
+  let foodAmount =
+    state.foodPool?.amount ??
+    Object.keys(state.resources).reduce(
+      (sum, id) =>
+        sum +
+        (RESOURCES[id].category === 'FOOD'
+          ? state.resources[id]?.amount || 0
+          : 0),
+      0,
+    );
+
+  const bonusGain = Math.min(
+    Math.max(0, bonusGainPerSec * seconds),
+    Math.max(0, foodCapacity - foodAmount),
+  );
+  foodAmount += bonusGain;
   const currentEntry = state.resources.potatoes || {
     amount: 0,
     discovered: false,
     produced: 0,
   };
-  // Potatoes after this tick: current amount + netFoodPerSec * seconds (clamped to capacity)
-  const nextAmount = clampResource(
-    currentEntry.amount + netFoodPerSec * seconds,
-    capacity,
-  );
+  const potatoesAfterBonus = currentEntry.amount + bonusGain;
   const resources = {
     ...state.resources,
     potatoes: {
-      amount: nextAmount,
-      discovered: currentEntry.discovered || nextAmount > 0,
+      amount: potatoesAfterBonus,
+      discovered: currentEntry.discovered || potatoesAfterBonus > 0,
       produced: currentEntry.produced,
     },
   };
 
+  let remaining = totalSettlersConsumption * seconds;
+  const foodIds = Object.keys(RESOURCES).filter(
+    (id) => RESOURCES[id].category === 'FOOD',
+  );
+  const prioritized = ['potatoes', ...foodIds.filter((id) => id !== 'potatoes')];
+  for (const id of prioritized) {
+    if (remaining <= 0) break;
+    const entry = resources[id] || { amount: 0, discovered: false, produced: 0 };
+    const use = Math.min(entry.amount, remaining);
+    if (use > 0) {
+      entry.amount -= use;
+      resources[id] = { ...entry };
+      remaining -= use;
+      foodAmount -= use;
+    }
+  }
+
   let starvationTimer = state.colony?.starvationTimerSeconds || 0;
-  if (nextAmount > 0) {
+  if (foodAmount > 0) {
     starvationTimer = 0;
   } else {
     starvationTimer += seconds;
@@ -175,7 +203,7 @@ export function processSettlersTick(
     bonusFoodPerSec: bonusGainPerSec,
     totalFoodBonusPercent,
     totalSettlersConsumption,
-    potatoes: nextAmount,
+    potatoes: resources.potatoes.amount,
     starvationTimerSeconds: starvationTimer,
     roleBonuses: bonuses,
   };
@@ -190,6 +218,7 @@ export function processSettlersTick(
       ...state,
       colony,
       resources,
+      foodPool: { amount: foodAmount, capacity: foodCapacity },
       population: { ...state.population, settlers },
       log,
     },

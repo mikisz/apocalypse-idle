@@ -15,6 +15,18 @@ const initResources = () => {
   return obj;
 };
 
+const initFoodPool = () => {
+  let amount = 0;
+  let capacity = 0;
+  Object.values(RESOURCES).forEach((r) => {
+    if (r.category === 'FOOD') {
+      amount += r.startingAmount || 0;
+      capacity += r.startingCapacity || 0;
+    }
+  });
+  return { amount, capacity };
+};
+
 const initBuildings = () => ({
   potatoField: { count: 2, isDesiredOn: true },
   loggingCamp: { count: 1, isDesiredOn: true },
@@ -42,6 +54,7 @@ export const defaultState = {
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
   resources: initResources(),
+  foodPool: initFoodPool(),
   buildings: initBuildings(),
   powerTypeOrder: initPowerTypeOrder(),
   research: initResearch(),

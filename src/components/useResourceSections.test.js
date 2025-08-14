@@ -3,12 +3,13 @@ import { renderHook } from '@testing-library/react';
 import { useResourceSections } from './useResourceSections.js';
 
 describe('useResourceSections', () => {
-  test('sums capacities of all food resources', () => {
+  test('uses food pool totals for food', () => {
     const state = {
       resources: {
         potatoes: { amount: 100, discovered: true },
         meat: { amount: 50, discovered: true },
       },
+      foodPool: { amount: 150, capacity: 400 },
       buildings: {},
       research: { completed: [] },
       population: { settlers: [] },
@@ -18,7 +19,8 @@ describe('useResourceSections', () => {
     });
     const foodSection = result.current.sections.find((s) => s.title === 'Food');
     const totalRow = foodSection.items.find((i) => i.id === 'food-total');
-    expect(totalRow.capacity).toBe(200 + 100); // changed: 450+150 -> 200+100
+    expect(totalRow.amount).toBe(150);
+    expect(totalRow.capacity).toBe(400);
   });
 
   test('marks resources at capacity', () => {
