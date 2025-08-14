@@ -7,6 +7,7 @@ import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';
 import { buildInitialPowerTypeOrder } from '../engine/power.js';
 import { deepClone } from '../utils/clone.ts';
+import { getFoodCapacity } from './selectors.js';
 
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded: any) {
@@ -21,13 +22,20 @@ export function prepareLoadedState(loaded: any) {
   base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
   base.ui = { ...base.ui, ...cloned.ui };
   base.resources = { ...base.resources, ...cloned.resources };
-  base.foodPool = { ...base.foodPool, ...cloned.foodPool };
   base.buildings = { ...base.buildings, ...cloned.buildings };
   Object.values(base.buildings).forEach((b: any) => {
     if (typeof b.isDesiredOn !== 'boolean') b.isDesiredOn = true;
   });
   base.powerTypeOrder = buildInitialPowerTypeOrder(cloned.powerTypeOrder || []);
   base.research = { ...base.research, ...cloned.research };
+  const foodAmount = Object.keys(RESOURCES).reduce((sum, id) => {
+    if (RESOURCES[id].category === 'FOOD') {
+      return sum + (base.resources[id]?.amount || 0);
+    }
+    return sum;
+  }, 0);
+  const foodCapacity = getFoodCapacity(base);
+  base.foodPool = { amount: foodAmount, capacity: foodCapacity };
   base.population = { ...base.population, ...cloned.population };
   if (Array.isArray(cloned.population?.settlers)) {
     base.population.settlers = cloned.population.settlers.map((s: any) => ({
