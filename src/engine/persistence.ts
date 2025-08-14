@@ -234,7 +234,13 @@ export function save(state: any): any {
 
 export function load(raw: any): { state: any; migratedFrom: number | null } {
   const save = typeof raw === 'string' ? JSON.parse(raw) : deepClone(raw);
-  save.version = save.version ?? save.schemaVersion ?? 1;
+  const parsedVersion = Number(save.version ?? save.schemaVersion);
+  save.version = Number.isNaN(parsedVersion) ? 1 : parsedVersion;
+  if (save.version > CURRENT_SAVE_VERSION) {
+    throw new Error(
+      `Save version ${save.version} is newer than supported version ${CURRENT_SAVE_VERSION}`,
+    );
+  }
   validateSave(save);
   const start = save.version;
   applyMigrations(save);

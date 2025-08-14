@@ -73,4 +73,25 @@ describe('persistence migrations and validation', () => {
     expect(typeof state.log[0].id).toBe('string');
     expect(typeof state.log[0].time).toBe('number');
   });
+
+  it('parses string version numbers', () => {
+    const oldSave = {
+      version: '2',
+      resources: {},
+      buildings: {},
+      population: {},
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(2);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+  });
+
+  it('throws on future save versions', () => {
+    const futureVersion = CURRENT_SAVE_VERSION + 1;
+    const futureSave = { version: String(futureVersion) };
+    expect(() => load(JSON.stringify(futureSave))).toThrow(
+      `Save version ${futureVersion} is newer than supported version ${CURRENT_SAVE_VERSION}`,
+    );
+  });
 });
