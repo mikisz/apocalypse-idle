@@ -139,15 +139,17 @@ export const LAST_NAMES = [
 import { DAYS_PER_YEAR } from '../engine/time.ts';
 import { BALANCE } from './balance.js';
 
-export function makeRandomSettler({ sex, randomizeAge = false } = {}) {
-  const chosenSex = sex || (Math.random() < 0.5 ? 'M' : 'F');
+export function makeRandomSettler({
+  sex,
+  randomizeAge = false,
+  rng = Math.random,
+} = {}) {
+  const chosenSex = sex || (rng() < 0.5 ? 'M' : 'F');
   const firstPool = FIRST_NAMES[chosenSex];
-  const firstName = firstPool[Math.floor(Math.random() * firstPool.length)];
-  const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+  const firstName = firstPool[Math.floor(rng() * firstPool.length)];
+  const lastName = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)];
   const baseAge = 18 * DAYS_PER_YEAR;
-  const randomDays = randomizeAge
-    ? Math.floor(Math.random() * DAYS_PER_YEAR)
-    : 0;
+  const randomDays = randomizeAge ? Math.floor(rng() * DAYS_PER_YEAR) : 0;
   return {
     id: globalThis.crypto?.randomUUID
       ? globalThis.crypto.randomUUID()
