@@ -10,6 +10,7 @@ export function applyOfflineProgress(
   state: any,
   elapsedSeconds: number,
   roleBonuses: Record<string, number> = {},
+  rng: () => number = Math.random,
 ): { state: any; gains: Record<string, number>; events: any[] } {
   if (elapsedSeconds <= 0) return { state, gains: {}, events: [] };
   const before = deepClone(state.resources);
@@ -33,7 +34,7 @@ export function applyOfflineProgress(
       current,
       1,
       bonusFoodPerSec,
-      Math.random,
+      rng,
       roleBonuses,
     );
     current = settlersResult.state;

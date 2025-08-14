@@ -9,6 +9,11 @@ import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';
 import { calculateFoodCapacity } from '../../state/selectors.js';
 
+const createRng = (seed = 1) => () => {
+  seed = (seed * 16807) % 2147483647;
+  return (seed - 1) / 2147483646;
+};
+
 describe('economy basics', () => {
   test('spring potato field output', () => {
     const state = deepClone(defaultState);
@@ -122,7 +127,8 @@ describe('economy basics', () => {
     state.resources.meat.amount = 1;
     state.foodPool = { amount: 1.3, capacity: cap };
     state.population.settlers = [{ id: 's1' }, { id: 's2' }];
-    const { state: after } = processSettlersTick(state, 1, 0);
+    const rng = createRng();
+    const { state: after } = processSettlersTick(state, 1, 0, rng);
     const consumption = 2 * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
     expect(after.resources.potatoes.amount).toBeCloseTo(
       Math.max(0, 0.3 - consumption),
