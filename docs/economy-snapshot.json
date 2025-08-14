@@ -1,5 +1,5 @@
 {
-  "version": "35f35aa12e885b89cd28e6978415732365573f45",
+  "version": "e412e0e8b37cb9b8933bf57d647d6e698fd6a0f1",
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -1088,6 +1088,15 @@
       "origin": {
         "file": "roles.js",
         "path": "ROLES.metalworker"
+      }
+    },
+    {
+      "id": "mason",
+      "name": "Mason",
+      "skill": "Masonry",
+      "origin": {
+        "file": "roles.js",
+        "path": "ROLES.mason"
       }
     },
     {
