@@ -14,6 +14,13 @@ export default function ResourceRow({
   demand,
   stored,
 }) {
+  const displayAmount =
+    capacity != null && Math.abs(amount - capacity) < 1e-6 ? capacity : amount;
+  const displayStored =
+    stored != null && capacity != null && Math.abs(stored - capacity) < 1e-6
+      ? capacity
+      : stored ?? amount;
+
   const content = (
     <li className="flex items-center justify-between text-sm tabular-nums">
       <span className="flex items-center gap-2">
@@ -27,13 +34,13 @@ export default function ResourceRow({
           </span>
         ) : (
           <span className={capped ? 'text-orange-500' : undefined}>
-            {formatAmount(amount)}
+            {formatAmount(displayAmount)}
             {capacity != null && ` / ${formatAmount(capacity)}`}
           </span>
         )}
         {supply != null && demand != null ? (
           <span className="text-xs text-muted-foreground">
-            {formatAmount(stored ?? amount)}
+            {formatAmount(displayStored)}
             {capacity != null && ` / ${formatAmount(capacity)}`}
           </span>
         ) : rate != null ? (
