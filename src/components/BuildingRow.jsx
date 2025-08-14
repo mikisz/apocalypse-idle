@@ -34,12 +34,11 @@ export default function BuildingRow({
     1 +
     (perOutputs.length > 0 || building.capacityAdd ? 1 : 0) +
     (perInputs.length > 0 ? 1 : 0);
-  const gridColsClass =
-    columnCount === 3
-      ? 'grid-cols-3'
-      : columnCount === 2
-        ? 'grid-cols-2'
-        : 'grid-cols-1';
+  const gridColsClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+  }[columnCount];
 
   const capacityEntries = Object.entries(building.capacityAdd || {});
   const hasFoodCapacity = capacityEntries.some(([res]) => res === 'FOOD');
@@ -135,7 +134,6 @@ export default function BuildingRow({
               <div>
                 <div className="text-xs font-medium">Increase:</div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
-
                   {building.cardTextOverride ? (
                     <span>{building.cardTextOverride}</span>
                   ) : (
@@ -149,7 +147,6 @@ export default function BuildingRow({
                       ) : null;
                     })
                   )}
-
                 </div>
               </div>
             )
