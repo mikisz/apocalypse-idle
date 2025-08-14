@@ -1,5 +1,7 @@
 {
+
   "version": "bd1109da0b31db9f7e6649157100bf13e85d00c1",
+
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -606,6 +608,34 @@
       }
     },
     {
+      "id": "largeGranary",
+      "name": "Large Granary",
+      "type": "storage",
+      "cost": {
+        "wood": 35,
+        "stone": 20,
+        "bricks": 20
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "FOOD": 600
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[13]"
+      }
+    },
+    {
       "id": "rawStorage",
       "name": "Warehouse",
       "type": "storage",
@@ -633,6 +663,7 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[14]"
+
       }
     },
     {
@@ -661,7 +692,9 @@
       },
       "origin": {
         "file": "buildings.js",
+
         "path": "BUILDINGS[15]"
+
       }
     },
     {
@@ -691,6 +724,7 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[16]"
+
       }
     }
   ],
