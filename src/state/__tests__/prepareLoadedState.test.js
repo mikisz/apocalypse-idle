@@ -1,8 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { prepareLoadedState } from '../prepareLoadedState.ts';
 import { defaultState } from '../defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
 import { calculateFoodCapacity } from '../selectors.js';
+
+const fakeCandidate = { id: 'cand1' };
+vi.mock('../../engine/candidates.ts', () => ({
+  generateCandidate: vi.fn(() => fakeCandidate),
+}));
 
 // Test that offline gains produce log entries
 
@@ -15,6 +20,22 @@ describe('prepareLoadedState', () => {
     expect(state.log[0].text).toMatch(/while offline/);
   });
 
+  it('records radio contact during offline progress', () => {
+    const now = Date.now();
+    const loaded = {
+      buildings: { radio: { count: 1 }, woodGenerator: { count: 1 } },
+      resources: { power: { amount: 0 }, wood: { amount: 100 } },
+      population: { candidate: null },
+      colony: { radioTimer: 3 },
+      lastSaved: now - 5000,
+    };
+    const state = prepareLoadedState(loaded);
+    expect(state.population.candidate).toEqual(fakeCandidate);
+    expect(state.ui.offlineProgress?.candidates).toContain(
+      'Someone responded to the radio',
+    );
+  });
+
   it('defaults missing building flags to true', () => {
     const loaded = { buildings: { loggingCamp: { count: 3 } } };
     const state = prepareLoadedState(loaded);
@@ -22,7 +43,9 @@ describe('prepareLoadedState', () => {
   });
 
   it('preserves existing isDesiredOn flags', () => {
-    const loaded = { buildings: { loggingCamp: { count: 3, isDesiredOn: false } } };
+    const loaded = {
+      buildings: { loggingCamp: { count: 3, isDesiredOn: false } },
+    };
     const state = prepareLoadedState(loaded);
     expect(state.buildings.loggingCamp.isDesiredOn).toBe(false);
   });

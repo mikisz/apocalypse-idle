@@ -46,6 +46,14 @@ export default function OfflineProgressModal() {
                 ))}
               </div>
             )}
+            {info.candidates?.length > 0 && (
+              <div className="mb-2 space-y-1">
+                <div>Radio contact:</div>
+                {info.candidates.map((c, i) => (
+                  <div key={i}>{c}</div>
+                ))}
+              </div>
+            )}
             {Object.entries(info.gains).map(([res, amt]) => (
               <div key={res}>
                 {res}: {Math.floor(amt)}

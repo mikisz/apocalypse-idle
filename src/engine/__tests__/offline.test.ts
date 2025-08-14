@@ -11,13 +11,15 @@ import { generateCandidate } from '../candidates.ts';
 import { processTick } from '../production.ts';
 import { RESEARCH_MAP } from '../../data/research.js';
 
-const createRng = (seed = 1) => () => {
-  seed = (seed * 16807) % 2147483647;
-  return (seed - 1) / 2147483646;
-};
+const createRng =
+  (seed = 1) =>
+  () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
 
 describe('applyOfflineProgress', () => {
-  it('uses post-production state to update radio', () => {
+  it('uses post-production state to update radio and emits event', () => {
     generateCandidate.mockClear();
     const rng = createRng();
     const state = {
@@ -26,10 +28,12 @@ describe('applyOfflineProgress', () => {
       population: { candidate: null },
       colony: { radioTimer: 3 },
     };
-    const { state: next } = applyOfflineProgress(state, 5, {}, rng);
+    const { state: next, events } = applyOfflineProgress(state, 5, {}, rng);
     expect(generateCandidate).toHaveBeenCalledOnce();
     expect(next.population.candidate).toEqual(fakeCandidate);
     expect(next.colony.radioTimer).toBe(0);
+    const evt = events.find((e) => e.type === 'candidate');
+    expect(evt?.text).toBe('Someone responded to the radio');
   });
 
   it('returns resource gains for production while offline', () => {
@@ -92,7 +96,12 @@ describe('applyOfflineProgress', () => {
     });
     const seconds = 10;
     const rng = createRng(5);
-    const { state: offline } = applyOfflineProgress(createState(), seconds, {}, rng);
+    const { state: offline } = applyOfflineProgress(
+      createState(),
+      seconds,
+      {},
+      rng,
+    );
     let online = createState();
     for (let i = 0; i < seconds; i += 1) {
       online = processTick(online, 1);
