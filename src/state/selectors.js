@@ -13,6 +13,7 @@ import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { SHELTER_MAX } from '../data/settlement.js';
 import { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
 export { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
+import { getOutputCapacityFactor } from '../engine/capacity.ts';
 
 /** @typedef {import('./useGame.tsx').GameState} GameState */
 
@@ -107,34 +108,18 @@ function getOutputCapacityFactorRates(
   foodCapacity,
   totalFoodAmount,
 ) {
-  let f = factor;
+  const desired = {};
   Object.entries(outputs || {}).forEach(([res, base]) => {
-    if (RESOURCES[res].category === 'FOOD') {
-      const room = foodCapacity - totalFoodAmount;
-      if (room <= 0) {
-        f = 0;
-        return;
-      }
-      const maxGain = base * count * f;
-      if (maxGain > 0) {
-        f = Math.min(f, room / maxGain);
-      }
-    } else {
-      const cap = getCapacity(state, res);
-      if (!Number.isFinite(cap)) return;
-      const current = resources[res] || 0;
-      const room = cap - current;
-      if (room <= 0) {
-        f = 0;
-        return;
-      }
-      const maxGain = base * count * f;
-      if (maxGain > 0) {
-        f = Math.min(f, room / maxGain);
-      }
-    }
+    desired[res] = base * count * factor;
   });
-  return Math.max(0, Math.min(1, f));
+  const capFactor = getOutputCapacityFactor(
+    state,
+    resources,
+    desired,
+    foodCapacity,
+    totalFoodAmount,
+  );
+  return factor * capFactor;
 }
 
 function aggregateBuildingRates(state, roleBonuses) {

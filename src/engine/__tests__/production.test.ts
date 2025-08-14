@@ -3,6 +3,8 @@ import { describe, test, expect } from 'vitest';
 import { processTick } from '../production.ts';
 import { defaultState } from '../../state/defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
+import { getOutputCapacityFactor } from '../capacity.ts';
+import { ensureCapacityCache } from '../../state/capacityCache.ts';
 
 describe('production building on/off and power allocation', () => {
   test('OFF avoids all consumption and production', () => {
@@ -100,5 +102,14 @@ describe('production building on/off and power allocation', () => {
     expect(next.buildings.radio.offlineReason).toBeUndefined();
     expect(next.buildings.toolsmithy.offlineReason).toBe('power');
     expect(next.resources.power.amount).toBeCloseTo(0, 5);
+  });
+
+  test('capacity factor caps outputs at storage limit', () => {
+    const state = deepClone(defaultState);
+    ensureCapacityCache(state);
+    const resources = { wood: { amount: 79.8 } };
+    const desired = { wood: 1 };
+    const factor = getOutputCapacityFactor(state, resources, desired, 0, 0);
+    expect(factor).toBeCloseTo(0.2, 5);
   });
 });
