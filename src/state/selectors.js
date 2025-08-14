@@ -433,11 +433,8 @@ function buildResourceGroups(state, netRates, prodRates) {
  * @param {Record<string,{perSec:number,label:string}>} netRates
  */
 function createFoodTotalRow(state, foodIds, netRates) {
-  const totalAmount =
-    state.foodPool?.amount ??
-    foodIds.reduce((sum, id) => sum + (state.resources[id]?.amount || 0), 0);
-  const totalCapacity =
-    state.foodPool?.capacity ?? getFoodCapacity(state);
+  const totalAmount = state.foodPool?.amount || 0;
+  const totalCapacity = state.foodPool?.capacity || 0;
   const totalNetRate = foodIds.reduce(
     (sum, id) => sum + (netRates[id]?.perSec || 0),
     0,
@@ -445,7 +442,7 @@ function createFoodTotalRow(state, foodIds, netRates) {
   return {
     id: 'food-total',
     name: 'Total',
-    amount: state.foodPool?.amount ?? totalAmount,
+    amount: totalAmount,
     capacity: totalCapacity,
     rate: formatRate(totalNetRate),
   };

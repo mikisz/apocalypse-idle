@@ -41,6 +41,9 @@ export default function BuildingRow({
         ? 'grid-cols-2'
         : 'grid-cols-1';
 
+  const capacityEntries = Object.entries(building.capacityAdd || {});
+  const hasFoodCapacity = capacityEntries.some(([res]) => res === 'FOOD');
+
   return (
     <Container className="space-y-3 shadow-none">
       <div className="flex items-center justify-between">
@@ -131,12 +134,18 @@ export default function BuildingRow({
               <div>
                 <div className="text-xs font-medium">Increase:</div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
-                  {Object.entries(building.capacityAdd).map(([res, cap]) => (
-                    <span key={res} className="flex items-center gap-1">
-                      {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
-                      {RESOURCES[res].name} capacity
-                    </span>
-                  ))}
+                  {hasFoodCapacity && building.cardTextOverride
+                    ? (
+                        <span className="flex items-center gap-1">
+                          {building.cardTextOverride}
+                        </span>
+                      )
+                    : capacityEntries.map(([res, cap]) => (
+                        <span key={res} className="flex items-center gap-1">
+                          {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
+                          {RESOURCES[res].name} capacity
+                        </span>
+                      ))}
                 </div>
               </div>
             )
