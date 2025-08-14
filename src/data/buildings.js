@@ -174,7 +174,8 @@ export const BUILDINGS = [
     costBase: { wood: 20, scrap: 5, stone: 5 },
     costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { potatoes: 150, meat: 75 }, // changed: potatoes 300->150, meat 150->75
+    capacityAdd: { FOOD: 225 },
+    cardTextOverride: 'Food Capacity +225',
     description: 'Increases storage for harvested crops.',
   },
   {

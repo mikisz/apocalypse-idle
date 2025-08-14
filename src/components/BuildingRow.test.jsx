@@ -27,6 +27,7 @@ describe('BuildingRow', () => {
     );
 
     expect(screen.getByText('Increase:')).toBeTruthy();
-    expect(screen.getByText('+100 Food capacity')).toBeTruthy();
+    expect(screen.getByText('Food Capacity +225')).toBeTruthy();
+
   });
 });
