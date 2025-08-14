@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { getResourceRates, getResourceSections, getPowerStatus } from '../selectors.js';
+import {
+  getResourceRates,
+  getResourceSections,
+  getPowerStatus,
+  getFoodCapacity,
+  getCapacity,
+} from '../selectors.js';
+import { defaultState } from '../defaultState.js';
+import { deepClone } from '../../utils/clone.ts';
 
 describe('getResourceRates', () => {
   it('ignores buildings that are turned off', () => {
@@ -55,5 +63,22 @@ describe('power selectors', () => {
     expect(row.demand).toBe(1);
     expect(row.amount).toBe(3);
     expect(row.capacity).toBe(10);
+  });
+});
+
+describe('capacity calculations', () => {
+  it('getCapacity accounts for storage buildings', () => {
+    const state = deepClone(defaultState);
+    expect(getCapacity(state, 'planks')).toBe(40);
+    state.buildings.materialsDepot = { count: 1 };
+    expect(getCapacity(state, 'planks')).toBe(140);
+  });
+
+  it('getFoodCapacity sums base and storage', () => {
+    const state = deepClone(defaultState);
+    const base = getFoodCapacity(state);
+    expect(base).toBe(300);
+    state.buildings.foodStorage = { count: 1 };
+    expect(getFoodCapacity(state)).toBe(525);
   });
 });

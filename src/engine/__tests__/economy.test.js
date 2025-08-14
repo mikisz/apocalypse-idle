@@ -61,6 +61,18 @@ describe('economy basics', () => {
     expect(next.resources.wood.amount).toBeCloseTo(9.6, 5);
   });
 
+  test('brick kiln converts stone and wood into bricks', () => {
+    const state = deepClone(defaultState);
+    state.resources.stone.amount = 1;
+    state.resources.wood.amount = 1;
+    state.buildings.loggingCamp.count = 0;
+    state.buildings.brickKiln = { count: 1 };
+    const next = processTick(state, 1);
+    expect(next.resources.bricks.amount).toBeCloseTo(0.4, 5);
+    expect(next.resources.stone.amount).toBeCloseTo(0.6, 5);
+    expect(next.resources.wood.amount).toBeCloseTo(0.7, 5);
+  });
+
   test('removing last required building unassigns settlers', () => {
     const state = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
