@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';
 import { RESEARCH_MAP } from '../data/research.js';
@@ -6,6 +7,7 @@ import { Button } from './Button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { Container } from './ui/container';
 import { Switch } from './ui/switch';
+import { buildingPropType } from './propTypes.js';
 
 export default function BuildingRow({
   building,
@@ -39,9 +41,6 @@ export default function BuildingRow({
     2: 'grid-cols-2',
     3: 'grid-cols-3',
   }[columnCount];
-
-  const capacityEntries = Object.entries(building.capacityAdd || {});
-  const hasFoodCapacity = capacityEntries.some(([res]) => res === 'FOOD');
 
   return (
     <Container className="space-y-3 shadow-none">
@@ -178,3 +177,32 @@ export default function BuildingRow({
     </Container>
   );
 }
+
+BuildingRow.propTypes = {
+  building: buildingPropType.isRequired,
+  count: PropTypes.number,
+  atMax: PropTypes.bool,
+  costEntries: PropTypes.arrayOf(PropTypes.array),
+  perOutputs: PropTypes.arrayOf(
+    PropTypes.shape({
+      res: PropTypes.string.isRequired,
+      perSec: PropTypes.number.isRequired,
+    }),
+  ),
+  perInputs: PropTypes.arrayOf(
+    PropTypes.shape({
+      res: PropTypes.string.isRequired,
+      perSec: PropTypes.number.isRequired,
+    }),
+  ),
+  canAfford: PropTypes.bool,
+  unlocked: PropTypes.bool,
+  offlineReason: PropTypes.string,
+  isDesiredOn: PropTypes.bool,
+  resourceShortage: PropTypes.bool,
+  buildTooltip: PropTypes.node,
+  showPowerWarning: PropTypes.bool,
+  onBuild: PropTypes.func,
+  onDemolish: PropTypes.func,
+  onToggle: PropTypes.func,
+};

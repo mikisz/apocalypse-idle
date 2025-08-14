@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { formatAge } from '../utils/format.js';
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
 import { SKILL_LABELS } from '../data/roles.js';
@@ -141,3 +142,28 @@ export default function SettlerList({
     <div className="text-center text-muted-foreground">No survivors</div>
   );
 }
+
+const roleType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+});
+
+const settlerType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  firstName: PropTypes.string.isRequired,
+  lastName: PropTypes.string.isRequired,
+  sex: PropTypes.string.isRequired,
+  ageDays: PropTypes.number.isRequired,
+  isDead: PropTypes.bool,
+  happiness: PropTypes.number,
+  happinessBreakdown: PropTypes.array,
+  skills: PropTypes.object,
+  role: PropTypes.string,
+});
+
+SettlerList.propTypes = {
+  settlers: PropTypes.arrayOf(settlerType).isRequired,
+  availableRoles: PropTypes.arrayOf(roleType).isRequired,
+  setSettlerRole: PropTypes.func.isRequired,
+  onBanish: PropTypes.func.isRequired,
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { formatAmount, formatRate } from '../utils/format.js';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
@@ -19,7 +20,7 @@ export default function ResourceRow({
   const displayStored =
     stored != null && capacity != null && Math.abs(stored - capacity) < 1e-6
       ? capacity
-      : stored ?? amount;
+      : (stored ?? amount);
 
   const content = (
     <li className="flex items-center justify-between text-sm tabular-nums">
@@ -59,3 +60,16 @@ export default function ResourceRow({
     </Tooltip>
   );
 }
+
+ResourceRow.propTypes = {
+  icon: PropTypes.node,
+  name: PropTypes.string.isRequired,
+  amount: PropTypes.number.isRequired,
+  capacity: PropTypes.number,
+  capped: PropTypes.bool,
+  rate: PropTypes.string,
+  tooltip: PropTypes.node,
+  supply: PropTypes.number,
+  demand: PropTypes.number,
+  stored: PropTypes.number,
+};

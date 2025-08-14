@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Checkbox } from './ui/checkbox';
 
 export default function SettlerFilters({
@@ -28,3 +29,10 @@ export default function SettlerFilters({
     </div>
   );
 }
+
+SettlerFilters.propTypes = {
+  onlyLiving: PropTypes.bool.isRequired,
+  setOnlyLiving: PropTypes.func.isRequired,
+  unassignedOnly: PropTypes.bool.isRequired,
+  setUnassignedOnly: PropTypes.func.isRequired,
+};
