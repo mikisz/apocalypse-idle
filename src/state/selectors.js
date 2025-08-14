@@ -39,19 +39,11 @@ export function getCapacity(state, resourceId) {
 export function getFoodPoolAmount(state) {
   if (state.foodPool?.amount != null) return state.foodPool.amount;
   return Object.keys(RESOURCES).reduce((sum, id) => {
-
     if (RESOURCES[id].category === 'FOOD') {
       sum += state.resources?.[id]?.amount || 0;
     }
     return sum;
   }, 0);
-  BUILDINGS.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
-    if (count > 0 && b.capacityAdd?.FOOD) {
-      total += b.capacityAdd.FOOD * count;
-    }
-  });
-  return total;
 }
 
 /**
@@ -97,8 +89,7 @@ export function getSettlerCapacity(state) {
 export function getPowerStatus(state) {
   const stored =
     state.powerStatus?.stored ?? state.resources?.power?.amount ?? 0;
-  const capacity =
-    state.powerStatus?.capacity ?? getCapacity(state, 'power');
+  const capacity = state.powerStatus?.capacity ?? getCapacity(state, 'power');
   const supply = state.powerStatus?.supply ?? 0;
   const demand = state.powerStatus?.demand ?? 0;
   return { supply, demand, stored, capacity };
@@ -431,8 +422,8 @@ function buildResourceGroups(state, netRates, prodRates) {
     const capacity = isFood
       ? null
       : isPower
-      ? powerStatus.capacity
-      : getCapacity(state, r.id);
+        ? powerStatus.capacity
+        : getCapacity(state, r.id);
     if (isFood) foodIds.push(r.id);
     const rateInfo = (isFood ? prodRates : netRates)[r.id];
     const discovered = state.resources[r.id]?.discovered;
