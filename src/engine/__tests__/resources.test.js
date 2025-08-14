@@ -10,4 +10,8 @@ describe('clampResource', () => {
   it('handles non-finite numbers', () => {
     expect(clampResource(NaN, 2)).toBe(0);
   });
+
+  it('treats infinite capacity as unlimited', () => {
+    expect(clampResource(5, Infinity)).toBe(5);
+  });
 });
