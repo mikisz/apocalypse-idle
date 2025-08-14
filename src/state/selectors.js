@@ -57,8 +57,8 @@ export function calculateFoodCapacity(state) {
     let fromBuildings = 0;
     BUILDINGS.forEach((b) => {
       const count = state.buildings?.[b.id]?.count || 0;
-      if (count > 0 && b.capacityAdd?.[id]) {
-        fromBuildings += b.capacityAdd[id] * count;
+      if (count > 0) {
+        if (b.capacityAdd?.[id]) fromBuildings += b.capacityAdd[id] * count;
       }
     });
     const bonus = getResearchStorageBonus(state, id);
