@@ -7,8 +7,7 @@ import {
   canAffordBuilding,
   getCapacity,
 } from '../selectors.js';
-import { clampResource } from '../../engine/resources.js';
-import { demolishBuilding } from '../../engine/production.js';
+import { demolishBuilding, buildBuilding } from '../../engine/production.js';
 import { RESEARCH_MAP } from '../../data/research.js';
 
 export default function useBuilding(building: any, completedResearch: string[] = []) {
@@ -37,30 +36,8 @@ export default function useBuilding(building: any, completedResearch: string[] =
 
   const onBuild = useCallback(() => {
     if (!canAfford || !unlocked || atMax) return;
-    setState((prev) => {
-      const resources = { ...prev.resources } as any;
-      costEntries.forEach(([res, amt]) => {
-        const currentEntry = resources[res] || { amount: 0, discovered: false };
-        const next = currentEntry.amount - amt;
-        resources[res] = {
-          amount: next,
-          discovered: currentEntry.discovered || next > 0,
-        };
-      });
-      const newCount = count + 1;
-      const buildings = {
-        ...prev.buildings,
-        [building.id]: { count: newCount },
-      } as any;
-      Object.keys(resources).forEach((res) => {
-        const cap = getCapacity({ ...prev, buildings } as any, res);
-        const entry = resources[res];
-        entry.amount = clampResource(entry.amount, cap);
-        if (entry.amount > 0) entry.discovered = true;
-      });
-      return { ...prev, resources, buildings } as any;
-    });
-  }, [canAfford, unlocked, atMax, costEntries, setState, count, building.id]);
+    setState((prev) => buildBuilding(prev, building.id));
+  }, [canAfford, unlocked, atMax, setState, building.id]);
 
   const onDemolish = useCallback(() => {
     if (count <= 0) return;
