@@ -3,13 +3,12 @@ import { Dispatch, SetStateAction } from 'react';
 import useGameLoop from '../../engine/useGameLoop.tsx';
 import { processTick } from '../../engine/production.js';
 import { processResearchTick } from '../../engine/research.js';
-import { getResourceRates, getCapacity } from '../selectors.js';
+import { getResourceRates, getFoodCapacity } from '../selectors.js';
 import { RESOURCES } from '../../data/resources.js';
 import {
   processSettlersTick,
   computeRoleBonuses,
 } from '../../engine/settlers.js';
-import { clampResource } from '../../engine/resources.js';
 import { updateRadio } from '../../engine/radio.js';
 import { getYear, DAYS_PER_YEAR } from '../../engine/time.js';
 
@@ -33,27 +32,30 @@ export function applyProduction(prev: any, dt: number) {
 
   let state = withResearch;
   if (bonusFoodPerSec) {
-    const capacity = getCapacity(withResearch, 'potatoes');
-    const currentEntry = withResearch.resources?.potatoes || {
-      amount: 0,
-      discovered: false,
-      produced: 0,
-    };
-    const nextAmount = clampResource(
-      currentEntry.amount + bonusFoodPerSec * dt,
-      capacity,
-    );
-    state = {
-      ...withResearch,
-      resources: {
-        ...withResearch.resources,
-        potatoes: {
-          ...currentEntry,
-          amount: nextAmount,
-          discovered: currentEntry.discovered || nextAmount > 0,
+    const foodCapacity = getFoodCapacity(withResearch);
+    const currentPool = withResearch.foodPool?.amount || 0;
+    const room = Math.max(0, foodCapacity - currentPool);
+    const bonusGain = Math.min(bonusFoodPerSec * dt, room);
+    if (bonusGain > 0) {
+      const currentEntry = withResearch.resources?.potatoes || {
+        amount: 0,
+        discovered: false,
+        produced: 0,
+      };
+      const nextAmount = currentEntry.amount + bonusGain;
+      state = {
+        ...withResearch,
+        resources: {
+          ...withResearch.resources,
+          potatoes: {
+            ...currentEntry,
+            amount: nextAmount,
+            discovered: currentEntry.discovered || nextAmount > 0,
+          },
         },
-      },
-    };
+        foodPool: { amount: currentPool + bonusGain, capacity: foodCapacity },
+      };
+    }
   }
 
   return { state, roleBonuses, bonusFoodPerSec };

@@ -34,6 +34,18 @@ export function getCapacity(state, resourceId) {
 /**
  * @param {GameState} state
  */
+export function getFoodCapacity(state) {
+  return Object.keys(RESOURCES).reduce((sum, id) => {
+    if (RESOURCES[id].category === 'FOOD') {
+      sum += getCapacity(state, id);
+    }
+    return sum;
+  }, 0);
+}
+
+/**
+ * @param {GameState} state
+ */
 export function getSettlerCapacity(state) {
   const count = state.buildings?.shelter?.count || 0;
   return Math.min(count, SHELTER_MAX);
@@ -110,20 +122,34 @@ function getOutputCapacityFactorRates(
   outputs = {},
   count,
   factor,
+  foodCapacity,
+  totalFoodAmount,
 ) {
   let f = factor;
   Object.entries(outputs || {}).forEach(([res, base]) => {
-    const cap = getCapacity(state, res);
-    if (!Number.isFinite(cap)) return;
-    const current = resources[res] || 0;
-    const room = cap - current;
-    if (room <= 0) {
-      f = 0;
-      return;
-    }
-    const maxGain = base * count * f;
-    if (maxGain > 0) {
-      f = Math.min(f, room / maxGain);
+    if (RESOURCES[res].category === 'FOOD') {
+      const room = foodCapacity - totalFoodAmount;
+      if (room <= 0) {
+        f = 0;
+        return;
+      }
+      const maxGain = base * count * f;
+      if (maxGain > 0) {
+        f = Math.min(f, room / maxGain);
+      }
+    } else {
+      const cap = getCapacity(state, res);
+      if (!Number.isFinite(cap)) return;
+      const current = resources[res] || 0;
+      const room = cap - current;
+      if (room <= 0) {
+        f = 0;
+        return;
+      }
+      const maxGain = base * count * f;
+      if (maxGain > 0) {
+        f = Math.min(f, room / maxGain);
+      }
     }
   });
   return Math.max(0, Math.min(1, f));
@@ -136,6 +162,14 @@ function aggregateBuildingRates(state, roleBonuses) {
   Object.keys(state.resources || {}).forEach((id) => {
     resources[id] = state.resources[id]?.amount || 0;
   });
+  let totalFoodAmount =
+    state.foodPool?.amount ??
+    Object.keys(resources).reduce(
+      (sum, id) =>
+        sum + (RESOURCES[id].category === 'FOOD' ? resources[id] : 0),
+      0,
+    );
+  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
   PRODUCTION_BUILDINGS.forEach((b) => {
     const entry = state.buildings?.[b.id];
     const count = entry?.count || 0;
@@ -150,6 +184,8 @@ function aggregateBuildingRates(state, roleBonuses) {
           b.outputsPerSecBase,
           count,
           factor,
+          foodCapacity,
+          totalFoodAmount,
         );
         if (factor <= 0) return;
         const canRun = Object.entries(b.inputsPerSecBase).every(
@@ -164,6 +200,7 @@ function aggregateBuildingRates(state, roleBonuses) {
           const amt = base * count * factor;
           rates[res] = (rates[res] || 0) - amt;
           resources[res] = (resources[res] || 0) - amt;
+          if (RESOURCES[res].category === 'FOOD') totalFoodAmount -= amt;
         });
       } else {
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
@@ -178,12 +215,15 @@ function aggregateBuildingRates(state, roleBonuses) {
           b.outputsPerSecBase,
           count,
           factor,
+          foodCapacity,
+          totalFoodAmount,
         );
         if (factor <= 0) return;
         Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
           const amt = base * count * factor;
           rates[res] = (rates[res] || 0) - amt;
           resources[res] = (resources[res] || 0) - amt;
+          if (RESOURCES[res].category === 'FOOD') totalFoodAmount -= amt;
         });
       }
     } else {
@@ -193,6 +233,8 @@ function aggregateBuildingRates(state, roleBonuses) {
         b.outputsPerSecBase,
         count,
         factor,
+        foodCapacity,
+        totalFoodAmount,
       );
       if (factor <= 0) return;
     }
@@ -213,11 +255,17 @@ function aggregateBuildingRates(state, roleBonuses) {
           count *
           (1 + bonusPercent / 100 + researchBonus) *
           factor;
-        const cap = getCapacity(state, res);
-        if (Number.isFinite(cap)) {
-          const current = resources[res] || 0;
-          const room = cap - current;
+        if (category === 'FOOD') {
+          const room = foodCapacity - totalFoodAmount;
           gain = room > 0 ? Math.min(gain, room) : 0;
+          totalFoodAmount += gain;
+        } else {
+          const cap = getCapacity(state, res);
+          if (Number.isFinite(cap)) {
+            const current = resources[res] || 0;
+            const room = cap - current;
+            gain = room > 0 ? Math.min(gain, room) : 0;
+          }
         }
         rates[res] = (rates[res] || 0) + gain;
         resources[res] = (resources[res] || 0) + gain;
@@ -378,13 +426,11 @@ function buildResourceGroups(state, netRates, prodRates) {
  * @param {Record<string,{perSec:number,label:string}>} netRates
  */
 function createFoodTotalRow(state, foodIds, netRates) {
-  const totalAmount = foodIds.reduce(
-    (sum, id) => sum + (state.resources[id]?.amount || 0),
-    0,
-  );
+  const totalAmount =
+    state.foodPool?.amount ??
+    foodIds.reduce((sum, id) => sum + (state.resources[id]?.amount || 0), 0);
   const totalCapacity =
-    state.foodPool?.capacity ??
-    foodIds.reduce((sum, id) => sum + getCapacity(state, id), 0);
+    state.foodPool?.capacity ?? getFoodCapacity(state);
   const totalNetRate = foodIds.reduce(
     (sum, id) => sum + (netRates[id]?.perSec || 0),
     0,

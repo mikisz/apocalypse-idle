@@ -10,7 +10,11 @@ import {
   ROLE_BUILDINGS,
 } from '../data/roles.js';
 import { getSeason, getSeasonMultiplier } from './time.js';
-import { getCapacity, getResearchOutputBonus } from '../state/selectors.js';
+import {
+  getCapacity,
+  getFoodCapacity,
+  getResearchOutputBonus,
+} from '../state/selectors.js';
 import { clampResource } from './resources.js';
 import { setOfflineReason } from './powerHandling.js';
 import { getTypeOrderIndex } from './power.js';
@@ -21,20 +25,34 @@ function getOutputCapacityFactor(
   outputs = {},
   count,
   seconds,
+  foodCapacity,
+  totalFoodAmount,
 ) {
   let f = 1;
   Object.entries(outputs).forEach(([res, base]) => {
-    const capacity = getCapacity(state, res);
-    if (!Number.isFinite(capacity)) return;
-    const current = resources[res]?.amount || 0;
-    const room = capacity - current;
-    if (room <= 0) {
-      f = 0;
-      return;
-    }
-    const maxGain = base * count * seconds;
-    if (maxGain > 0) {
-      f = Math.min(f, room / maxGain);
+    if (RESOURCES[res].category === 'FOOD') {
+      const room = foodCapacity - totalFoodAmount;
+      if (room <= 0) {
+        f = 0;
+        return;
+      }
+      const maxGain = base * count * seconds;
+      if (maxGain > 0) {
+        f = Math.min(f, room / maxGain);
+      }
+    } else {
+      const capacity = getCapacity(state, res);
+      if (!Number.isFinite(capacity)) return;
+      const current = resources[res]?.amount || 0;
+      const room = capacity - current;
+      if (room <= 0) {
+        f = 0;
+        return;
+      }
+      const maxGain = base * count * seconds;
+      if (maxGain > 0) {
+        f = Math.min(f, room / maxGain);
+      }
     }
   });
   return Math.max(0, Math.min(1, f));
@@ -44,6 +62,17 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   const season = getSeason(state);
   const resources = { ...state.resources };
   const buildings = { ...state.buildings };
+  let totalFoodAmount =
+    state.foodPool?.amount ??
+    Object.keys(resources).reduce(
+      (sum, id) =>
+        sum +
+        (RESOURCES[id].category === 'FOOD'
+          ? resources[id]?.amount || 0
+          : 0),
+      0,
+    );
+  const foodCapacity = state.foodPool?.capacity ?? getFoodCapacity(state);
 
   const active = PRODUCTION_BUILDINGS.filter((b) => {
     const entry = state.buildings?.[b.id];
@@ -92,14 +121,26 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
         (1 + bonusPercent / 100 + researchBonus) *
         seconds *
         capFactor;
-      const capacity = getCapacity(state, res);
       const currentEntry = resources[res] || { amount: 0, discovered: false };
-      const next = clampResource(currentEntry.amount + gain, capacity);
-      resources[res] = {
-        amount: next,
-        discovered: currentEntry.discovered || count > 0 || next > 0,
-        produced: (currentEntry.produced || 0) + Math.max(0, gain),
-      };
+      if (category === 'FOOD') {
+        const room = foodCapacity - totalFoodAmount;
+        const actualGain = room > 0 ? Math.min(gain, room) : 0;
+        const next = currentEntry.amount + actualGain;
+        totalFoodAmount += actualGain;
+        resources[res] = {
+          amount: next,
+          discovered: currentEntry.discovered || count > 0 || next > 0,
+          produced: (currentEntry.produced || 0) + Math.max(0, actualGain),
+        };
+      } else {
+        const capacity = getCapacity(state, res);
+        const next = clampResource(currentEntry.amount + gain, capacity);
+        resources[res] = {
+          amount: next,
+          discovered: currentEntry.discovered || count > 0 || next > 0,
+          produced: (currentEntry.produced || 0) + Math.max(0, gain),
+        };
+      }
     });
   };
 
@@ -108,14 +149,25 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
       if (res === 'power') return;
       const amt = base * count * seconds * capFactor;
-      const capacity = getCapacity(state, res);
       const entryRes = resources[res] || { amount: 0, discovered: false };
-      const next = clampResource(entryRes.amount - amt, capacity);
-      resources[res] = {
-        ...entryRes,
-        amount: next,
-        discovered: entryRes.discovered || next > 0,
-      };
+      if (RESOURCES[res].category === 'FOOD') {
+        const next = Math.max(0, entryRes.amount - amt);
+        const consumed = entryRes.amount - next;
+        totalFoodAmount -= consumed;
+        resources[res] = {
+          ...entryRes,
+          amount: next,
+          discovered: entryRes.discovered || next > 0,
+        };
+      } else {
+        const capacity = getCapacity(state, res);
+        const next = clampResource(entryRes.amount - amt, capacity);
+        resources[res] = {
+          ...entryRes,
+          amount: next,
+          discovered: entryRes.discovered || next > 0,
+        };
+      }
     });
   };
 
@@ -160,6 +212,8 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
       b.outputsPerSecBase,
       count,
       seconds,
+      foodCapacity,
+      totalFoodAmount,
     );
     if (capFactor <= 0) return;
 
@@ -191,6 +245,8 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
       b.outputsPerSecBase,
       count,
       seconds,
+      foodCapacity,
+      totalFoodAmount,
     );
     if (capFactor <= 0) return;
 
@@ -237,8 +293,9 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
     if (entry.amount > 0) entry.discovered = true;
   });
 
+  const foodPool = { amount: totalFoodAmount, capacity: foodCapacity };
   const powerStatus = { supply: supplyTotal, demand: demandTotal, stored, capacity };
-  return { ...state, resources, buildings, powerStatus };
+  return { ...state, resources, buildings, powerStatus, foodPool };
 }
 
 export function processTick(state, seconds = 1, roleBonuses = {}) {

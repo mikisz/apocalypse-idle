@@ -21,6 +21,7 @@ export function prepareLoadedState(loaded: any) {
   base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
   base.ui = { ...base.ui, ...cloned.ui };
   base.resources = { ...base.resources, ...cloned.resources };
+  base.foodPool = { ...base.foodPool, ...cloned.foodPool };
   base.buildings = { ...base.buildings, ...cloned.buildings };
   Object.values(base.buildings).forEach((b: any) => {
     if (typeof b.isDesiredOn !== 'boolean') b.isDesiredOn = true;
