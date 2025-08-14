@@ -41,6 +41,9 @@ export default function BuildingRow({
         ? 'grid-cols-2'
         : 'grid-cols-1';
 
+  const capacityEntries = Object.entries(building.capacityAdd || {});
+  const hasFoodCapacity = capacityEntries.some(([res]) => res === 'FOOD');
+
   return (
     <Container className="space-y-3 shadow-none">
       <div className="flex items-center justify-between">
@@ -132,6 +135,7 @@ export default function BuildingRow({
               <div>
                 <div className="text-xs font-medium">Increase:</div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
+
                   {building.cardTextOverride ? (
                     <span>{building.cardTextOverride}</span>
                   ) : (
@@ -145,6 +149,7 @@ export default function BuildingRow({
                       ) : null;
                     })
                   )}
+
                 </div>
               </div>
             )
