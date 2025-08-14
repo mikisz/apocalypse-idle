@@ -41,7 +41,6 @@ beforeEach(() => {
 
 describe('applyProduction', () => {
   it('calculates bonuses and adds farmer bonus after consumption', () => {
-    (computeRoleBonuses as any).mockReturnValue({ farmer: 0.1, builder: 0.05 });
     (processTick as any).mockReturnValue('after');
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 1, produced: 0, discovered: true } },
@@ -56,7 +55,8 @@ describe('applyProduction', () => {
     (RESOURCES as any).potatoes = { category: 'FOOD' };
     (RESOURCES as any).metal = { category: 'METAL' };
 
-    const result = applyProduction({ population: { settlers: [] } }, 1);
+    const roleBonuses = { farmer: 0.1, builder: 0.05 };
+    const result = applyProduction({ population: { settlers: [] } }, 1, roleBonuses);
 
     expect(processTick).toHaveBeenCalledWith(
       { population: { settlers: [] } },
@@ -75,7 +75,6 @@ describe('applyProduction', () => {
   });
 
   it('clamps bonus food to capacity', () => {
-    (computeRoleBonuses as any).mockReturnValue({ farmer: 1 });
     (processTick as any).mockReturnValue('after');
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 99.5, produced: 0, discovered: true } },
@@ -88,7 +87,9 @@ describe('applyProduction', () => {
     (getFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
 
-    const result = applyProduction({ population: { settlers: [] } }, 1);
+    const result = applyProduction({ population: { settlers: [] } }, 1, {
+      farmer: 1,
+    });
 
     expect(result.state.resources.potatoes.amount).toBe(100);
   });
@@ -96,20 +97,26 @@ describe('applyProduction', () => {
 
 describe('applySettlers', () => {
   it('processes settlers tick', () => {
+    (computeRoleBonuses as any).mockReturnValue({ farmer: 0.2 });
     (processSettlersTick as any).mockReturnValue({
       state: 'settlersProcessed',
       telemetry: 'tele',
     });
     const rng = () => 0.5;
-    const result = applySettlers('stateBefore', 1, rng);
+    const result = applySettlers({ population: { settlers: [] } }, 1, rng);
+    expect(computeRoleBonuses).toHaveBeenCalledWith([]);
     expect(processSettlersTick).toHaveBeenCalledWith(
-      'stateBefore',
+      { population: { settlers: [] } },
       1,
       0,
       rng,
-      null,
+      { farmer: 0.2 },
     );
-    expect(result).toEqual({ state: 'settlersProcessed', telemetry: 'tele' });
+    expect(result).toEqual({
+      state: 'settlersProcessed',
+      telemetry: 'tele',
+      roleBonuses: { farmer: 0.2 },
+    });
   });
 });
 
