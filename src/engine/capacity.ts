@@ -6,34 +6,36 @@ function getAmount(resources: Record<string, any>, res: string): number {
   return typeof entry === 'number' ? entry : entry?.amount || 0;
 }
 
-export function getOutputCapacityFactor(
+export function getOutputCapacityFactors(
   state: any,
   resources: Record<string, any>,
   desiredOutputs: Record<string, number> = {},
   foodCapacity: number,
   totalFoodAmount: number,
-): number {
-  let factor = 1;
-  let totalFoodOut = 0;
+): Record<string, number> {
+  const factors: Record<string, number> = {};
+  let foodRoom = foodCapacity - totalFoodAmount;
   Object.entries(desiredOutputs).forEach(([res, amount]) => {
     if (RESOURCES[res].category === 'FOOD') {
-      if (amount > 0) totalFoodOut += amount;
+      const room = Math.max(0, foodRoom);
+      const factor = amount > 0 ? Math.min(1, room / amount) : 1;
+      factors[res] = Math.max(0, factor);
+      foodRoom -= amount * factors[res];
     } else {
       const capacity = getCapacity(state, res);
-      if (!Number.isFinite(capacity)) return;
+      if (!Number.isFinite(capacity)) {
+        factors[res] = 1;
+        return;
+      }
       const current = getAmount(resources, res);
       const room = capacity - current;
       if (room <= 0) {
-        factor = 0;
+        factors[res] = 0;
         return;
       }
-      if (amount > 0) factor = Math.min(factor, room / amount);
+      const factor = amount > 0 ? Math.min(1, room / amount) : 1;
+      factors[res] = Math.max(0, factor);
     }
   });
-  if (totalFoodOut > 0) {
-    const room = foodCapacity - totalFoodAmount;
-    if (room <= 0) factor = 0;
-    else factor = Math.min(factor, room / totalFoodOut);
-  }
-  return Math.max(0, Math.min(1, factor));
+  return factors;
 }
