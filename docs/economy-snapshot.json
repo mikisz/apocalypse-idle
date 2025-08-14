@@ -1,7 +1,5 @@
 {
-
-  "version": "bd1109da0b31db9f7e6649157100bf13e85d00c1",
-
+  "version": "c11326f359c9175a01416a829276595fd60e647e",
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -166,7 +164,6 @@
       "startingAmount": 0,
       "startingCapacity": 40,
       "unit": null,
-
       "origin": {
         "file": "resources.js",
         "path": "RESOURCES.bricks"
@@ -607,8 +604,7 @@
       "costGrowth": 1.22,
       "refund": 0.5,
       "storage": {
-        "potatoes": 150,
-        "meat": 75
+        "FOOD": 225
       },
       "outputsPerSec": {},
       "inputsPerSec": {},
@@ -622,8 +618,34 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[13]"
-
-
+      }
+    },
+    {
+      "id": "largeGranary",
+      "name": "Large Granary",
+      "type": "storage",
+      "cost": {
+        "wood": 35,
+        "stone": 20,
+        "bricks": 20
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "FOOD": 600
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[14]"
       }
     },
     {
@@ -653,8 +675,37 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[14]"
-
+        "path": "BUILDINGS[15]"
+      }
+    },
+    {
+      "id": "largeWarehouse",
+      "name": "Large Warehouse",
+      "type": "storage",
+      "cost": {
+        "wood": 40,
+        "stone": 30,
+        "bricks": 20
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "wood": 400,
+        "stone": 160,
+        "scrap": 240
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[16]"
       }
     },
     {
@@ -683,8 +734,37 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[15]"
-
+        "path": "BUILDINGS[17]"
+      }
+    },
+    {
+      "id": "largeMaterialsDepot",
+      "name": "Large Materials Depot",
+      "type": "storage",
+      "cost": {
+        "wood": 35,
+        "bricks": 25,
+        "scrap": 15
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "planks": 180,
+        "metalParts": 90,
+        "bricks": 180
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[18]"
       }
     },
     {
@@ -713,8 +793,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[16]"
-
+        "path": "BUILDINGS[19]"
       }
     }
   ],
@@ -1153,6 +1232,12 @@
       "id": "farmer",
       "name": "Farmer",
       "skill": "Farming",
+      "resources": [
+        "potatoes"
+      ],
+      "buildings": [
+        "potatoField"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.farmer"
@@ -1162,6 +1247,12 @@
       "id": "hunter",
       "name": "Hunter",
       "skill": "Hunting",
+      "resources": [
+        "meat"
+      ],
+      "buildings": [
+        "huntersHut"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.hunter"
@@ -1171,6 +1262,16 @@
       "id": "gatherer",
       "name": "Gatherer",
       "skill": "Gathering",
+      "resources": [
+        "wood",
+        "scrap",
+        "stone"
+      ],
+      "buildings": [
+        "loggingCamp",
+        "scrapyard",
+        "quarry"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.gatherer"
@@ -1180,6 +1281,12 @@
       "id": "carpenter",
       "name": "Carpenter",
       "skill": "Carpentry",
+      "resources": [
+        "planks"
+      ],
+      "buildings": [
+        "sawmill"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.carpenter"
@@ -1189,6 +1296,12 @@
       "id": "metalworker",
       "name": "Metalworker",
       "skill": "Metalworking",
+      "resources": [
+        "metalParts"
+      ],
+      "buildings": [
+        "metalWorkshop"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.metalworker"
@@ -1198,6 +1311,12 @@
       "id": "mason",
       "name": "Mason",
       "skill": "Masonry",
+      "resources": [
+        "bricks"
+      ],
+      "buildings": [
+        "brickKiln"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.mason"
@@ -1207,6 +1326,12 @@
       "id": "toolsmith",
       "name": "Toolsmith",
       "skill": "Toolsmithing",
+      "resources": [
+        "tools"
+      ],
+      "buildings": [
+        "toolsmithy"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.toolsmith"
@@ -1216,6 +1341,12 @@
       "id": "engineer",
       "name": "Engineer",
       "skill": "Engineering",
+      "resources": [
+        "power"
+      ],
+      "buildings": [
+        "woodGenerator"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.engineer"
@@ -1225,6 +1356,12 @@
       "id": "scientist",
       "name": "Scientist",
       "skill": "Scientist",
+      "resources": [
+        "science"
+      ],
+      "buildings": [
+        "school"
+      ],
       "origin": {
         "file": "roles.js",
         "path": "ROLES.scientist"
