@@ -117,8 +117,8 @@ const roles = ROLE_LIST.map((r) => ({
   id: r.id,
   name: r.name,
   skill: r.skill,
-  resource: r.resource,
-  building: r.building,
+  resources: r.resources,
+  buildings: r.buildings,
   origin: { file: 'roles.js', path: `ROLES.${r.id}` },
 }));
 
@@ -247,10 +247,10 @@ research.forEach((r, idx) => {
 md += '\n';
 
 md += '## 6) Roles\n';
-md += '| id | name | skill | resource | building | source |\n';
+md += '| id | name | skill | resources | buildings | source |\n';
 md += '| - | - | - | - | - | - |\n';
 roles.forEach((r) => {
-  md += `| ${r.id} | ${r.name} | ${r.skill} | ${r.resource} | ${r.building} | roles.js:ROLES.${r.id} |\n`;
+  md += `| ${r.id} | ${r.name} | ${r.skill} | ${formatArr(r.resources)} | ${formatArr(r.buildings)} | roles.js:ROLES.${r.id} |\n`;
 });
 md += '\n';
 
