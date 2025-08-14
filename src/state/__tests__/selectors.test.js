@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { getResourceRates, getResourceSections, getPowerStatus } from '../selectors.js';
+import {
+  getCapacity,
+  getFoodPoolAmount,
+  getFoodPoolCapacity,
+  getResourceRates,
+  getResourceSections,
+  getPowerStatus,
+} from '../selectors.js';
+import { defaultState } from '../defaultState.js';
+import { deepClone } from '../../utils/clone.ts';
 
 describe('getResourceRates', () => {
   it('ignores buildings that are turned off', () => {
@@ -55,5 +64,28 @@ describe('power selectors', () => {
     expect(row.demand).toBe(1);
     expect(row.amount).toBe(3);
     expect(row.capacity).toBe(10);
+  });
+});
+
+describe('food pool selectors', () => {
+  it('returns food pool values when present', () => {
+    const state = { foodPool: { amount: 5, capacity: 10 } };
+    expect(getFoodPoolAmount(state)).toBe(5);
+    expect(getFoodPoolCapacity(state)).toBe(10);
+  });
+
+  it('computes amount and capacity when food pool missing', () => {
+    const state = deepClone(defaultState);
+    delete state.foodPool;
+    state.resources.potatoes.amount = 2;
+    state.resources.meat.amount = 1;
+    state.buildings.foodStorage = { count: 1 };
+    expect(getFoodPoolAmount(state)).toBeCloseTo(3, 5);
+    expect(getFoodPoolCapacity(state)).toBe(525);
+  });
+
+  it('capacity selector returns Infinity for individual food resources', () => {
+    const state = { buildings: {}, research: { completed: [] } };
+    expect(getCapacity(state, 'potatoes')).toBe(Infinity);
   });
 });

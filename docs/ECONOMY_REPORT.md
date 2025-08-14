@@ -73,6 +73,7 @@ Each tick represents 1 second. For each building: base production is modified by
 | gatherer | Gatherer | Gathering | undefined | undefined | roles.js:ROLES.gatherer |
 | carpenter | Carpenter | Carpentry | undefined | undefined | roles.js:ROLES.carpenter |
 | metalworker | Metalworker | Metalworking | undefined | undefined | roles.js:ROLES.metalworker |
+| mason | Mason | Masonry | undefined | undefined | roles.js:ROLES.mason |
 | toolsmith | Toolsmith | Toolsmithing | undefined | undefined | roles.js:ROLES.toolsmith |
 | engineer | Engineer | Engineering | undefined | undefined | roles.js:ROLES.engineer |
 | scientist | Scientist | Scientist | undefined | undefined | roles.js:ROLES.scientist |

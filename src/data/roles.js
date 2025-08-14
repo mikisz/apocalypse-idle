@@ -34,6 +34,13 @@ export const ROLES = {
     resources: ['metalParts'],
     buildings: ['metalWorkshop'],
   },
+  mason: {
+    id: 'mason',
+    name: 'Mason',
+    skill: 'Masonry',
+    resources: ['bricks'],
+    buildings: ['brickKiln'],
+  },
   toolsmith: {
     id: 'toolsmith',
     name: 'Toolsmith',

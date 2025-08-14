@@ -1,38 +1,33 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import BuildingRow from './BuildingRowContainer.jsx';
-import { BUILDING_MAP } from '../data/buildings.js';
-import { GameContext } from '../state/useGame.tsx';
-import { defaultState } from '../state/defaultState.js';
+import { describe, it, expect } from 'vitest';
+import BuildingRow from './BuildingRow.jsx';
 
 describe('BuildingRow', () => {
-  it('shows capacity increase for storage buildings', () => {
-    const ctx = {
-      state: defaultState,
-      setState: vi.fn(),
-      setActiveTab: vi.fn(),
-      toggleDrawer: vi.fn(),
-      setSettlerRole: vi.fn(),
-      beginResearch: vi.fn(),
-      abortResearch: vi.fn(),
-      dismissOfflineModal: vi.fn(),
-      resetGame: vi.fn(),
-      loadError: false,
-      retryLoad: vi.fn(),
+  it('shows cardTextOverride for food capacity', () => {
+    const building = {
+      name: 'Granary',
+      description: 'Increases food storage.',
+      capacityAdd: { FOOD: 100 },
+      cardTextOverride: '+100 Food capacity',
     };
 
     render(
-      <GameContext.Provider value={ctx}>
-        <BuildingRow
-          building={BUILDING_MAP.foodStorage}
-          completedResearch={[]}
-        />
-      </GameContext.Provider>,
+      <BuildingRow
+        building={building}
+        costEntries={[]}
+        perOutputs={[]}
+        perInputs={[]}
+        canAfford
+        unlocked
+        onBuild={() => {}}
+        onDemolish={() => {}}
+        onToggle={() => {}}
+      />,
     );
 
     expect(screen.getByText('Increase:')).toBeTruthy();
-    expect(screen.getByText(/🍖 \+75 Meat capacity/)).toBeTruthy(); // changed: 150 -> 75
-    expect(screen.getByText(/🥔 \+150 Potatoes capacity/)).toBeTruthy(); // changed: 300 -> 150
+    expect(screen.getByText('Food Capacity +225')).toBeTruthy();
+
   });
 });

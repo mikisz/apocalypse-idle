@@ -44,4 +44,16 @@ describe('settlers tick', () => {
 
     expect(final.resources.potatoes.amount).toBeCloseTo(expected, 5);
   });
+
+  it('clamps food once after bonus and consumption', () => {
+    const state = deepClone(defaultState);
+    const cap = 200;
+    state.resources.potatoes.amount = cap;
+    state.foodPool = { amount: cap, capacity: cap };
+    state.population.settlers = [{ id: 's1' }];
+    const bonusPerSec = BALANCE.FOOD_CONSUMPTION_PER_SETTLER + 0.1;
+    const { state: next } = processSettlersTick(state, 1, bonusPerSec);
+    expect(next.foodPool.amount).toBe(cap);
+    expect(next.resources.potatoes.amount).toBe(cap);
+  });
 });

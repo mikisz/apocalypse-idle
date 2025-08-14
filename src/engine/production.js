@@ -29,17 +29,11 @@ function getOutputCapacityFactor(
   totalFoodAmount,
 ) {
   let f = 1;
+  let totalFoodOut = 0;
   Object.entries(outputs).forEach(([res, base]) => {
     if (RESOURCES[res].category === 'FOOD') {
-      const room = foodCapacity - totalFoodAmount;
-      if (room <= 0) {
-        f = 0;
-        return;
-      }
       const maxGain = base * count * seconds;
-      if (maxGain > 0) {
-        f = Math.min(f, room / maxGain);
-      }
+      if (maxGain > 0) totalFoodOut += maxGain;
     } else {
       const capacity = getCapacity(state, res);
       if (!Number.isFinite(capacity)) return;
@@ -50,11 +44,14 @@ function getOutputCapacityFactor(
         return;
       }
       const maxGain = base * count * seconds;
-      if (maxGain > 0) {
-        f = Math.min(f, room / maxGain);
-      }
+      if (maxGain > 0) f = Math.min(f, room / maxGain);
     }
   });
+  if (totalFoodOut > 0) {
+    const room = foodCapacity - totalFoodAmount;
+    if (room <= 0) f = 0;
+    else f = Math.min(f, room / totalFoodOut);
+  }
   return Math.max(0, Math.min(1, f));
 }
 
@@ -124,9 +121,9 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
       const currentEntry = resources[res] || { amount: 0, discovered: false };
       if (category === 'FOOD') {
         const room = foodCapacity - totalFoodAmount;
-        const actualGain = room > 0 ? Math.min(gain, room) : 0;
-        const next = currentEntry.amount + actualGain;
+        const actualGain = Math.max(0, Math.min(gain, room));
         totalFoodAmount += actualGain;
+        const next = currentEntry.amount + actualGain;
         resources[res] = {
           amount: next,
           discovered: currentEntry.discovered || count > 0 || next > 0,
@@ -151,9 +148,9 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
       const amt = base * count * seconds * capFactor;
       const entryRes = resources[res] || { amount: 0, discovered: false };
       if (RESOURCES[res].category === 'FOOD') {
-        const next = Math.max(0, entryRes.amount - amt);
-        const consumed = entryRes.amount - next;
-        totalFoodAmount -= consumed;
+        const consume = Math.min(entryRes.amount, amt);
+        const next = entryRes.amount - consume;
+        totalFoodAmount = Math.max(0, totalFoodAmount - consume);
         resources[res] = {
           ...entryRes,
           amount: next,
@@ -302,6 +299,48 @@ export function processTick(state, seconds = 1, roleBonuses = {}) {
   return applyProduction(state, seconds, roleBonuses);
 }
 
+export function buildBuilding(state, buildingId) {
+  const blueprint = BUILDING_MAP[buildingId];
+  if (!blueprint) return state;
+  const count = state.buildings?.[buildingId]?.count || 0;
+  const cost = getBuildingCost(blueprint, count);
+  const resources = { ...state.resources };
+  for (const [res, amt] of Object.entries(cost)) {
+    if ((resources[res]?.amount || 0) < amt) return state;
+  }
+  Object.entries(cost).forEach(([res, amt]) => {
+    const entry = resources[res] || { amount: 0, discovered: false };
+    const next = entry.amount - amt;
+    resources[res] = {
+      amount: next,
+      discovered: entry.discovered || next > 0,
+      produced: entry.produced || 0,
+    };
+  });
+  const buildings = {
+    ...state.buildings,
+    [buildingId]: { count: count + 1 },
+  };
+  Object.keys(resources).forEach((res) => {
+    const cap = getCapacity({ ...state, buildings }, res);
+    const entry = resources[res];
+    entry.amount = clampResource(entry.amount, cap);
+    if (entry.amount > 0) entry.discovered = true;
+  });
+  let foodPool = state.foodPool;
+  if (blueprint.capacityAdd?.FOOD) {
+    const capacity = (foodPool?.capacity || 0) + blueprint.capacityAdd.FOOD;
+    const amount = Math.min(foodPool?.amount || 0, capacity);
+    foodPool = { amount, capacity };
+  }
+  return {
+    ...state,
+    resources,
+    buildings,
+    ...(foodPool ? { foodPool } : {}),
+  };
+}
+
 export function demolishBuilding(state, buildingId) {
   const blueprint = BUILDING_MAP[buildingId];
   const count = state.buildings?.[buildingId]?.count || 0;
@@ -338,10 +377,20 @@ export function demolishBuilding(state, buildingId) {
       );
     }
   }
+  let foodPool = state.foodPool;
+  if (blueprint.capacityAdd?.FOOD) {
+    const capacity = Math.max(
+      0,
+      (foodPool?.capacity || 0) - blueprint.capacityAdd.FOOD,
+    );
+    const amount = Math.min(foodPool?.amount || 0, capacity);
+    foodPool = { amount, capacity };
+  }
   return {
     ...state,
     resources,
     buildings,
     population: { ...state.population, settlers },
+    ...(foodPool ? { foodPool } : {}),
   };
 }

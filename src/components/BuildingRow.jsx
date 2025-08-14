@@ -41,6 +41,9 @@ export default function BuildingRow({
         ? 'grid-cols-2'
         : 'grid-cols-1';
 
+  const capacityEntries = Object.entries(building.capacityAdd || {});
+  const hasFoodCapacity = capacityEntries.some(([res]) => res === 'FOOD');
+
   return (
     <Container className="space-y-3 shadow-none">
       <div className="flex items-center justify-between">
@@ -61,11 +64,12 @@ export default function BuildingRow({
               No Power
             </span>
           )}
-          {isDesiredOn && (resourceShortage || offlineReason === 'resources') && (
-            <span className="px-1 text-xs text-white bg-red-600 rounded">
-              No Resources
-            </span>
-          )}
+          {isDesiredOn &&
+            (resourceShortage || offlineReason === 'resources') && (
+              <span className="px-1 text-xs text-white bg-red-600 rounded">
+                No Resources
+              </span>
+            )}
         </div>
         <div className="space-x-2 flex items-center">
           <Switch checked={isDesiredOn} onCheckedChange={onToggle} />
@@ -131,12 +135,21 @@ export default function BuildingRow({
               <div>
                 <div className="text-xs font-medium">Increase:</div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
-                  {Object.entries(building.capacityAdd).map(([res, cap]) => (
-                    <span key={res} className="flex items-center gap-1">
-                      {RESOURCES[res].icon} +{formatAmount(cap)}{' '}
-                      {RESOURCES[res].name} capacity
-                    </span>
-                  ))}
+
+                  {building.cardTextOverride ? (
+                    <span>{building.cardTextOverride}</span>
+                  ) : (
+                    Object.entries(building.capacityAdd).map(([res, cap]) => {
+                      const resource = RESOURCES[res];
+                      return resource ? (
+                        <span key={res} className="flex items-center gap-1">
+                          {resource.icon} +{formatAmount(cap)} {resource.name}{' '}
+                          capacity
+                        </span>
+                      ) : null;
+                    })
+                  )}
+
                 </div>
               </div>
             )
