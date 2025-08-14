@@ -277,4 +277,24 @@ describe('useNotifications', () => {
     rerender(<Wrapper state={low} />);
     expect(toast).not.toHaveBeenCalled();
   });
+
+  it('does not toast when happiness stays below 50%', () => {
+    const lower = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 49.4 } },
+    };
+    const slightlyHigher = {
+      research: { current: null, completed: [] },
+      resources: {},
+      population: { candidate: null, settlers: [] },
+      buildings: {},
+      colony: { happiness: { value: 49.6 } },
+    };
+    const { rerender } = render(<Wrapper state={lower} />);
+    rerender(<Wrapper state={slightlyHigher} />);
+    expect(toast).not.toHaveBeenCalled();
+  });
 });
