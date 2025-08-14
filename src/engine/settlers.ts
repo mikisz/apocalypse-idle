@@ -6,7 +6,8 @@ import {
   FOOD_VARIETY_BONUS,
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
-import { calculateFoodCapacity, getSettlerCapacity } from '../state/selectors.js';
+import { getSettlerCapacity } from '../state/selectors.js';
+import { calculateFoodCapacity, ensureCapacityCache } from '../state/capacityCache.ts';
 import { SECONDS_PER_DAY } from './time.ts';
 import { RESOURCES } from '../data/resources.js';
 import { clampResource } from './resources.ts';
@@ -36,6 +37,7 @@ export function processSettlersTick(
   rng: () => number = Math.random,
   roleBonuses: Record<string, number> | null = null,
 ): { state: any; telemetry: any; events: any[] } {
+  ensureCapacityCache(state);
   const settlers = state.population?.settlers
     ? [...state.population.settlers]
     : [];

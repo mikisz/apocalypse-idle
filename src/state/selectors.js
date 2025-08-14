@@ -11,30 +11,10 @@ import { formatRate } from '../utils/format.js';
 import { BALANCE } from '../data/balance.js';
 import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { SHELTER_MAX } from '../data/settlement.js';
+import { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
+export { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
 
 /** @typedef {import('./useGame.tsx').GameState} GameState */
-
-/**
- * @param {GameState} state
- * @param {string} resourceId
- */
-export function getCapacity(state, resourceId) {
-  if (RESOURCES[resourceId]?.category === 'FOOD') return Infinity;
-  const base = RESOURCES[resourceId]?.startingCapacity || 0;
-  let fromBuildings = 0;
-  BUILDINGS.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
-    if (count > 0 && b.capacityAdd?.[resourceId]) {
-      fromBuildings += b.capacityAdd[resourceId] * count;
-    }
-  });
-  const bonus = getResearchStorageBonus(state, resourceId);
-  return Math.floor((base + fromBuildings) * (1 + bonus));
-}
-
-/**
- * @param {GameState} state
- */
 
 export function getFoodPoolAmount(state) {
   if (state.foodPool?.amount != null) return state.foodPool.amount;
@@ -44,33 +24,6 @@ export function getFoodPoolAmount(state) {
     }
     return sum;
   }, 0);
-}
-
-/**
- * @param {GameState} state
- */
-export function calculateFoodCapacity(state) {
-  let total = 0;
-  Object.keys(RESOURCES).forEach((id) => {
-    if (RESOURCES[id].category !== 'FOOD') return;
-    const base = RESOURCES[id]?.startingCapacity || 0;
-    let fromBuildings = 0;
-    BUILDINGS.forEach((b) => {
-      const count = state.buildings?.[b.id]?.count || 0;
-      if (count > 0 && b.capacityAdd?.[id]) {
-        fromBuildings += b.capacityAdd[id] * count;
-      }
-    });
-    const bonus = getResearchStorageBonus(state, id);
-    total += Math.floor((base + fromBuildings) * (1 + bonus));
-  });
-  BUILDINGS.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
-    if (count > 0 && b.capacityAdd?.FOOD) {
-      total += b.capacityAdd.FOOD * count;
-    }
-  });
-  return total;
 }
 
 /**
