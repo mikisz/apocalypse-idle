@@ -1,5 +1,5 @@
 {
-  "version": "e412e0e8b37cb9b8933bf57d647d6e698fd6a0f1",
+  "version": "8a6d229320f1a7982a87555fff24acef870857b9",
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -575,6 +575,34 @@
       }
     },
     {
+      "id": "largeGranary",
+      "name": "Large Granary",
+      "type": "storage",
+      "cost": {
+        "wood": 35,
+        "stone": 20,
+        "bricks": 20
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "FOOD": 600
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[13]"
+      }
+    },
+    {
       "id": "rawStorage",
       "name": "Warehouse",
       "type": "storage",
@@ -601,7 +629,37 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[13]"
+        "path": "BUILDINGS[14]"
+      }
+    },
+    {
+      "id": "largeWarehouse",
+      "name": "Large Warehouse",
+      "type": "storage",
+      "cost": {
+        "wood": 40,
+        "stone": 30,
+        "bricks": 20
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "wood": 400,
+        "stone": 160,
+        "scrap": 240
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[15]"
       }
     },
     {
@@ -630,7 +688,37 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[14]"
+        "path": "BUILDINGS[16]"
+      }
+    },
+    {
+      "id": "largeMaterialsDepot",
+      "name": "Large Materials Depot",
+      "type": "storage",
+      "cost": {
+        "wood": 35,
+        "bricks": 25,
+        "scrap": 15
+      },
+      "costGrowth": 1.15,
+      "refund": 0.5,
+      "storage": {
+        "planks": 180,
+        "metalParts": 90,
+        "bricks": 180
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "masonry2",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[17]"
       }
     },
     {
@@ -659,7 +747,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[15]"
+        "path": "BUILDINGS[18]"
       }
     }
   ],
