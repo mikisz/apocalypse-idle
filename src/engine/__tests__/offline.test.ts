@@ -9,6 +9,7 @@ vi.mock('../candidates.ts', () => ({
 import { applyOfflineProgress } from '../offline.ts';
 import { generateCandidate } from '../candidates.ts';
 import { processTick } from '../production.ts';
+import { RESEARCH_MAP } from '../../data/research.js';
 
 const createRng = (seed = 1) => () => {
   seed = (seed * 16807) % 2147483647;
@@ -98,5 +99,23 @@ describe('applyOfflineProgress', () => {
     }
     expect(offline.resources.power).toEqual(online.resources.power);
     expect(offline.powerStatus).toEqual(online.powerStatus);
+  });
+
+  it('completes research and logs event while offline', () => {
+    const id = 'industry1';
+    const state: any = {
+      buildings: {},
+      resources: {},
+      research: { current: { id }, completed: [], progress: { [id]: 0 } },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0, starvationTimerSeconds: 0 },
+      log: [],
+    };
+    const seconds = RESEARCH_MAP[id].timeSec + 5;
+    const { state: next, events } = applyOfflineProgress(state, seconds, {});
+    expect(next.research.current).toBe(null);
+    expect(next.research.completed).toContain(id);
+    const evt = events.find((e: any) => e.type === 'research');
+    expect(evt?.text).toContain(RESEARCH_MAP[id].name);
   });
 });

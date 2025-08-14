@@ -1,10 +1,13 @@
 // @ts-nocheck
 import { RESOURCES } from '../data/resources.js';
+import { RESEARCH_MAP } from '../data/research.js';
 import { getResourceRates } from '../state/selectors.js';
 import { updateRadio } from './radio.ts';
 import { deepClone } from '../utils/clone.ts';
 import { processSettlersTick } from './settlers.ts';
 import { processTick } from './production.ts';
+import { processResearchTick } from './research.ts';
+import { createLogEntry } from '../utils/log.js';
 
 export function applyOfflineProgress(
   state: any,
@@ -17,6 +20,8 @@ export function applyOfflineProgress(
   const productionBonuses = { ...roleBonuses };
   delete productionBonuses.farmer;
   let current: any = { ...state };
+  if (!current.research)
+    current.research = { current: null, completed: [], progress: {} };
   let events: any[] = [];
 
   const CHUNK_SECONDS = 60;
@@ -25,6 +30,21 @@ export function applyOfflineProgress(
     remaining -= dt;
 
     current = processTick(current, dt, productionBonuses);
+    const researchBefore = current.research?.current?.id;
+    current = processResearchTick(current, dt, roleBonuses);
+    if (
+      researchBefore &&
+      !current.research.current &&
+      current.research.completed.includes(researchBefore)
+    ) {
+      const name = RESEARCH_MAP[researchBefore]?.name || researchBefore;
+      const entry = createLogEntry(`${name} research complete`);
+      current = {
+        ...current,
+        log: [entry, ...(current.log || [])].slice(0, 100),
+      };
+      events.push({ ...entry, type: 'research' });
+    }
     if (dt > 0 && current.powerStatus) {
       current.powerStatus = {
         ...current.powerStatus,
@@ -51,7 +71,10 @@ export function applyOfflineProgress(
       roleBonuses,
     );
     current = settlersResult.state;
-    if (settlersResult.events?.length) events.push(...settlersResult.events);
+    if (settlersResult.events?.length)
+      events.push(
+        ...settlersResult.events.map((e: any) => ({ ...e, type: 'death' })),
+      );
 
     const { candidate, radioTimer } = updateRadio(current, dt);
     current = {

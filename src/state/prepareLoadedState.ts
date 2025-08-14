@@ -71,7 +71,8 @@ export function prepareLoadedState(loaded: any) {
         now,
       ),
     );
-    const deathLogs = events || [];
+    const deathLogs = (events || []).filter((e) => e.type === 'death');
+    const researchLogs = (events || []).filter((e) => e.type === 'research');
     const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
     const yearAfter = getYear({
       ...progressed,
@@ -81,7 +82,10 @@ export function prepareLoadedState(loaded: any) {
       ...s,
       ageDays: (s.ageDays || 0) + elapsed / SECONDS_PER_DAY,
     }));
-    const show = Object.keys(gains).length > 0 || deathLogs.length > 0;
+    const show =
+      Object.keys(gains).length > 0 ||
+      deathLogs.length > 0 ||
+      researchLogs.length > 0;
     const log = [...resourceLogs, ...(progressed.log || [])].slice(0, 100);
     return {
       ...progressed,
@@ -90,7 +94,12 @@ export function prepareLoadedState(loaded: any) {
       ui: {
         ...progressed.ui,
         offlineProgress: show
-          ? { elapsed, gains, deaths: deathLogs.map((e) => e.text) }
+          ? {
+              elapsed,
+              gains,
+              deaths: deathLogs.map((e) => e.text),
+              research: researchLogs.map((e) => e.text),
+            }
           : null,
       },
       log,
