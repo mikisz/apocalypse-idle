@@ -8,8 +8,8 @@ describe('BuildingRow', () => {
     const building = {
       name: 'Granary',
       description: 'Increases food storage.',
-      capacityAdd: { FOOD: 100 },
-      cardTextOverride: '+100 Food capacity',
+      capacityAdd: { FOOD: 225 },
+      cardTextOverride: 'Food Capacity +225',
     };
 
     render(

@@ -41,7 +41,7 @@ beforeEach(() => {
 
 describe('applyProduction', () => {
   it('calculates bonuses and adds farmer bonus after consumption', () => {
-    (computeRoleBonuses as any).mockReturnValue({ farmer: 10, builder: 5 });
+    (computeRoleBonuses as any).mockReturnValue({ farmer: 0.1, builder: 0.05 });
     (processTick as any).mockReturnValue('after');
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 1, produced: 0, discovered: true } },
@@ -61,7 +61,7 @@ describe('applyProduction', () => {
     expect(processTick).toHaveBeenCalledWith(
       { population: { settlers: [] } },
       1,
-      { builder: 5 },
+      { builder: 0.05 },
     );
     expect(result).toEqual({
       state: {
@@ -69,13 +69,13 @@ describe('applyProduction', () => {
         population: { settlers: [] },
         foodPool: { amount: 1.2, capacity: 100 },
       },
-      roleBonuses: { farmer: 10, builder: 5 },
+      roleBonuses: { farmer: 0.1, builder: 0.05 },
       bonusFoodPerSec: 0.2,
     });
   });
 
   it('clamps bonus food to capacity', () => {
-    (computeRoleBonuses as any).mockReturnValue({ farmer: 100 });
+    (computeRoleBonuses as any).mockReturnValue({ farmer: 1 });
     (processTick as any).mockReturnValue('after');
     (processResearchTick as any).mockReturnValue({
       resources: { potatoes: { amount: 99.5, produced: 0, discovered: true } },

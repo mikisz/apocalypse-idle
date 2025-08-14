@@ -28,7 +28,7 @@ export function applyProduction(prev: any, dt: number) {
       totalFoodProdBase += rates[id]?.perSec || 0;
     }
   });
-  const bonusFoodPerSec = totalFoodProdBase * (farmerBonus / 100);
+  const bonusFoodPerSec = totalFoodProdBase * farmerBonus;
 
   let state = withResearch;
   if (bonusFoodPerSec) {

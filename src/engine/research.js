@@ -46,8 +46,8 @@ export function processResearchTick(state, seconds = 1, roleBonuses = {}) {
   if (!current) return state;
   const node = RESEARCH_MAP[current.id];
   const prev = state.research.progress[current.id] || 0;
-  const bonusPercent = roleBonuses['scientist'] || 0;
-  const next = prev + seconds * (1 + bonusPercent / 100);
+  const bonus = roleBonuses['scientist'] || 0;
+  const next = prev + seconds * (1 + bonus);
   const progress = { ...state.research.progress, [current.id]: next };
   if (next >= node.timeSec) {
     const completed = [...state.research.completed, current.id];
