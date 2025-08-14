@@ -35,14 +35,23 @@ export function getCapacity(state, resourceId) {
 /**
  * @param {GameState} state
  */
+
 export function getFoodPoolAmount(state) {
   if (state.foodPool?.amount != null) return state.foodPool.amount;
   return Object.keys(RESOURCES).reduce((sum, id) => {
+
     if (RESOURCES[id].category === 'FOOD') {
       sum += state.resources?.[id]?.amount || 0;
     }
     return sum;
   }, 0);
+  BUILDINGS.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    if (count > 0 && b.capacityAdd?.FOOD) {
+      total += b.capacityAdd.FOOD * count;
+    }
+  });
+  return total;
 }
 
 /**
