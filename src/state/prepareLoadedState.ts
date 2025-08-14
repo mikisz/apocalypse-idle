@@ -9,6 +9,11 @@ import { buildInitialPowerTypeOrder } from '../engine/power.ts';
 import { deepClone } from '../utils/clone.ts';
 import { calculateFoodCapacity } from './selectors.js';
 
+// Offline progress is capped to prevent extreme catch-up or tiny gains.
+// Apply at most 12 hours and ignore gaps shorter than 15 minutes.
+const MAX_OFFLINE_SECONDS = 12 * 60 * 60;
+const MIN_OFFLINE_SECONDS = 15 * 60;
+
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded: any) {
   const cloned: any = deepClone(loaded || {});
@@ -57,8 +62,9 @@ export function prepareLoadedState(loaded: any) {
   const prevYear = base.gameTime.year || getYear(base);
   base.gameTime.year = prevYear;
   const now = Date.now();
-  const elapsed = Math.floor((now - (cloned.lastSaved || now)) / 1000);
-  if (elapsed > 0) {
+  const rawElapsed = Math.floor((now - (cloned.lastSaved || now)) / 1000);
+  const elapsed = Math.min(Math.max(rawElapsed, 0), MAX_OFFLINE_SECONDS);
+  if (elapsed >= MIN_OFFLINE_SECONDS) {
     const bonuses = computeRoleBonuses(base.population?.settlers || []);
     const {
       state: progressed,
