@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
-  getCapacity,
-  getFoodPoolAmount,
-  getFoodPoolCapacity,
   getResourceRates,
   getResourceSections,
   getPowerStatus,
+  getFoodCapacity,
+  getCapacity,
+
 } from '../selectors.js';
 import { defaultState } from '../defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
@@ -67,25 +67,21 @@ describe('power selectors', () => {
   });
 });
 
-describe('food pool selectors', () => {
-  it('returns food pool values when present', () => {
-    const state = { foodPool: { amount: 5, capacity: 10 } };
-    expect(getFoodPoolAmount(state)).toBe(5);
-    expect(getFoodPoolCapacity(state)).toBe(10);
-  });
 
-  it('computes amount and capacity when food pool missing', () => {
+describe('capacity calculations', () => {
+  it('getCapacity accounts for storage buildings', () => {
     const state = deepClone(defaultState);
-    delete state.foodPool;
-    state.resources.potatoes.amount = 2;
-    state.resources.meat.amount = 1;
-    state.buildings.foodStorage = { count: 1 };
-    expect(getFoodPoolAmount(state)).toBeCloseTo(3, 5);
-    expect(getFoodPoolCapacity(state)).toBe(525);
+    expect(getCapacity(state, 'planks')).toBe(40);
+    state.buildings.materialsDepot = { count: 1 };
+    expect(getCapacity(state, 'planks')).toBe(140);
   });
 
-  it('capacity selector returns Infinity for individual food resources', () => {
-    const state = { buildings: {}, research: { completed: [] } };
-    expect(getCapacity(state, 'potatoes')).toBe(Infinity);
+  it('getFoodCapacity sums base and storage', () => {
+    const state = deepClone(defaultState);
+    const base = getFoodCapacity(state);
+    expect(base).toBe(300);
+    state.buildings.foodStorage = { count: 1 };
+    expect(getFoodCapacity(state)).toBe(525);
+
   });
 });

@@ -4,28 +4,28 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import { execSync } from 'child_process';
 import { register } from 'node:module';
 
-import { BUILDINGS, getBuildingCost } from '../src/data/buildings.js';
-import { RESOURCES } from '../src/data/resources.js';
-import { RESEARCH } from '../src/data/research.js';
-import { ROLE_LIST } from '../src/data/roles.js';
-import {
-  initSeasons,
-  getSeasonMultiplier,
-  SEASON_DURATION,
-} from '../src/engine/time.js';
-import { CURRENT_SAVE_VERSION } from '../src/engine/persistence.js';
-import { BALANCE, ROLE_BONUS_PER_SETTLER } from '../src/data/balance.js';
-import {
-  RADIO_BASE_SECONDS,
-  SHELTER_COST_GROWTH,
-  SHELTER_MAX,
-} from '../src/data/settlement.js';
-import { defaultState } from '../src/state/defaultState.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
 register('ts-node/esm', pathToFileURL(repoRoot + '/'));
+
+const { BUILDINGS, getBuildingCost } = await import('../src/data/buildings.js');
+const { RESOURCES } = await import('../src/data/resources.js');
+const { RESEARCH } = await import('../src/data/research.js');
+const { ROLE_LIST } = await import('../src/data/roles.js');
+const {
+  initSeasons,
+  getSeasonMultiplier,
+  SEASON_DURATION,
+} = await import('../src/engine/time.js');
+const { CURRENT_SAVE_VERSION } = await import('../src/engine/persistence.js');
+const { BALANCE, ROLE_BONUS_PER_SETTLER } = await import('../src/data/balance.js');
+const {
+  RADIO_BASE_SECONDS,
+  SHELTER_COST_GROWTH,
+  SHELTER_MAX,
+} = await import('../src/data/settlement.js');
+const { defaultState } = await import('../src/state/defaultState.js');
 
 function getCommitInfo() {
   try {
@@ -281,15 +281,6 @@ md += `- ROLE_BONUS_PER_SETTLER(level): level<=10 -> 0.1*level; else 1 + 0.05*(l
 md += `- SHELTER_MAX = ${SHELTER_MAX} (source: settlement.js:SHELTER_MAX)\n`;
 md += `- SHELTER_COST_GROWTH = ${SHELTER_COST_GROWTH} (source: settlement.js:SHELTER_COST_GROWTH)\n`;
 md += `- RADIO_BASE_SECONDS = ${RADIO_BASE_SECONDS} (source: settlement.js:RADIO_BASE_SECONDS)\n`;
-
-const { parseArgs, generateReport } = await import('../src/dev/economyReporter.ts');
-const paybackOpts = parseArgs([]);
-const paybackRaw = generateReport(paybackOpts);
-const paybackSection = paybackRaw
-  .replace(/^# Economy Report\n\n?/, '')
-  .trimStart();
-md += '\n';
-md += paybackSection;
 
 fs.writeFileSync(path.join(repoRoot, 'docs/ECONOMY_REPORT.md'), md);
 
