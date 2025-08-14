@@ -1,8 +1,34 @@
 import { FIRST_NAMES, LAST_NAMES } from '../data/names.js';
 import { ROLE_LIST } from '../data/roles.js';
-import { DAYS_PER_YEAR } from './time.js';
+import { DAYS_PER_YEAR } from './time.ts';
 
-function randomSkillLevel(rng = Math.random) {
+interface SkillEntry {
+  level: number;
+}
+
+type SkillMap = Record<string, SkillEntry>;
+
+export interface Candidate {
+  id: string;
+  firstName: string;
+  lastName: string;
+  sex: 'M' | 'F';
+  age: number;
+  skills: SkillMap;
+}
+
+export interface Settler {
+  id: string;
+  firstName: string;
+  lastName: string;
+  sex: 'M' | 'F';
+  ageDays: number;
+  isDead: boolean;
+  role: string | null;
+  skills: SkillMap;
+}
+
+function randomSkillLevel(rng: () => number = Math.random): number {
   const r = rng();
   if (r < 0.68) return 0;
   if (r < 0.87) return 1;
@@ -13,18 +39,18 @@ function randomSkillLevel(rng = Math.random) {
   return 6;
 }
 
-function pickRandom(arr, rng) {
+function pickRandom<T>(arr: T[], rng: () => number): T {
   return arr[Math.floor(rng() * arr.length)];
 }
 
-export function generateCandidate(rng = Math.random) {
+export function generateCandidate(rng: () => number = Math.random): Candidate {
   const sex = rng() < 0.5 ? 'M' : 'F';
   const firstNames = FIRST_NAMES[sex];
   const firstName = pickRandom(firstNames, rng);
   const lastName = pickRandom(LAST_NAMES, rng);
   const age = Math.floor(18 + Math.pow(rng(), 1.6) * 47);
 
-  const skills = {};
+  const skills: SkillMap = {};
   ROLE_LIST.forEach((r) => {
     skills[r.id] = { level: randomSkillLevel(rng) };
   });
@@ -63,7 +89,7 @@ export function generateCandidate(rng = Math.random) {
   };
 }
 
-export function candidateToSettler(candidate) {
+export function candidateToSettler(candidate: Candidate): Settler {
   return {
     id: candidate.id,
     firstName: candidate.firstName,

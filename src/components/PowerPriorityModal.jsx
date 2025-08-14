@@ -4,7 +4,7 @@ import { useGame } from '../state/useGame.tsx';
 import {
   buildInitialPowerTypeOrder,
   getPoweredConsumerTypeIds,
-} from '../engine/power.js';
+} from '../engine/power.ts';
 import { Button } from './Button';
 import {
   Dialog,

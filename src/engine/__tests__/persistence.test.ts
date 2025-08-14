@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
-import { load, validateSave, CURRENT_SAVE_VERSION } from '../persistence.js';
+import { load, validateSave, CURRENT_SAVE_VERSION } from '../persistence.ts';
 
 describe('persistence migrations and validation', () => {
   it('migrates v2 saves to include new fields', () => {

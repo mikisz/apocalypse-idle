@@ -1,8 +1,8 @@
 import { RESEARCH_MAP } from '../data/research.js';
-import { clampResource } from './resources.js';
+import { clampResource } from './resources.ts';
 import { getCapacity } from '../state/selectors.js';
 
-export function startResearch(state, id) {
+export function startResearch(state: any, id: string): any {
   const node = RESEARCH_MAP[id];
   if (!node) return state;
   if (state.research.current) return state;
@@ -19,7 +19,7 @@ export function startResearch(state, id) {
   };
 }
 
-export function cancelResearch(state) {
+export function cancelResearch(state: any): any {
   const current = state.research.current;
   if (!current) return state;
   const node = RESEARCH_MAP[current.id];
@@ -41,7 +41,11 @@ export function cancelResearch(state) {
   };
 }
 
-export function processResearchTick(state, seconds = 1, roleBonuses = {}) {
+export function processResearchTick(
+  state: any,
+  seconds: number = 1,
+  roleBonuses: Record<string, number> = {},
+): any {
   const current = state.research.current;
   if (!current) return state;
   const node = RESEARCH_MAP[current.id];

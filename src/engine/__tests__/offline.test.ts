@@ -1,13 +1,14 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 
 const fakeCandidate = { id: 'cand1' };
-vi.mock('../candidates.js', () => ({
+vi.mock('../candidates.ts', () => ({
   generateCandidate: vi.fn(() => fakeCandidate),
 }));
 
-import { applyOfflineProgress } from '../offline.js';
-import { generateCandidate } from '../candidates.js';
-import { processTick } from '../production.js';
+import { applyOfflineProgress } from '../offline.ts';
+import { generateCandidate } from '../candidates.ts';
+import { processTick } from '../production.ts';
 
 describe('applyOfflineProgress', () => {
   it('uses post-production state to update radio', () => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createLogEntry } from '../utils/log.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { deepClone } from '../utils/clone.ts';
@@ -10,7 +11,7 @@ export const migrations = [
   {
     from: 1,
     to: 2,
-    up(save) {
+    up(save: any) {
       if (typeof save.gameTime === 'number') {
         save.gameTime = { seconds: save.gameTime };
       } else if (!save.gameTime) {
@@ -23,7 +24,7 @@ export const migrations = [
   {
     from: 2,
     to: 3,
-    up(save) {
+    up(save: any) {
       if (!save.ui || typeof save.ui !== 'object' || Array.isArray(save.ui)) {
         save.ui = {
           activeTab: 'base',
@@ -63,7 +64,7 @@ export const migrations = [
   {
     from: 3,
     to: 4,
-    up(save) {
+    up(save: any) {
       if (!Array.isArray(save.log)) {
         save.log = [];
       } else {
@@ -87,7 +88,7 @@ export const migrations = [
   {
     from: 4,
     to: 5,
-    up(save) {
+    up(save: any) {
       if (!save.population || typeof save.population !== 'object') {
         save.population = { settlers: [], candidate: null };
       } else {
@@ -106,7 +107,7 @@ export const migrations = [
   {
     from: 5,
     to: 6,
-    up(save) {
+    up(save: any) {
       if (!Array.isArray(save.log)) {
         save.log = [];
       } else {
@@ -122,7 +123,7 @@ export const migrations = [
   {
     from: 6,
     to: 7,
-    up(save) {
+    up(save: any) {
       if (save.buildings && typeof save.buildings === 'object') {
         Object.values(save.buildings).forEach((b) => {
           if (b && typeof b === 'object' && !('isDesiredOn' in b)) {
@@ -135,7 +136,7 @@ export const migrations = [
   },
 ];
 
-export function applyMigrations(save) {
+export function applyMigrations(save: any): any {
   while (save.version < CURRENT_SAVE_VERSION) {
     const migration = migrations.find((m) => m.from === save.version);
     if (!migration) throw new Error(`Missing migration from v${save.version}`);
@@ -145,7 +146,7 @@ export function applyMigrations(save) {
   return save;
 }
 
-export function validateSave(obj) {
+export function validateSave(obj: any): boolean {
   if (!obj || typeof obj !== 'object')
     throw new Error('Invalid save: not an object');
   if (!('resources' in obj)) throw new Error('Invalid save: missing resources');
@@ -227,11 +228,11 @@ export function validateSave(obj) {
   return true;
 }
 
-export function save(state) {
+export function save(state: any): any {
   return { ...state, version: CURRENT_SAVE_VERSION, lastSaved: Date.now() };
 }
 
-export function load(raw) {
+export function load(raw: any): { state: any; migratedFrom: number | null } {
   const save = typeof raw === 'string' ? JSON.parse(raw) : deepClone(raw);
   save.version = save.version ?? save.schemaVersion ?? 1;
   validateSave(save);
@@ -241,7 +242,7 @@ export function load(raw) {
   return { state: save, migratedFrom: start < save.version ? start : null };
 }
 
-export function saveGame(state) {
+export function saveGame(state: any): any {
   try {
     const data = save(state);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -252,7 +253,7 @@ export function saveGame(state) {
   }
 }
 
-export function loadGame() {
+export function loadGame(): { state: any | null; error: any } {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return { state: null, error: null };
   try {
@@ -264,7 +265,7 @@ export function loadGame() {
   }
 }
 
-export function deleteSave() {
+export function deleteSave(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (err) {
@@ -272,7 +273,7 @@ export function deleteSave() {
   }
 }
 
-export function exportSaveFile(state) {
+export function exportSaveFile(state: any): any {
   const data = save(state);
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });

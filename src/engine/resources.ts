@@ -1,4 +1,4 @@
-export function clampResource(value, capacity) {
+export function clampResource(value: number, capacity: number): number {
   let v = Number.isFinite(value) ? value : 0;
   const c = Number.isFinite(capacity) ? Math.max(0, capacity) : 0;
   const result = Math.max(0, Math.min(c, v));

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import ResourceRow from '../ResourceRow.jsx';
-import { processSettlersTick } from '../../engine/settlers.js';
+import { processSettlersTick } from '../../engine/settlers.ts';
 import { defaultState } from '../../state/defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';

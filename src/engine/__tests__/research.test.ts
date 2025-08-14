@@ -1,13 +1,14 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import {
   startResearch,
   processResearchTick,
   cancelResearch,
-} from '../research.js';
+} from '../research.ts';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { defaultState } from '../../state/defaultState.js';
 import { getResearchOutputBonus } from '../../state/selectors.js';
-import { computeRoleBonuses } from '../settlers.js';
+import { computeRoleBonuses } from '../settlers.ts';
 import { deepClone } from '../../utils/clone.ts';
 
 describe('research engine', () => {

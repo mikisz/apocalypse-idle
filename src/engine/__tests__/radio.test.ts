@@ -1,15 +1,16 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 
 const fakeCandidate = { id: 'cand1' };
 
-vi.mock('../candidates.js', () => ({
+vi.mock('../candidates.ts', () => ({
   generateCandidate: vi.fn(() => fakeCandidate),
 }));
 
-import { updateRadio } from '../radio.js';
-import { applyProduction } from '../production.js';
+import { updateRadio } from '../radio.ts';
+import { applyProduction } from '../production.ts';
 import { getResourceRates } from '../../state/selectors.js';
-import { generateCandidate } from '../candidates.js';
+import { generateCandidate } from '../candidates.ts';
 
 const baseState = {
   buildings: { radio: { count: 1 } },

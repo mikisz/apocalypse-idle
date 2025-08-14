@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { getTimeBreakdown } from '../engine/time.js';
+import { getTimeBreakdown } from '../engine/time.ts';
 import { useGame } from '../state/useGame.tsx';
 import { Button } from './Button';
 

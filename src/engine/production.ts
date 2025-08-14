@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   PRODUCTION_BUILDINGS,
   BUILDING_MAP,
@@ -9,25 +10,25 @@ import {
   BUILDING_ROLES,
   ROLE_BUILDINGS,
 } from '../data/roles.js';
-import { getSeason, getSeasonMultiplier } from './time.js';
+import { getSeason, getSeasonMultiplier } from './time.ts';
 import {
   getCapacity,
   calculateFoodCapacity,
   getResearchOutputBonus,
 } from '../state/selectors.js';
-import { clampResource } from './resources.js';
-import { setOfflineReason } from './powerHandling.js';
-import { getTypeOrderIndex } from './power.js';
+import { clampResource } from './resources.ts';
+import { setOfflineReason } from './powerHandling.ts';
+import { getTypeOrderIndex } from './power.ts';
 
 function getOutputCapacityFactor(
-  state,
-  resources,
-  outputs = {},
-  count,
-  seconds,
-  foodCapacity,
-  totalFoodAmount,
-) {
+  state: any,
+  resources: Record<string, any>,
+  outputs: Record<string, number> = {},
+  count: number,
+  seconds: number,
+  foodCapacity: number,
+  totalFoodAmount: number,
+): number {
   let f = 1;
   let totalFoodOut = 0;
   Object.entries(outputs).forEach(([res, base]) => {
@@ -55,7 +56,11 @@ function getOutputCapacityFactor(
   return Math.max(0, Math.min(1, f));
 }
 
-export function applyProduction(state, seconds = 1, roleBonuses = {}) {
+export function applyProduction(
+  state: any,
+  seconds: number = 1,
+  roleBonuses: Record<string, number> = {},
+): any {
   const season = getSeason(state);
   const resources = { ...state.resources };
   const buildings = { ...state.buildings };
@@ -99,7 +104,7 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   let supplyTotal = 0;
   let supplyRemaining = 0;
 
-  const runOutputs = (b, count, capFactor) => {
+  const runOutputs = (b: any, count: number, capFactor: number): void => {
     if (!b.outputsPerSecBase) return;
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       if (res === 'power') return;
@@ -296,11 +301,15 @@ export function applyProduction(state, seconds = 1, roleBonuses = {}) {
   return { ...state, resources, buildings, powerStatus, foodPool };
 }
 
-export function processTick(state, seconds = 1, roleBonuses = {}) {
+export function processTick(
+  state: any,
+  seconds: number = 1,
+  roleBonuses: Record<string, number> = {},
+): any {
   return applyProduction(state, seconds, roleBonuses);
 }
 
-export function buildBuilding(state, buildingId) {
+export function buildBuilding(state: any, buildingId: string): any {
   const blueprint = BUILDING_MAP[buildingId];
   if (!blueprint) return state;
   const count = state.buildings?.[buildingId]?.count || 0;
@@ -342,7 +351,7 @@ export function buildBuilding(state, buildingId) {
   };
 }
 
-export function demolishBuilding(state, buildingId) {
+export function demolishBuilding(state: any, buildingId: string): any {
   const blueprint = BUILDING_MAP[buildingId];
   const count = state.buildings?.[buildingId]?.count || 0;
   if (!blueprint || count <= 0) return state;

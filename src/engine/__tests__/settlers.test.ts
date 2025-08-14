@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
-import { processTick } from '../production.js';
-import { processSettlersTick, computeRoleBonuses } from '../settlers.js';
+import { processTick } from '../production.ts';
+import { processSettlersTick, computeRoleBonuses } from '../settlers.ts';
 import { getResourceRates } from '../../state/selectors.js';
 import { defaultState } from '../../state/defaultState.js';
 import { RESOURCES } from '../../data/resources.js';

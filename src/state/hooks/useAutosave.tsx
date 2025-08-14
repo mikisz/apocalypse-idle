@@ -1,5 +1,5 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import { saveGame } from '../../engine/persistence.js';
+import { saveGame } from '../../engine/persistence.ts';
 import type { GameState } from '../useGame.tsx';
 
 export default function useAutosave(

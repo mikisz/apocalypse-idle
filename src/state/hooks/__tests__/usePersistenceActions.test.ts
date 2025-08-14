@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-vi.mock('../../../engine/persistence.js', () => ({
+vi.mock('../../../engine/persistence.ts', () => ({
   loadGame: vi.fn(),
   deleteSave: vi.fn(),
   saveGame: vi.fn(),
@@ -11,7 +11,7 @@ vi.mock('../../prepareLoadedState.ts', () => ({
   prepareLoadedState: vi.fn((s: any) => ({ ...s, prepared: true })),
 }));
 
-import { loadGame, deleteSave, saveGame } from '../../../engine/persistence.js';
+import { loadGame, deleteSave, saveGame } from '../../../engine/persistence.ts';
 import { prepareLoadedState } from '../../prepareLoadedState.ts';
 import { defaultState } from '../../defaultState.js';
 import usePersistenceActions from '../usePersistenceActions';

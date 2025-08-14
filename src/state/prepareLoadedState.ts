@@ -1,22 +1,22 @@
 import { defaultState } from './defaultState.js';
-import { getYear, initSeasons, SECONDS_PER_DAY } from '../engine/time.js';
-import { computeRoleBonuses } from '../engine/settlers.js';
-import { applyOfflineProgress } from '../engine/offline.js';
+import { getYear, initSeasons, SECONDS_PER_DAY } from '../engine/time.ts';
+import { computeRoleBonuses } from '../engine/settlers.ts';
+import { applyOfflineProgress } from '../engine/offline.ts';
 import { createLogEntry } from '../utils/log.js';
 import { RESOURCES } from '../data/resources.js';
 import { formatAmount } from '../utils/format.js';
-import { buildInitialPowerTypeOrder } from '../engine/power.js';
+import { buildInitialPowerTypeOrder } from '../engine/power.ts';
 import { deepClone } from '../utils/clone.ts';
 import { calculateFoodCapacity } from './selectors.js';
 
 /* eslint-disable-next-line react-refresh/only-export-components */
 export function prepareLoadedState(loaded: any) {
-  const cloned = deepClone(loaded || {});
+  const cloned: any = deepClone(loaded || {});
   const gameTime =
     typeof cloned.gameTime === 'number'
       ? { seconds: cloned.gameTime }
       : cloned.gameTime || { seconds: 0 };
-  const base = deepClone(defaultState);
+  const base: any = deepClone(defaultState);
   base.version = cloned.version ?? base.version;
   base.gameTime = { ...base.gameTime, ...gameTime };
   base.meta = { ...base.meta, ...cloned.meta, seasons: initSeasons() };
@@ -29,7 +29,7 @@ export function prepareLoadedState(loaded: any) {
   base.powerTypeOrder = buildInitialPowerTypeOrder(cloned.powerTypeOrder || []);
   base.research = { ...base.research, ...cloned.research };
   const foodAmount = Object.keys(RESOURCES).reduce((sum, id) => {
-    if (RESOURCES[id].category === 'FOOD') {
+    if ((RESOURCES as any)[id].category === 'FOOD') {
       return sum + (base.resources[id]?.amount || 0);
     }
     return sum;
@@ -51,7 +51,7 @@ export function prepareLoadedState(loaded: any) {
     ...cloned.powerStatus,
   };
   if (Array.isArray(cloned.log)) {
-    base.log = [...cloned.log];
+    base.log = [...(cloned.log as any[])];
   }
   base.lastSaved = cloned.lastSaved ?? base.lastSaved;
   const prevYear = base.gameTime.year || getYear(base);
@@ -67,7 +67,7 @@ export function prepareLoadedState(loaded: any) {
     );
     const resourceLogs = Object.entries(gains).map(([res, amt]) =>
       createLogEntry(
-        `Gained ${formatAmount(amt)} ${RESOURCES[res].name} while offline`,
+        `Gained ${formatAmount(amt)} ${(RESOURCES as any)[res].name} while offline`,
         now,
       ),
     );

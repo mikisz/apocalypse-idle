@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
-import { setOfflineReason } from '../powerHandling.js';
+import { setOfflineReason } from '../powerHandling.ts';
 
 describe('setOfflineReason', () => {
   it('marks building offline on power shortage', () => {

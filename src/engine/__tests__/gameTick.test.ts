@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../production.js', () => ({
+vi.mock('../production.ts', () => ({
   processTick: vi.fn(),
 }));
-vi.mock('../research.js', () => ({
+vi.mock('../research.ts', () => ({
   processResearchTick: vi.fn(),
 }));
-vi.mock('../settlers.js', () => ({
+vi.mock('../settlers.ts', () => ({
   processSettlersTick: vi.fn(),
   computeRoleBonuses: vi.fn(),
 }));
@@ -17,21 +17,21 @@ vi.mock('../../state/selectors.js', () => ({
 vi.mock('../../data/resources.js', () => ({
   RESOURCES: {},
 }));
-vi.mock('../radio.js', () => ({
+vi.mock('../radio.ts', () => ({
   updateRadio: vi.fn(),
 }));
-vi.mock('../time.js', () => ({
+vi.mock('../time.ts', () => ({
   getYear: vi.fn(),
   DAYS_PER_YEAR: 365,
 }));
 
 import { applyProduction, applySettlers, applyYearUpdate } from '../gameTick.ts';
-import { processTick } from '../production.js';
-import { processResearchTick } from '../research.js';
-import { processSettlersTick, computeRoleBonuses } from '../settlers.js';
+import { processTick } from '../production.ts';
+import { processResearchTick } from '../research.ts';
+import { processSettlersTick, computeRoleBonuses } from '../settlers.ts';
 import { getResourceRates, calculateFoodCapacity } from '../../state/selectors.js';
-import { updateRadio } from '../radio.js';
-import { getYear, DAYS_PER_YEAR } from '../time.js';
+import { updateRadio } from '../radio.ts';
+import { getYear, DAYS_PER_YEAR } from '../time.ts';
 import { RESOURCES } from '../../data/resources.js';
 
 beforeEach(() => {

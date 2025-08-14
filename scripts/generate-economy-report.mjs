@@ -17,8 +17,8 @@ const {
   initSeasons,
   getSeasonMultiplier,
   SEASON_DURATION,
-} = await import('../src/engine/time.js');
-const { CURRENT_SAVE_VERSION } = await import('../src/engine/persistence.js');
+} = await import('../src/engine/time.ts');
+const { CURRENT_SAVE_VERSION } = await import('../src/engine/persistence.ts');
 const { BALANCE, ROLE_BONUS_PER_SETTLER } = await import('../src/data/balance.js');
 const {
   RADIO_BASE_SECONDS,

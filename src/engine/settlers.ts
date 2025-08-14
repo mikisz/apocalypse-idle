@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   BALANCE,
   XP_TIME_TO_NEXT_LEVEL_SECONDS,
@@ -6,13 +7,13 @@ import {
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
 import { calculateFoodCapacity, getSettlerCapacity } from '../state/selectors.js';
-import { SECONDS_PER_DAY } from './time.js';
+import { SECONDS_PER_DAY } from './time.ts';
 import { RESOURCES } from '../data/resources.js';
-import { clampResource } from './resources.js';
+import { clampResource } from './resources.ts';
 import { createLogEntry } from '../utils/log.js';
 
-export function computeRoleBonuses(settlers) {
-  const bonuses = {};
+export function computeRoleBonuses(settlers: any[]): Record<string, number> {
+  const bonuses: Record<string, number> = {};
   settlers.forEach((s) => {
     if (s.isDead || !s.role) return;
     const skill = s.skills?.[s.role] || { level: 0 };
@@ -22,19 +23,19 @@ export function computeRoleBonuses(settlers) {
   return bonuses;
 }
 
-export function assignmentsSummary(settlers) {
-  const living = settlers.filter((s) => !s.isDead);
-  const assigned = living.filter((s) => s.role != null);
+export function assignmentsSummary(settlers: any[]): { assigned: number; living: number } {
+  const living = settlers.filter((s: any) => !s.isDead);
+  const assigned = living.filter((s: any) => s.role != null);
   return { assigned: assigned.length, living: living.length };
 }
 
 export function processSettlersTick(
-  state,
-  seconds = BALANCE.TICK_SECONDS,
-  bonusFoodPerSec = 0,
-  rng = Math.random,
-  roleBonuses = null,
-) {
+  state: any,
+  seconds: number = BALANCE.TICK_SECONDS,
+  bonusFoodPerSec: number = 0,
+  rng: () => number = Math.random,
+  roleBonuses: Record<string, number> | null = null,
+): { state: any; telemetry: any; events: any[] } {
   const settlers = state.population?.settlers
     ? [...state.population.settlers]
     : [];

@@ -5,8 +5,8 @@ import {
 } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import { RESEARCH_MAP } from '../data/research.js';
-import { getSeason, getSeasonMultiplier } from '../engine/time.js';
-import { computeRoleBonuses } from '../engine/settlers.js';
+import { getSeason, getSeasonMultiplier } from '../engine/time.ts';
+import { computeRoleBonuses } from '../engine/settlers.ts';
 import { formatRate } from '../utils/format.js';
 import { BALANCE } from '../data/balance.js';
 import { ROLE_BY_RESOURCE } from '../data/roles.js';

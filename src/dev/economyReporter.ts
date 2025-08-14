@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { pathToFileURL } from 'url';
 import { BUILDINGS } from '../data/buildings.js';
-import { SEASONS } from '../engine/time.js';
+import { SEASONS } from '../engine/time.ts';
 import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
 import {
   marginalWeightedCost,

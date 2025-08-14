@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import {
   valueWeightedStream,
@@ -8,7 +9,7 @@ import {
 import type { BuildingData, SeasonsRecord } from '../economyTypes.ts';
 import { BUILDINGS } from '../../data/buildings.js';
 import { RESOURCES } from '../../data/resources.js';
-import { SEASONS } from '../../engine/time.js';
+import { SEASONS } from '../../engine/time.ts';
 
 describe('economyMath helpers', () => {
   it('valueWeightedStream', () => {

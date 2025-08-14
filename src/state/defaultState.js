@@ -1,7 +1,7 @@
-import { initSeasons } from '../engine/time.js';
-import { CURRENT_SAVE_VERSION } from '../engine/persistence.js';
+import { initSeasons } from '../engine/time.ts';
+import { CURRENT_SAVE_VERSION } from '../engine/persistence.ts';
 import { RESOURCES } from '../data/resources.js';
-import { buildInitialPowerTypeOrder } from '../engine/power.js';
+import { buildInitialPowerTypeOrder } from '../engine/power.ts';
 import { makeRandomSettler } from '../data/names.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { BALANCE } from '../data/balance.js';
