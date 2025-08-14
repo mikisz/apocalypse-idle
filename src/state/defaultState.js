@@ -5,6 +5,7 @@ import { buildInitialPowerTypeOrder } from '../engine/power.js';
 import { makeRandomSettler } from '../data/names.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { BALANCE } from '../data/balance.js';
+import { getFoodCapacity } from './selectors.js';
 
 const initResources = () => {
   const obj = {};
@@ -13,18 +14,6 @@ const initResources = () => {
     obj[r.id] = { amount: amt, discovered: amt > 0, produced: 0 };
   });
   return obj;
-};
-
-const initFoodPool = () => {
-  let amount = 0;
-  let capacity = 0;
-  Object.values(RESOURCES).forEach((r) => {
-    if (r.category === 'FOOD') {
-      amount += r.startingAmount || 0;
-      capacity += r.startingCapacity || 0;
-    }
-  });
-  return { amount, capacity };
 };
 
 const initBuildings = () => ({
@@ -48,14 +37,28 @@ const initColony = () => ({
 
 const initResearch = () => ({ current: null, completed: [], progress: {} });
 
+const resources = initResources();
+const buildings = initBuildings();
+
+const initFoodPool = () => {
+  let amount = 0;
+  Object.values(RESOURCES).forEach((r) => {
+    if (r.category === 'FOOD') {
+      amount += resources[r.id]?.amount || 0;
+    }
+  });
+  const capacity = getFoodCapacity({ resources, buildings });
+  return { amount, capacity };
+};
+
 export const defaultState = {
   version: CURRENT_SAVE_VERSION,
   gameTime: { seconds: 0 },
   meta: { seasons: initSeasons() },
   ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
-  resources: initResources(),
+  resources,
   foodPool: initFoodPool(),
-  buildings: initBuildings(),
+  buildings,
   powerTypeOrder: initPowerTypeOrder(),
   research: initResearch(),
   population: { settlers: initSettlers(), candidate: null },
