@@ -1,5 +1,7 @@
 {
+
   "version": "bd1109da0b31db9f7e6649157100bf13e85d00c1",
+
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -164,6 +166,7 @@
       "startingAmount": 0,
       "startingCapacity": 40,
       "unit": null,
+
       "origin": {
         "file": "resources.js",
         "path": "RESOURCES.bricks"
@@ -619,6 +622,8 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[13]"
+
+
       }
     },
     {
@@ -649,6 +654,7 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[14]"
+
       }
     },
     {
@@ -678,6 +684,7 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[15]"
+
       }
     },
     {
@@ -707,6 +714,7 @@
       "origin": {
         "file": "buildings.js",
         "path": "BUILDINGS[16]"
+
       }
     }
   ],
@@ -822,6 +830,30 @@
       }
     },
     {
+      "id": "masonry1",
+      "name": "Masonry I",
+      "scienceCost": 90,
+      "timeSec": 150,
+      "prereqs": [
+        "industry1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [
+          "bricks"
+        ],
+        "buildings": [
+          "brickKiln"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[4]"
+      }
+    },
+    {
       "id": "industry2",
       "name": "Industry II",
       "scienceCost": 200,
@@ -847,7 +879,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[4]"
+        "path": "RESEARCH[5]"
       }
     },
     {
@@ -875,7 +907,32 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[5]"
+        "path": "RESEARCH[6]"
+      }
+    },
+    {
+      "id": "masonry2",
+      "name": "Masonry II",
+      "scienceCost": 140,
+      "timeSec": 210,
+      "prereqs": [
+        "masonry1",
+        "logistics1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [
+          "largeWarehouse",
+          "largeGranary",
+          "largeMaterialsDepot"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[7]"
       }
     },
     {
@@ -905,7 +962,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[6]"
+        "path": "RESEARCH[8]"
       }
     },
     {
@@ -935,7 +992,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[7]"
+        "path": "RESEARCH[9]"
       }
     },
     {
@@ -970,7 +1027,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[8]"
+        "path": "RESEARCH[10]"
       }
     },
     {
@@ -997,7 +1054,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[9]"
+        "path": "RESEARCH[11]"
       }
     },
     {
@@ -1019,7 +1076,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[10]"
+        "path": "RESEARCH[12]"
       }
     },
     {
@@ -1037,7 +1094,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[11]"
+        "path": "RESEARCH[13]"
       }
     },
     {
@@ -1061,7 +1118,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[12]"
+        "path": "RESEARCH[14]"
       }
     },
     {
@@ -1087,7 +1144,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[13]"
+        "path": "RESEARCH[15]"
       }
     }
   ],

@@ -120,9 +120,14 @@ export function processSettlersTick(
       entry.amount -= use;
       resources[id] = { ...entry };
       remaining -= use;
-      foodAmount -= use;
     }
   }
+
+  // Update food pool amount to match remaining food
+  foodAmount = foodIds.reduce(
+    (sum, id) => sum + (resources[id]?.amount || 0),
+    0,
+  );
 
   const finalFoodAmount = clampResource(foodAmount, foodCapacity);
   const overflow = foodAmount - finalFoodAmount;

@@ -19,6 +19,7 @@ import { SHELTER_MAX } from '../data/settlement.js';
  * @param {string} resourceId
  */
 export function getCapacity(state, resourceId) {
+  if (RESOURCES[resourceId]?.category === 'FOOD') return Infinity;
   const base = RESOURCES[resourceId]?.startingCapacity || 0;
   let fromBuildings = 0;
   BUILDINGS.forEach((b) => {
@@ -34,13 +35,52 @@ export function getCapacity(state, resourceId) {
 /**
  * @param {GameState} state
  */
-export function getFoodCapacity(state) {
+
+export function getFoodPoolAmount(state) {
+  if (state.foodPool?.amount != null) return state.foodPool.amount;
   return Object.keys(RESOURCES).reduce((sum, id) => {
+
     if (RESOURCES[id].category === 'FOOD') {
-      sum += getCapacity(state, id);
+      sum += state.resources?.[id]?.amount || 0;
     }
     return sum;
   }, 0);
+  BUILDINGS.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    if (count > 0 && b.capacityAdd?.FOOD) {
+      total += b.capacityAdd.FOOD * count;
+    }
+  });
+  return total;
+}
+
+/**
+ * @param {GameState} state
+ */
+export function getFoodPoolCapacity(state) {
+  if (state.foodPool?.capacity != null) return state.foodPool.capacity;
+  let total = 0;
+  Object.keys(RESOURCES).forEach((id) => {
+    if (RESOURCES[id].category !== 'FOOD') return;
+    const base = RESOURCES[id]?.startingCapacity || 0;
+    let fromBuildings = 0;
+    BUILDINGS.forEach((b) => {
+      const count = state.buildings?.[b.id]?.count || 0;
+      if (count > 0 && b.capacityAdd?.[id]) {
+        fromBuildings += b.capacityAdd[id] * count;
+      }
+    });
+    const bonus = getResearchStorageBonus(state, id);
+    total += Math.floor((base + fromBuildings) * (1 + bonus));
+  });
+  return total;
+}
+
+/**
+ * @param {GameState} state
+ */
+export function getFoodCapacity(state) {
+  return getFoodPoolCapacity(state);
 }
 
 /**
@@ -426,11 +466,8 @@ function buildResourceGroups(state, netRates, prodRates) {
  * @param {Record<string,{perSec:number,label:string}>} netRates
  */
 function createFoodTotalRow(state, foodIds, netRates) {
-  const totalAmount =
-    state.foodPool?.amount ??
-    foodIds.reduce((sum, id) => sum + (state.resources[id]?.amount || 0), 0);
-  const totalCapacity =
-    state.foodPool?.capacity ?? getFoodCapacity(state);
+  const totalAmount = state.foodPool?.amount || 0;
+  const totalCapacity = state.foodPool?.capacity || 0;
   const totalNetRate = foodIds.reduce(
     (sum, id) => sum + (netRates[id]?.perSec || 0),
     0,
@@ -438,7 +475,7 @@ function createFoodTotalRow(state, foodIds, netRates) {
   return {
     id: 'food-total',
     name: 'Total',
-    amount: state.foodPool?.amount ?? totalAmount,
+    amount: totalAmount,
     capacity: totalCapacity,
     rate: formatRate(totalNetRate),
   };

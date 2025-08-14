@@ -174,8 +174,22 @@ export const BUILDINGS = [
     costBase: { wood: 20, scrap: 5, stone: 5 },
     costGrowth: 1.22, // changed: 1.2 -> 1.22
     refund: 0.5,
-    capacityAdd: { potatoes: 150, meat: 75 }, // changed: potatoes 300->150, meat 150->75
+    capacityAdd: { FOOD: 225 },
+    cardTextOverride: 'Food Capacity +225',
     description: 'Increases storage for harvested crops.',
+  },
+  {
+    id: 'largeGranary',
+    name: 'Large Granary',
+    domain: 'STORAGE',
+    type: 'storage',
+    requiresResearch: 'masonry2',
+    costBase: { wood: 35, stone: 20, bricks: 20 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { FOOD: 600 },
+    cardTextOverride: 'Food Capacity +600',
+    description: 'Increases total Food capacity across all food types.',
   },
   {
     id: 'rawStorage',
@@ -188,6 +202,18 @@ export const BUILDINGS = [
     description: 'Increases storage for wood, stone and scrap.',
   },
   {
+    id: 'largeWarehouse',
+    name: 'Large Warehouse',
+    domain: 'STORAGE',
+    type: 'storage',
+    requiresResearch: 'masonry2',
+    costBase: { wood: 40, stone: 30, bricks: 20 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { wood: 400, stone: 160, scrap: 240 },
+    description: 'Expanded storage for raw materials.',
+  },
+  {
     id: 'materialsDepot',
     name: 'Materials Depot',
     type: 'storage',
@@ -197,6 +223,18 @@ export const BUILDINGS = [
     refund: 0.5,
     capacityAdd: { planks: 100, metalParts: 40 }, // changed: planks 300->100, metalParts 240->40
     description: 'Stores processed construction materials.',
+  },
+  {
+    id: 'largeMaterialsDepot',
+    name: 'Large Materials Depot',
+    domain: 'STORAGE',
+    type: 'storage',
+    requiresResearch: 'masonry2',
+    costBase: { wood: 35, bricks: 25, scrap: 15 },
+    costGrowth: 1.15,
+    refund: 0.5,
+    capacityAdd: { planks: 180, metalParts: 90, bricks: 180 },
+    description: 'Expanded storage for processed construction materials.',
   },
   {
     id: 'battery',

@@ -1,7 +1,9 @@
 # Economy Report
 
 ## 1) Overview
+
 Economy generated from commit **bd1109da0b31db9f7e6649157100bf13e85d00c1** on 2025-08-14 02:36:12 +0200. Save version: **7**.
+
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
