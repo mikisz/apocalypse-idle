@@ -4,7 +4,7 @@
 
 - Idle colony sim built with React 19, Vite, and TailwindCSS v4.
 - Core loop: seasonal time system drives building harvest cycles and settler production.
-- Autosave every 10s; offline progress applied on load with capacity clamping.
+- Autosave every 10s; offline progress applied on load with capacity clamping (max 12h, min 15m).
 - Base view exposes food/resource buildings and event log; population view manages settler roles.
 
 ## Feature Matrix
@@ -13,7 +13,7 @@
 | ------------------------------------------------------- | ------------- |
 | Time, year and season tracking                          | ✅            |
 | Season modifiers affecting farming and wood             | ✅            |
-| Autosave & offline progress with capacity clamp         | ✅            |
+| Autosave & offline progress with time caps              | ✅            |
 | Resource sidebar with capacities & rates                | ✅            |
 | Building construction/demolition with cost & 50% refund | ✅            |
 | Population roles and basic stats                        | ✅            |
