@@ -48,6 +48,15 @@ export const RESOURCES = {
     startingAmount: 0,
     startingCapacity: 40, // changed: 50 -> 40
   },
+  bricks: {
+    id: 'bricks',
+    name: 'Bricks',
+    icon: '🧱',
+    category: 'CONSTRUCTION_MATERIALS',
+    startingAmount: 0,
+    startingCapacity: 40,
+    unit: '',
+  },
   metalParts: {
     id: 'metalParts',
     name: 'Metal Parts',

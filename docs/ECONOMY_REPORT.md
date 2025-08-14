@@ -1,7 +1,7 @@
 # Economy Report
 
 ## 1) Overview
-Economy generated from commit **35f35aa12e885b89cd28e6978415732365573f45** on 2025-08-14 01:19:44 +0200. Save version: **7**.
+Economy generated from commit **63b0fbfb32c756104bd862057cab4559b24254d2** on 2025-08-14 02:09:55 +0200. Save version: **7**.
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -13,18 +13,19 @@ Each tick represents 1 second. For each building: base production is modified by
 | stone | Stone | RAW | 0 | 50 |  | resources.js:RESOURCES.stone |
 | scrap | Scrap | RAW | 0 | 60 |  | resources.js:RESOURCES.scrap |
 | planks | Planks | CONSTRUCTION_MATERIALS | 0 | 40 |  | resources.js:RESOURCES.planks |
+| bricks | Bricks | CONSTRUCTION_MATERIALS | 0 | 40 |  | resources.js:RESOURCES.bricks |
 | metalParts | Metal Parts | CONSTRUCTION_MATERIALS | 0 | 24 |  | resources.js:RESOURCES.metalParts |
 | tools | Tools | CONSTRUCTION_MATERIALS | 0 | 24 |  | resources.js:RESOURCES.tools |
 | science | Science | SOCIETY | 0 | 400 |  | resources.js:RESOURCES.science |
 | power | Power | ENERGY | 0 | 20 |  | resources.js:RESOURCES.power |
 
 ## 3) Seasons
-| season | duration (sec) | potatoes | meat | wood | stone | scrap | planks | metalParts | tools | science | power | source |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
-| spring | 270 | 1.250 | 1.250 | 1.100 | 1.100 | 1.100 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[0] |
-| summer | 270 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[1] |
-| autumn | 270 | 0.850 | 0.850 | 0.900 | 0.900 | 0.900 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[2] |
-| winter | 270 | 0.000 | 0.000 | 0.800 | 0.800 | 0.800 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[3] |
+| season | duration (sec) | potatoes | meat | wood | stone | scrap | planks | bricks | metalParts | tools | science | power | source |
+| - | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| spring | 270 | 1.250 | 1.250 | 1.100 | 1.100 | 1.100 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[0] |
+| summer | 270 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[1] |
+| autumn | 270 | 0.850 | 0.850 | 0.900 | 0.900 | 0.900 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[2] |
+| winter | 270 | 0.000 | 0.000 | 0.800 | 0.800 | 0.800 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | time.js:SEASONS[3] |
 
 ## 4) Buildings
 | id | name | type | cost | costGrowth | refund | storage | base prod/s | inputs per sec | requiresResearch | season mults | source |
@@ -88,6 +89,7 @@ Starting season: spring, Year: 1.
 | stone | 0 | 50 | resources.js:RESOURCES.stone.startingAmount/startingCapacity |
 | scrap | 0 | 60 | resources.js:RESOURCES.scrap.startingAmount/startingCapacity |
 | planks | 0 | 40 | resources.js:RESOURCES.planks.startingAmount/startingCapacity |
+| bricks | 0 | 40 | resources.js:RESOURCES.bricks.startingAmount/startingCapacity |
 | metalParts | 0 | 24 | resources.js:RESOURCES.metalParts.startingAmount/startingCapacity |
 | tools | 0 | 24 | resources.js:RESOURCES.tools.startingAmount/startingCapacity |
 | science | 0 | 400 | resources.js:RESOURCES.science.startingAmount/startingCapacity |

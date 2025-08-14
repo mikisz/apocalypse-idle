@@ -1,5 +1,5 @@
 {
-  "version": "35f35aa12e885b89cd28e6978415732365573f45",
+  "version": "63b0fbfb32c756104bd862057cab4559b24254d2",
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -12,6 +12,7 @@
         "stone": 1.1,
         "scrap": 1.1,
         "planks": 1,
+        "bricks": 1,
         "metalParts": 1,
         "tools": 1,
         "science": 1,
@@ -31,6 +32,7 @@
         "stone": 1,
         "scrap": 1,
         "planks": 1,
+        "bricks": 1,
         "metalParts": 1,
         "tools": 1,
         "science": 1,
@@ -50,6 +52,7 @@
         "stone": 0.9,
         "scrap": 0.9,
         "planks": 1,
+        "bricks": 1,
         "metalParts": 1,
         "tools": 1,
         "science": 1,
@@ -69,6 +72,7 @@
         "stone": 0.8,
         "scrap": 0.8,
         "planks": 1,
+        "bricks": 1,
         "metalParts": 1,
         "tools": 1,
         "science": 1,
@@ -151,6 +155,18 @@
       "origin": {
         "file": "resources.js",
         "path": "RESOURCES.planks"
+      }
+    },
+    {
+      "key": "bricks",
+      "displayName": "Bricks",
+      "category": "CONSTRUCTION_MATERIALS",
+      "startingAmount": 0,
+      "startingCapacity": 40,
+      "unit": "",
+      "origin": {
+        "file": "resources.js",
+        "path": "RESOURCES.bricks"
       }
     },
     {
@@ -1195,6 +1211,10 @@
       "capacity": 60
     },
     "planks": {
+      "amount": 0,
+      "capacity": 40
+    },
+    "bricks": {
       "amount": 0,
       "capacity": 40
     },
