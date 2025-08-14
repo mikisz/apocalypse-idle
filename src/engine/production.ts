@@ -18,45 +18,11 @@ import {
   ensureCapacityCache,
   invalidateCapacityCache,
 } from '../state/capacityCache.ts';
+import { getOutputCapacityFactor } from './capacity.ts';
 import { clampResource } from './resources.ts';
 import { setOfflineReason } from './powerHandling.ts';
 import { getTypeOrderIndex } from './power.ts';
 
-function getOutputCapacityFactor(
-  state: any,
-  resources: Record<string, any>,
-  outputs: Record<string, number> = {},
-  count: number,
-  seconds: number,
-  foodCapacity: number,
-  totalFoodAmount: number,
-): number {
-  let f = 1;
-  let totalFoodOut = 0;
-  Object.entries(outputs).forEach(([res, base]) => {
-    if (RESOURCES[res].category === 'FOOD') {
-      const maxGain = base * count * seconds;
-      if (maxGain > 0) totalFoodOut += maxGain;
-    } else {
-      const capacity = getCapacity(state, res);
-      if (!Number.isFinite(capacity)) return;
-      const current = resources[res]?.amount || 0;
-      const room = capacity - current;
-      if (room <= 0) {
-        f = 0;
-        return;
-      }
-      const maxGain = base * count * seconds;
-      if (maxGain > 0) f = Math.min(f, room / maxGain);
-    }
-  });
-  if (totalFoodOut > 0) {
-    const room = foodCapacity - totalFoodAmount;
-    if (room <= 0) f = 0;
-    else f = Math.min(f, room / totalFoodOut);
-  }
-  return Math.max(0, Math.min(1, f));
-}
 
 export function applyProduction(
   state: any,
@@ -212,12 +178,14 @@ export function applyProduction(
   others.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
+    const desiredOutputs = {} as Record<string, number>;
+    Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
+      desiredOutputs[res] = base * count * seconds;
+    });
     const capFactor = getOutputCapacityFactor(
       state,
       resources,
-      b.outputsPerSecBase,
-      count,
-      seconds,
+      desiredOutputs,
       foodCapacity,
       totalFoodAmount,
     );
@@ -245,12 +213,14 @@ export function applyProduction(
   consumers.forEach((b) => {
     const count = state.buildings?.[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
+    const desiredOutputs = {} as Record<string, number>;
+    Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
+      desiredOutputs[res] = base * count * seconds;
+    });
     const capFactor = getOutputCapacityFactor(
       state,
       resources,
-      b.outputsPerSecBase,
-      count,
-      seconds,
+      desiredOutputs,
       foodCapacity,
       totalFoodAmount,
     );
