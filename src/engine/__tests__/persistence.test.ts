@@ -116,6 +116,88 @@ describe('persistence migrations and validation', () => {
     expect(typeof state.log[0].time).toBe('number');
   });
 
+  it('migrates v4 saves to current version', () => {
+    const oldSave = {
+      version: 4,
+      resources: { wood: { amount: 0, discovered: true } },
+      buildings: { loggingCamp: { count: 1 } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [{ id: '1', text: 'hi' }],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [] },
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(4);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.population).toHaveProperty('candidate', null);
+    expect(state.colony).toBeDefined();
+    expect(state.buildings.loggingCamp).toHaveProperty('isDesiredOn', true);
+    expect(typeof state.log[0].time).toBe('number');
+  });
+
+  it('migrates v5 saves to current version', () => {
+    const oldSave = {
+      version: 5,
+      resources: { wood: { amount: 0, discovered: true } },
+      buildings: { loggingCamp: { count: 1 } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [{ id: '1', text: 'hi' }],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0 },
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(5);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.population).toHaveProperty('candidate');
+    expect(state.colony).toBeDefined();
+    expect(typeof state.log[0].time).toBe('number');
+    expect(state.buildings.loggingCamp).toHaveProperty('isDesiredOn', true);
+  });
+
+  it('migrates v6 saves to current version', () => {
+    const oldSave = {
+      version: 6,
+      resources: { wood: { amount: 0, discovered: true } },
+      buildings: { loggingCamp: { count: 1 } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [{ id: '1', text: 'hi', time: 123 }],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0 },
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(6);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.population).toHaveProperty('candidate');
+    expect(state.colony).toBeDefined();
+    expect(state.buildings.loggingCamp).toHaveProperty('isDesiredOn', true);
+    expect(state.log[0].time).toBe(123);
+  });
+
+  it('loads v7 saves without migrating', () => {
+    const oldSave = {
+      version: 7,
+      resources: { wood: { amount: 0, discovered: true } },
+      buildings: { loggingCamp: { count: 1, isDesiredOn: false } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [{ id: '1', text: 'hi', time: 123 }],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0 },
+    };
+
+    const { state, migratedFrom } = load(JSON.stringify(oldSave));
+    expect(migratedFrom).toBe(null);
+    expect(state.version).toBe(CURRENT_SAVE_VERSION);
+    expect(state.population).toHaveProperty('candidate');
+    expect(state.colony).toBeDefined();
+    expect(state.buildings.loggingCamp).toHaveProperty('isDesiredOn', false);
+  });
+
   it('parses string version numbers', () => {
     const oldSave = {
       version: '2',
