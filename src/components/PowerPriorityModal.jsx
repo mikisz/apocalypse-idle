@@ -44,7 +44,8 @@ export default function PowerPriorityModal({ onClose }) {
     order.forEach((id) => {
       if (powered.includes(id) && !cleaned.includes(id)) cleaned.push(id);
       else if (!powered.includes(id))
-        console.warn('Unknown or non-powered typeId in powerTypeOrder:', id);
+        if (import.meta.env.DEV)
+          console.warn('Unknown or non-powered typeId in powerTypeOrder:', id);
     });
     setState((prev) => ({ ...prev, powerTypeOrder: cleaned }));
     onClose();
