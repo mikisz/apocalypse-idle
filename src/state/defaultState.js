@@ -5,7 +5,7 @@ import { buildInitialPowerTypeOrder } from '../engine/power.js';
 import { makeRandomSettler } from '../data/names.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { BALANCE } from '../data/balance.js';
-import { getFoodCapacity } from './selectors.js';
+import { calculateFoodCapacity } from './selectors.js';
 
 const initResources = () => {
   const obj = {};
@@ -47,7 +47,7 @@ const initFoodPool = () => {
       amount += resources[r.id]?.amount || 0;
     }
   });
-  const capacity = getFoodCapacity({ resources, buildings });
+  const capacity = calculateFoodCapacity({ resources, buildings });
   return { amount, capacity };
 };
 
