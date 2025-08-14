@@ -45,7 +45,7 @@ export default function PopulationView() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 text-lg font-semibold">
-              +{Math.round(bonuses[r.id] || 0)}%
+              +{Math.round((bonuses[r.id] || 0) * 100)}%
             </CardContent>
           </Card>
         ))}

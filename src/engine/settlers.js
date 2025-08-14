@@ -16,7 +16,7 @@ export function computeRoleBonuses(settlers) {
   settlers.forEach((s) => {
     if (s.isDead || !s.role) return;
     const skill = s.skills?.[s.role] || { level: 0 };
-    const bonus = ROLE_BONUS_PER_SETTLER(skill.level) * 100; // TODO: bonus already fractional; remove ×100 in application
+    const bonus = ROLE_BONUS_PER_SETTLER(skill.level);
     bonuses[s.role] = (bonuses[s.role] || 0) + bonus;
   });
   return bonuses;
@@ -70,7 +70,7 @@ export function processSettlersTick(
 
   // Compute bonuses
   const bonuses = roleBonuses || computeRoleBonuses(living);
-  const totalFoodBonusPercent = bonuses['farmer'] || 0;
+  const totalFoodBonusPercent = (bonuses['farmer'] || 0) * 100;
 
   const bonusGainPerSec = bonusFoodPerSec;
   const totalSettlersConsumption =

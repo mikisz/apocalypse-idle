@@ -283,13 +283,13 @@ function aggregateBuildingRates(state, roleBonuses) {
           mult = b.seasonProfile[season.id] ?? 1;
         else mult = getSeasonMultiplier(season, category);
         const role = ROLE_BY_RESOURCE[res];
-        const bonusPercent = roleBonuses[role] || 0;
+        const bonus = roleBonuses[role] || 0;
         const researchBonus = getResearchOutputBonus(state, res);
         let gain =
           base *
           mult *
           count *
-          (1 + bonusPercent / 100 + researchBonus) *
+          (1 + bonus + researchBonus) *
           factor;
         if (category === 'FOOD') {
           const room = foodCapacity - totalFoodAmount;

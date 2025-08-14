@@ -75,6 +75,7 @@ export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
     });
     const bonusFoodPerSec =
       totalFoodProdAfter * ((roleBonuses['farmer'] || 0) / 100);
+
     const settlersResult = processSettlersTick(
       current,
       chunk,
