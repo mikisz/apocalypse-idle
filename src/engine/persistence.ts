@@ -4,6 +4,7 @@ import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { deepClone } from '../utils/clone.ts';
 
 const STORAGE_KEY = 'apocalypse-idle-save';
+const STORAGE_BACKUP_KEY = `${STORAGE_KEY}-backup`;
 
 export const CURRENT_SAVE_VERSION = 7;
 
@@ -278,11 +279,29 @@ export function load(raw: any): { state: any; migratedFrom: number | null } {
 }
 
 export function saveGame(state: any): any {
+  let hadBackup = false;
   try {
     const data = save(state);
+
+    const existing = localStorage.getItem(STORAGE_KEY);
+    if (existing !== null) {
+      localStorage.setItem(STORAGE_BACKUP_KEY, existing);
+      hadBackup = true;
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (hadBackup) localStorage.removeItem(STORAGE_BACKUP_KEY);
     return data;
   } catch (err) {
+    try {
+      if (hadBackup) {
+        const backup = localStorage.getItem(STORAGE_BACKUP_KEY);
+        if (backup !== null) localStorage.setItem(STORAGE_KEY, backup);
+        localStorage.removeItem(STORAGE_BACKUP_KEY);
+      }
+    } catch (restoreErr) {
+      if (import.meta.env.DEV) console.error('Restore failed', restoreErr);
+    }
     if (import.meta.env.DEV) console.error('Save failed', err);
     return state;
   }
@@ -298,6 +317,14 @@ export function loadGame(): { state: any | null; error: any } {
     if (import.meta.env.DEV) console.error('Load failed', err);
     return { state: null, error: err };
   }
+}
+
+export function restoreBackup(): boolean {
+  const backup = localStorage.getItem(STORAGE_BACKUP_KEY);
+  if (backup === null) return false;
+  localStorage.setItem(STORAGE_KEY, backup);
+  localStorage.removeItem(STORAGE_BACKUP_KEY);
+  return true;
 }
 
 export function deleteSave(): void {

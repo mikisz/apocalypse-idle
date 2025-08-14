@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { describe, it, expect } from 'vitest';
-import { load, validateSave, CURRENT_SAVE_VERSION } from '../persistence.ts';
+import { describe, it, expect, vi } from 'vitest';
+import { load, validateSave, CURRENT_SAVE_VERSION, saveGame, restoreBackup } from '../persistence.ts';
 
 describe('persistence migrations and validation', () => {
   it('migrates v2 saves to include new fields', () => {
@@ -135,5 +135,46 @@ describe('persistence migrations and validation', () => {
     expect(() => load(JSON.stringify(futureSave))).toThrow(
       `Save version ${futureVersion} is newer than supported version ${CURRENT_SAVE_VERSION}`,
     );
+  });
+});
+
+describe('save backups', () => {
+  const STORAGE_KEY = 'apocalypse-idle-save';
+  const BACKUP_KEY = `${STORAGE_KEY}-backup`;
+
+  it('restores backup when saving fails', () => {
+    localStorage.clear();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ old: true }));
+
+    const originalSetItem = Storage.prototype.setItem;
+    let shouldFail = true;
+    const spy = vi
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(function (key, value) {
+        if (shouldFail && key === STORAGE_KEY) {
+          shouldFail = false;
+          throw new Error('fail');
+        }
+        return originalSetItem.call(this, key, value);
+      });
+
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    saveGame({ fresh: true });
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ old: true }));
+    expect(localStorage.getItem(BACKUP_KEY)).toBeNull();
+
+    spy.mockRestore();
+    errSpy.mockRestore();
+  });
+
+  it('can manually restore backup', () => {
+    localStorage.clear();
+    localStorage.setItem(BACKUP_KEY, JSON.stringify({ old: true }));
+    localStorage.setItem(STORAGE_KEY, 'bad');
+    expect(restoreBackup()).toBe(true);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ old: true }));
+    expect(localStorage.getItem(BACKUP_KEY)).toBeNull();
   });
 });
