@@ -1,3 +1,4 @@
+import React from 'react';
 import { useGame } from '../state/useGame.tsx';
 import { formatTime } from '../utils/time.js';
 import { Button } from './Button';
@@ -38,18 +39,18 @@ export default function OfflineProgressModal() {
                 ))}
               </div>
             )}
-            {info.research?.length > 0 && (
+            {(info.researchCompleted || info.research)?.length > 0 && (
               <div className="mb-2 space-y-1">
                 <div>Research completed:</div>
-                {info.research.map((r, i) => (
+                {(info.researchCompleted || info.research).map((r, i) => (
                   <div key={i}>{r}</div>
                 ))}
               </div>
             )}
-            {info.candidates?.length > 0 && (
+            {(info.candidateArrivals || info.candidates)?.length > 0 && (
               <div className="mb-2 space-y-1">
                 <div>Radio contact:</div>
-                {info.candidates.map((c, i) => (
+                {(info.candidateArrivals || info.candidates).map((c, i) => (
                   <div key={i}>{c}</div>
                 ))}
               </div>
