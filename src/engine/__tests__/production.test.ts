@@ -3,8 +3,9 @@ import { describe, test, expect } from 'vitest';
 import { processTick } from '../production.ts';
 import { defaultState } from '../../state/defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
-import { getOutputCapacityFactor } from '../capacity.ts';
+import { getOutputCapacityFactors } from '../capacity.ts';
 import { ensureCapacityCache } from '../../state/capacityCache.ts';
+import { PRODUCTION_BUILDINGS, BUILDING_MAP } from '../../data/buildings.js';
 
 describe('production building on/off and power allocation', () => {
   test('OFF avoids all consumption and production', () => {
@@ -104,12 +105,34 @@ describe('production building on/off and power allocation', () => {
     expect(next.resources.power.amount).toBeCloseTo(0, 5);
   });
 
-  test('capacity factor caps outputs at storage limit', () => {
+  test('capacity factors cap outputs individually', () => {
     const state = deepClone(defaultState);
     ensureCapacityCache(state);
-    const resources = { wood: { amount: 79.8 } };
-    const desired = { wood: 1 };
-    const factor = getOutputCapacityFactor(state, resources, desired, 0, 0);
-    expect(factor).toBeCloseTo(0.2, 5);
+    const resources = { wood: { amount: 79.8 }, stone: { amount: 0 } };
+    const desired = { wood: 1, stone: 1 };
+    const factors = getOutputCapacityFactors(state, resources, desired, 0, 0);
+    expect(factors.wood).toBeCloseTo(0.2, 5);
+    expect(factors.stone).toBeCloseTo(1, 5);
+  });
+
+  test('multi-output building clamps each resource separately', () => {
+    const state = deepClone(defaultState);
+    const dual = {
+      id: 'dual',
+      outputsPerSecBase: { wood: 1, stone: 1 },
+    };
+    PRODUCTION_BUILDINGS.push(dual);
+    BUILDING_MAP[dual.id] = dual;
+    state.buildings[dual.id] = { count: 1 };
+    state.gameTime.seconds = 270; // ensure summer multipliers = 1
+    state.resources.wood.amount = 79.5;
+    state.resources.wood.discovered = true;
+    state.resources.stone.amount = 0;
+    state.resources.stone.discovered = true;
+    const next = processTick(state, 1);
+    expect(next.resources.wood.amount).toBeCloseTo(80, 5);
+    expect(next.resources.stone.amount).toBeCloseTo(1, 5);
+    PRODUCTION_BUILDINGS.pop();
+    delete BUILDING_MAP[dual.id];
   });
 });

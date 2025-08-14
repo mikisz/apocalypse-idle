@@ -18,7 +18,7 @@ import {
   ensureCapacityCache,
   invalidateCapacityCache,
 } from '../state/capacityCache.ts';
-import { getOutputCapacityFactor } from './capacity.ts';
+import { getOutputCapacityFactors } from './capacity.ts';
 import { clampResource } from './resources.ts';
 import { setOfflineReason } from './powerHandling.ts';
 import { getTypeOrderIndex } from './power.ts';
@@ -73,10 +73,16 @@ export function applyProduction(
   let supplyTotal = 0;
   let supplyRemaining = 0;
 
-  const runOutputs = (b: any, count: number, capFactor: number): void => {
+  const runOutputs = (
+    b: any,
+    count: number,
+    capFactors: Record<string, number>,
+  ): void => {
     if (!b.outputsPerSecBase) return;
     Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
       if (res === 'power') return;
+      const factor = capFactors[res] ?? 0;
+      if (factor <= 0) return;
       const category = RESOURCES[res].category;
       let mult;
       if (b.seasonProfile === 'constant') mult = 1;
@@ -92,7 +98,7 @@ export function applyProduction(
         count *
         (1 + bonus + researchBonus) *
         seconds *
-        capFactor;
+        factor;
       const currentEntry = resources[res] || { amount: 0, discovered: false };
       if (category === 'FOOD') {
         const room = foodCapacity - totalFoodAmount;
@@ -172,7 +178,11 @@ export function applyProduction(
     supplyTotal += gain;
     supplyRemaining += gain;
 
-    runOutputs(b, count, 1);
+    const capFactors: Record<string, number> = {};
+    Object.keys(b.outputsPerSecBase || {}).forEach((res) => {
+      if (res !== 'power') capFactors[res] = 1;
+    });
+    runOutputs(b, count, capFactors);
   });
 
   others.forEach((b) => {
@@ -182,28 +192,30 @@ export function applyProduction(
     Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
       desiredOutputs[res] = base * count * seconds;
     });
-    const capFactor = getOutputCapacityFactor(
+    const capFactors = getOutputCapacityFactors(
       state,
       resources,
       desiredOutputs,
       foodCapacity,
       totalFoodAmount,
     );
-    if (capFactor <= 0) return;
+    const values = Object.values(capFactors);
+    const runFactor = values.length > 0 ? Math.max(...values) : 1;
+    if (runFactor <= 0) return;
 
     if (b.inputsPerSecBase) {
       for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
-        const need = base * count * seconds * capFactor;
+        const need = base * count * seconds * runFactor;
         const have = resources[res]?.amount || 0;
         if (have < need) {
           setOfflineReason(buildings, b.id, count, 'resources');
           return;
         }
       }
-      runInputs(b, count, capFactor);
+      runInputs(b, count, runFactor);
     }
 
-    runOutputs(b, count, capFactor);
+    runOutputs(b, count, capFactors);
   });
 
   let stored = resources.power?.amount || 0;
@@ -217,19 +229,21 @@ export function applyProduction(
     Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
       desiredOutputs[res] = base * count * seconds;
     });
-    const capFactor = getOutputCapacityFactor(
+    const capFactors = getOutputCapacityFactors(
       state,
       resources,
       desiredOutputs,
       foodCapacity,
       totalFoodAmount,
     );
-    if (capFactor <= 0) return;
+    const values = Object.values(capFactors);
+    const runFactor = values.length > 0 ? Math.max(...values) : 1;
+    if (runFactor <= 0) return;
 
     if (b.inputsPerSecBase) {
       for (const [res, base] of Object.entries(b.inputsPerSecBase)) {
         if (res === 'power') continue;
-        const need = base * count * seconds * capFactor;
+        const need = base * count * seconds * runFactor;
         const have = resources[res]?.amount || 0;
         if (have < need) {
           setOfflineReason(buildings, b.id, count, 'resources');
@@ -238,7 +252,8 @@ export function applyProduction(
       }
     }
 
-    const powerNeed = (b.inputsPerSecBase?.power || 0) * count * seconds * capFactor;
+    const powerNeed =
+      (b.inputsPerSecBase?.power || 0) * count * seconds * runFactor;
     demandTotal += powerNeed;
     let available = supplyRemaining + stored;
     if (available >= powerNeed) {
@@ -248,8 +263,8 @@ export function applyProduction(
         supplyRemaining = 0;
         stored -= fromStored;
       }
-      runInputs(b, count, capFactor);
-      runOutputs(b, count, capFactor);
+      runInputs(b, count, runFactor);
+      runOutputs(b, count, capFactors);
     } else {
       setOfflineReason(buildings, b.id, count, 'power');
     }

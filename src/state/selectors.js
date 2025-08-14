@@ -13,7 +13,7 @@ import { ROLE_BY_RESOURCE } from '../data/roles.js';
 import { SHELTER_MAX } from '../data/settlement.js';
 import { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
 export { getCapacity, calculateFoodCapacity } from './capacityCache.ts';
-import { getOutputCapacityFactor } from '../engine/capacity.ts';
+import { getOutputCapacityFactors } from '../engine/capacity.ts';
 
 /** @typedef {import('./useGame.tsx').GameState} GameState */
 
@@ -112,14 +112,21 @@ function getOutputCapacityFactorRates(
   Object.entries(outputs || {}).forEach(([res, base]) => {
     desired[res] = base * count * factor;
   });
-  const capFactor = getOutputCapacityFactor(
+  const capFactors = getOutputCapacityFactors(
     state,
     resources,
     desired,
     foodCapacity,
     totalFoodAmount,
   );
-  return factor * capFactor;
+  const perRes = {};
+  let max = 0;
+  Object.entries(capFactors).forEach(([res, cf]) => {
+    perRes[res] = cf * factor;
+    if (cf > max) max = cf;
+  });
+  if (!Object.keys(capFactors).length) max = 1;
+  return { factor: factor * max, perRes };
 }
 
 function aggregateBuildingRates(state, roleBonuses) {
@@ -144,9 +151,10 @@ function aggregateBuildingRates(state, roleBonuses) {
     const on = entry?.isDesiredOn !== false;
     if (count <= 0 || !on) return;
     let factor = 1;
+    let perRes = {};
     if (b.inputsPerSecBase) {
       if (b.type === 'processing') {
-        factor = getOutputCapacityFactorRates(
+        const res = getOutputCapacityFactorRates(
           state,
           resources,
           b.outputsPerSecBase,
@@ -155,29 +163,31 @@ function aggregateBuildingRates(state, roleBonuses) {
           foodCapacity,
           totalFoodAmount,
         );
+        factor = res.factor;
+        perRes = res.perRes;
         if (factor <= 0) return;
         const canRun = Object.entries(b.inputsPerSecBase).every(
-          ([res, base]) => {
+          ([resId, base]) => {
             const need = base * count * factor;
-            const have = resources[res] || 0;
+            const have = resources[resId] || 0;
             return have >= need;
           },
         );
         if (!canRun) return;
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        Object.entries(b.inputsPerSecBase).forEach(([resId, base]) => {
           const amt = base * count * factor;
-          rates[res] = (rates[res] || 0) - amt;
-          resources[res] = (resources[res] || 0) - amt;
-          if (RESOURCES[res].category === 'FOOD') totalFoodAmount -= amt;
+          rates[resId] = (rates[resId] || 0) - amt;
+          resources[resId] = (resources[resId] || 0) - amt;
+          if (RESOURCES[resId].category === 'FOOD') totalFoodAmount -= amt;
         });
       } else {
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        Object.entries(b.inputsPerSecBase).forEach(([resId, base]) => {
           const need = base * count;
-          const have = resources[res] || 0;
+          const have = resources[resId] || 0;
           const ratio = need > 0 ? have / need : 1;
           factor = Math.min(factor, ratio);
         });
-        factor = getOutputCapacityFactorRates(
+        const res = getOutputCapacityFactorRates(
           state,
           resources,
           b.outputsPerSecBase,
@@ -186,16 +196,18 @@ function aggregateBuildingRates(state, roleBonuses) {
           foodCapacity,
           totalFoodAmount,
         );
+        factor = res.factor;
+        perRes = res.perRes;
         if (factor <= 0) return;
-        Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
+        Object.entries(b.inputsPerSecBase).forEach(([resId, base]) => {
           const amt = base * count * factor;
-          rates[res] = (rates[res] || 0) - amt;
-          resources[res] = (resources[res] || 0) - amt;
-          if (RESOURCES[res].category === 'FOOD') totalFoodAmount -= amt;
+          rates[resId] = (rates[resId] || 0) - amt;
+          resources[resId] = (resources[resId] || 0) - amt;
+          if (RESOURCES[resId].category === 'FOOD') totalFoodAmount -= amt;
         });
       }
     } else {
-      factor = getOutputCapacityFactorRates(
+      const res = getOutputCapacityFactorRates(
         state,
         resources,
         b.outputsPerSecBase,
@@ -204,39 +216,43 @@ function aggregateBuildingRates(state, roleBonuses) {
         foodCapacity,
         totalFoodAmount,
       );
+      factor = res.factor;
+      perRes = res.perRes;
       if (factor <= 0) return;
     }
     if (b.outputsPerSecBase) {
-      Object.entries(b.outputsPerSecBase).forEach(([res, base]) => {
-        const category = RESOURCES[res].category;
+      Object.entries(b.outputsPerSecBase).forEach(([resId, base]) => {
+        const factorRes = perRes[resId] ?? 0;
+        if (factorRes <= 0) return;
+        const category = RESOURCES[resId].category;
         let mult;
         if (b.seasonProfile === 'constant') mult = 1;
         else if (typeof b.seasonProfile === 'object')
           mult = b.seasonProfile[season.id] ?? 1;
         else mult = getSeasonMultiplier(season, category);
-        const role = ROLE_BY_RESOURCE[res];
+        const role = ROLE_BY_RESOURCE[resId];
         const bonus = roleBonuses[role] || 0;
-        const researchBonus = getResearchOutputBonus(state, res);
+        const researchBonus = getResearchOutputBonus(state, resId);
         let gain =
           base *
           mult *
           count *
           (1 + bonus + researchBonus) *
-          factor;
+          factorRes;
         if (category === 'FOOD') {
           const room = foodCapacity - totalFoodAmount;
           gain = room > 0 ? Math.min(gain, room) : 0;
           totalFoodAmount += gain;
         } else {
-          const cap = getCapacity(state, res);
+          const cap = getCapacity(state, resId);
           if (Number.isFinite(cap)) {
-            const current = resources[res] || 0;
+            const current = resources[resId] || 0;
             const room = cap - current;
             gain = room > 0 ? Math.min(gain, room) : 0;
           }
         }
-        rates[res] = (rates[res] || 0) + gain;
-        resources[res] = (resources[res] || 0) + gain;
+        rates[resId] = (rates[resId] || 0) + gain;
+        resources[resId] = (resources[resId] || 0) + gain;
       });
     }
   });
