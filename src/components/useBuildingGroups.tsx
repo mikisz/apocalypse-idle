@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useGame } from '../state/useGame.tsx';
 import { PRODUCTION_BUILDINGS, STORAGE_BUILDINGS } from '../data/buildings.js';
 

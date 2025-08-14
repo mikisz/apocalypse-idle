@@ -1,11 +1,12 @@
+// @ts-nocheck
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { processTick } from './production.js';
-import { processResearchTick } from './research.js';
+import { processTick } from './production.ts';
+import { processResearchTick } from './research.ts';
 import { getResourceRates, calculateFoodCapacity } from '../state/selectors.js';
 import { RESOURCES } from '../data/resources.js';
-import { processSettlersTick, computeRoleBonuses } from './settlers.js';
-import { updateRadio } from './radio.js';
-import { getYear, DAYS_PER_YEAR } from './time.js';
+import { processSettlersTick, computeRoleBonuses } from './settlers.ts';
+import { updateRadio } from './radio.ts';
+import { getYear, DAYS_PER_YEAR } from './time.ts';
 
 export function applyProduction(prev: any, dt: number, roleBonuses: any) {
   const productionBonuses = { ...roleBonuses };

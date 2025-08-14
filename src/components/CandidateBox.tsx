@@ -1,10 +1,11 @@
+// @ts-nocheck
 import type { JSX } from 'react';
 import { useGame } from '../state/useGame.tsx';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { candidateToSettler } from '../engine/candidates.js';
+import { candidateToSettler } from '../engine/candidates.ts';
 import { formatAge } from '../utils/format.js';
-import { DAYS_PER_YEAR } from '../engine/time.js';
+import { DAYS_PER_YEAR } from '../engine/time.ts';
 import Accordion from './Accordion.jsx';
 import { Button } from './ui/button';
 

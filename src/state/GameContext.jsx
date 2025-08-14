@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { GameContext } from './useGame.tsx';
-import { loadGame } from '../engine/persistence.js';
+import { loadGame } from '../engine/persistence.ts';
 import { defaultState } from './defaultState.js';
 import { prepareLoadedState } from './prepareLoadedState.ts';
 import useGameTick from './hooks/useGameTick.tsx';

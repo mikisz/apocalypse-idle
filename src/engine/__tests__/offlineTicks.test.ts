@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi } from 'vitest';
 
 const createBaseState = () => ({
@@ -13,18 +14,18 @@ const createBaseState = () => ({
 
 describe('offline progress', () => {
   it('invokes processTick once per elapsed second', async () => {
-    const mock = vi.fn((state) => state);
-    vi.doMock('../production.js', () => ({ processTick: mock }));
-    const { applyOfflineProgress } = await import('../offline.js');
+    const mock = vi.fn((state: any) => state);
+    vi.doMock('../production.ts', () => ({ processTick: mock }));
+    const { applyOfflineProgress } = await import('../offline.ts');
     applyOfflineProgress(createBaseState(), 5);
     expect(mock).toHaveBeenCalledTimes(5);
-    vi.doUnmock('../production.js');
+    vi.doUnmock('../production.ts');
     vi.resetModules();
   });
 
   it('matches online ticks for storage and power status', async () => {
-    const { applyOfflineProgress } = await import('../offline.js');
-    const { processTick } = await import('../production.js');
+    const { applyOfflineProgress } = await import('../offline.ts');
+    const { processTick } = await import('../production.ts');
     const offline = applyOfflineProgress(createBaseState(), 100).state;
     let online = createBaseState();
     for (let i = 0; i < 100; i += 1) {

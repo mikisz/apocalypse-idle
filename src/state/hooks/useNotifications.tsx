@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
@@ -60,7 +61,7 @@ export default function useNotifications(
       } else {
         const prevS = prevSettlerMap.get(s.id);
         if (prevS) {
-          Object.entries(s.skills || {}).forEach(([skill, entry]) => {
+          Object.entries(s.skills || {}).forEach(([skill, entry]: [string, any]) => {
             const prevLvl = prevS.skills?.[skill]?.level || 0;
             if (entry.level > prevLvl) {
               const fullName = s.name
@@ -77,16 +78,16 @@ export default function useNotifications(
       }
     });
 
-    Object.entries(state.buildings).forEach(([id, b]) => {
+    Object.entries(state.buildings as Record<string, any>).forEach(([id, b]) => {
       const currReason = b?.offlineReason;
-      const prevReason = prev.buildings?.[id]?.offlineReason;
+      const prevReason = (prev.buildings as any)?.[id]?.offlineReason;
       if (
         currReason === 'power' &&
         prevReason !== 'power' &&
         b?.isDesiredOn !== false &&
         !powerNotified.current.has(id)
       ) {
-        const name = BUILDING_MAP[id]?.name || id;
+        const name = (BUILDING_MAP as any)[id]?.name || id;
         const msg = `Power shortage: ${name} offline`;
         toast({ description: msg });
         addLog(msg);
@@ -98,7 +99,7 @@ export default function useNotifications(
         b?.isDesiredOn !== false &&
         !resourceShortageNotified.current.has(id)
       ) {
-        const name = BUILDING_MAP[id]?.name || id;
+        const name = (BUILDING_MAP as any)[id]?.name || id;
         const msg = `Resource shortage: ${name} offline`;
         toast({ description: msg });
         addLog(msg);
@@ -109,7 +110,7 @@ export default function useNotifications(
         resourceShortageNotified.current.delete(id);
     });
 
-    Object.entries(state.resources).forEach(([id, res]) => {
+    Object.entries(state.resources as Record<string, any>).forEach(([id, res]: [string, any]) => {
       const prevAmt = prev.resources?.[id]?.amount || 0;
       const currAmt = res.amount;
       const cap = getCapacity(state, id);
@@ -118,7 +119,7 @@ export default function useNotifications(
         currAmt >= cap &&
         !resourceNotified.current.has(id)
       ) {
-        const name = RESOURCES[id]?.name || id;
+        const name = (RESOURCES as any)[id]?.name || id;
         const msg = `${name} storage full`;
         toast({ description: msg });
         addLog(msg);

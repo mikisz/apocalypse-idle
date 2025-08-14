@@ -1,4 +1,9 @@
-export function setOfflineReason(buildings, id, count, reason) {
+export function setOfflineReason(
+  buildings: Record<string, any>,
+  id: string,
+  count: number,
+  reason: string | null,
+): void {
   const entry = buildings[id] || { count };
 
   // Only persist recognised reasons. This currently includes "power" when a

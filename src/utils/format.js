@@ -1,4 +1,4 @@
-import { DAYS_PER_YEAR } from '../engine/time.js';
+import { DAYS_PER_YEAR } from '../engine/time.ts';
 
 export function formatAmount(n) {
   const abs = Math.abs(n || 0);

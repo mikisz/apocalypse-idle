@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { clampResource } from '../resources.js';
+import { clampResource } from '../resources.ts';
 
 describe('clampResource', () => {
   it('clamps values to [0, capacity]', () => {

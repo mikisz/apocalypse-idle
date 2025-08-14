@@ -1,12 +1,12 @@
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { generateCandidate } from './candidates.js';
+import { generateCandidate, type Candidate } from './candidates.ts';
 
 export function updateRadio(
-  state,
-  elapsedSeconds,
-  candidateGenerator = generateCandidate,
-) {
-  let candidate = state.population?.candidate || null;
+  state: any,
+  elapsedSeconds: number,
+  candidateGenerator: () => Candidate = generateCandidate,
+): { candidate: Candidate | null; radioTimer: number } {
+  let candidate: Candidate | null = state.population?.candidate || null;
   let radioTimer = state.colony?.radioTimer ?? RADIO_BASE_SECONDS;
   if ((state.buildings?.radio?.count || 0) > 0) {
     const powered = (state.resources?.power?.amount || 0) > 0;

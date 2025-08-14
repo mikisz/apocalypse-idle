@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../state/useGame.tsx';
-import { computeRoleBonuses } from '../engine/settlers.js';
+import { computeRoleBonuses } from '../engine/settlers.ts';
 import { ROLE_LIST } from '../data/roles.js';
 import { getSettlerCapacity } from '../state/selectors.js';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';

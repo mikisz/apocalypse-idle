@@ -1,21 +1,21 @@
-// @ts-check
+export interface Season {
+  id: string;
+  label: string;
+  icon: string;
+  multipliers: Record<string, number>;
+}
 
-/**
- * @typedef {{id: string, label: string, icon: string, multipliers: Record<string, number>}} Season
- */
+export interface TimeBreakdown {
+  year: number;
+  day: number;
+  season: Season;
+  secondsInSeason: number;
+}
 
-/**
- * @typedef {{year: number, day: number, season: Season, secondsInSeason: number}} TimeBreakdown
- */
-
-/**
- * Seconds per season.
- * @type {number}
- */
+// Seconds per season.
 export const SEASON_DURATION = 270; // seconds per season
 
-/** @type {Season[]} */
-export const SEASONS = [
+export const SEASONS: Season[] = [
   {
     id: 'spring',
     label: 'Spring',
@@ -51,16 +51,14 @@ export const SECONDS_PER_DAY = SEASON_DURATION / DAYS_PER_SEASON;
  * Create a copy of all seasons for state initialization.
  * @returns {Season[]}
  */
-export function initSeasons() {
+export function initSeasons(): Season[] {
   return SEASONS.map((s) => ({ ...s }));
 }
 
-/**
- * Derive temporal information from game state.
- * @param {{ gameTime?: { seconds: number } }} state
- * @returns {TimeBreakdown}
- */
-export function getTimeBreakdown(state) {
+// Derive temporal information from game state.
+export function getTimeBreakdown(
+  state: { gameTime?: { seconds: number } } | undefined,
+): TimeBreakdown {
   const seconds = state?.gameTime?.seconds || 0;
   const seasonIndex = Math.floor(seconds / SEASON_DURATION) % SEASONS.length;
   const season = SEASONS[seasonIndex];
@@ -71,34 +69,23 @@ export function getTimeBreakdown(state) {
   return { year, day, season, secondsInSeason };
 }
 
-/**
- * @param {{ gameTime?: { seconds: number } }} state
- */
-export function getYear(state) {
+export function getYear(state: { gameTime?: { seconds: number } }): number {
   return getTimeBreakdown(state).year;
 }
 
-/**
- * @param {{ gameTime?: { seconds: number } }} state
- * @returns {Season}
- */
-export function getSeason(state) {
+export function getSeason(state: { gameTime?: { seconds: number } }): Season {
   return getTimeBreakdown(state).season;
 }
 
-/**
- * @param {Season | undefined} season
- * @param {string} category
- * @returns {number}
- */
-export function getSeasonMultiplier(season, category) {
+export function getSeasonMultiplier(
+  season: Season | undefined,
+  category: string,
+): number {
   return season?.multipliers?.[category] ?? 1;
 }
 
-/**
- * @param {{ gameTime?: { seconds: number } }} state
- * @returns {Record<string, number>}
- */
-export function getSeasonModifiers(state) {
+export function getSeasonModifiers(
+  state: { gameTime?: { seconds: number } },
+): Record<string, number> {
   return getSeason(state).multipliers || {};
 }

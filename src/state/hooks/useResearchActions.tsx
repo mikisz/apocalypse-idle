@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import { startResearch, cancelResearch } from '../../engine/research.js';
+import { startResearch, cancelResearch } from '../../engine/research.ts';
 import type { GameState } from '../useGame.tsx';
 
 export interface ResearchActions {

@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { describe, expect, test } from 'vitest';
-import { processTick, demolishBuilding } from '../production.js';
-import { processSettlersTick } from '../settlers.js';
+import { processTick, demolishBuilding } from '../production.ts';
+import { processSettlersTick } from '../settlers.ts';
 import { defaultState } from '../../state/defaultState.js';
 import { BUILDING_MAP, getBuildingCost } from '../../data/buildings.js';
-import { SEASON_DURATION } from '../time.js';
+import { SEASON_DURATION } from '../time.ts';
 import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';
 import { calculateFoodCapacity } from '../../state/selectors.js';

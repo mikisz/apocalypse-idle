@@ -136,7 +136,7 @@ export const LAST_NAMES = [
   'Gomez',
 ];
 
-import { DAYS_PER_YEAR } from '../engine/time.js';
+import { DAYS_PER_YEAR } from '../engine/time.ts';
 import { BALANCE } from './balance.js';
 
 export function makeRandomSettler({ sex, randomizeAge = false } = {}) {

@@ -1,5 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
-import { loadGame, deleteSave, saveGame } from '../../engine/persistence.js';
+import { loadGame, deleteSave, saveGame } from '../../engine/persistence.ts';
 import { defaultState } from '../defaultState.js';
 import { prepareLoadedState } from '../prepareLoadedState.ts';
 import type { GameState } from '../useGame.tsx';

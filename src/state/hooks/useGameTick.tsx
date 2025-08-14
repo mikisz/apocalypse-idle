@@ -9,7 +9,7 @@ import {
 
 export default function useGameTick(setState: Dispatch<SetStateAction<any>>) {
   useGameLoop((dt) => {
-    setState((prev) => {
+    setState((prev: any) => {
       const {
         state: settlersProcessed,
         telemetry,

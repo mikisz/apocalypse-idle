@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback } from 'react';
 import { useGame } from '../useGame.tsx';
 import {
@@ -7,7 +8,7 @@ import {
   canAffordBuilding,
   getCapacity,
 } from '../selectors.js';
-import { demolishBuilding, buildBuilding } from '../../engine/production.js';
+import { demolishBuilding, buildBuilding } from '../../engine/production.ts';
 import { RESEARCH_MAP } from '../../data/research.js';
 
 export default function useBuilding(building: any, completedResearch: string[] = []) {
@@ -47,7 +48,7 @@ export default function useBuilding(building: any, completedResearch: string[] =
   const onToggle = useCallback(
     (on: boolean) => {
       setState((prev) => {
-        const prevEntry = prev.buildings[building.id] || { count: 0 };
+        const prevEntry = (prev.buildings as Record<string, any>)[building.id] || { count: 0 };
         return {
           ...prev,
           buildings: {

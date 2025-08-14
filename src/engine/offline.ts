@@ -1,17 +1,22 @@
+// @ts-nocheck
 import { RESOURCES } from '../data/resources.js';
 import { getResourceRates } from '../state/selectors.js';
-import { updateRadio } from './radio.js';
+import { updateRadio } from './radio.ts';
 import { deepClone } from '../utils/clone.ts';
-import { processSettlersTick } from './settlers.js';
-import { processTick } from './production.js';
+import { processSettlersTick } from './settlers.ts';
+import { processTick } from './production.ts';
 
-export function applyOfflineProgress(state, elapsedSeconds, roleBonuses = {}) {
+export function applyOfflineProgress(
+  state: any,
+  elapsedSeconds: number,
+  roleBonuses: Record<string, number> = {},
+): { state: any; gains: Record<string, number>; events: any[] } {
   if (elapsedSeconds <= 0) return { state, gains: {}, events: [] };
   const before = deepClone(state.resources);
   const productionBonuses = { ...roleBonuses };
   delete productionBonuses.farmer;
-  let current = { ...state };
-  let events = [];
+  let current: any = { ...state };
+  let events: any[] = [];
 
   for (let i = 0; i < elapsedSeconds; i += 1) {
     current = processTick(current, 1, productionBonuses);

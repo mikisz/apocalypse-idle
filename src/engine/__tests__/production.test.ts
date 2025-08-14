@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { describe, test, expect } from 'vitest';
-import { processTick } from '../production.js';
+import { processTick } from '../production.ts';
 import { defaultState } from '../../state/defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
 

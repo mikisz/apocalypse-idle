@@ -3,11 +3,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { GameProvider } from '../GameContext.jsx';
 import { useGame } from '../useGame.tsx';
-import { loadGame } from '../../engine/persistence.js';
+import { loadGame } from '../../engine/persistence.ts';
 
 vi.mock('../hooks/useNotifications.tsx', () => ({ default: vi.fn() }));
 
-vi.mock('../../engine/persistence.js', () => ({
+vi.mock('../../engine/persistence.ts', () => ({
   saveGame: vi.fn((s) => s),
   loadGame: vi.fn(),
   deleteSave: vi.fn(),

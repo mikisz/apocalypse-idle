@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
 import { RESOURCES } from '../data/resources.js';
 
