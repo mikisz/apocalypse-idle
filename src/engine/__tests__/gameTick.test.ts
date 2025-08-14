@@ -1,38 +1,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../../engine/production.js', () => ({
+vi.mock('../production.js', () => ({
   processTick: vi.fn(),
 }));
-vi.mock('../../../engine/research.js', () => ({
+vi.mock('../research.js', () => ({
   processResearchTick: vi.fn(),
 }));
-vi.mock('../../../engine/settlers.js', () => ({
+vi.mock('../settlers.js', () => ({
   processSettlersTick: vi.fn(),
   computeRoleBonuses: vi.fn(),
 }));
-vi.mock('../../selectors.js', () => ({
+vi.mock('../../state/selectors.js', () => ({
   getResourceRates: vi.fn(),
   getFoodCapacity: vi.fn(),
 }));
-vi.mock('../../../data/resources.js', () => ({
+vi.mock('../../data/resources.js', () => ({
   RESOURCES: {},
 }));
-vi.mock('../../../engine/radio.js', () => ({
+vi.mock('../radio.js', () => ({
   updateRadio: vi.fn(),
 }));
-vi.mock('../../../engine/time.js', () => ({
+vi.mock('../time.js', () => ({
   getYear: vi.fn(),
   DAYS_PER_YEAR: 365,
 }));
 
-import { applyProduction, applySettlers, applyYearUpdate } from '../useGameTick';
-import { processTick } from '../../../engine/production.js';
-import { processResearchTick } from '../../../engine/research.js';
-import { processSettlersTick, computeRoleBonuses } from '../../../engine/settlers.js';
-import { getResourceRates, getFoodCapacity } from '../../selectors.js';
-import { updateRadio } from '../../../engine/radio.js';
-import { getYear, DAYS_PER_YEAR } from '../../../engine/time.js';
-import { RESOURCES } from '../../../data/resources.js';
+import { applyProduction, applySettlers, applyYearUpdate } from '../gameTick.ts';
+import { processTick } from '../production.js';
+import { processResearchTick } from '../research.js';
+import { processSettlersTick, computeRoleBonuses } from '../settlers.js';
+import { getResourceRates, getFoodCapacity } from '../../state/selectors.js';
+import { updateRadio } from '../radio.js';
+import { getYear, DAYS_PER_YEAR } from '../time.js';
+import { RESOURCES } from '../../data/resources.js';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -144,4 +144,3 @@ describe('applyYearUpdate', () => {
     expect(result.meta?.telemetry?.settlers).toBe(telemetry);
   });
 });
-
