@@ -3,6 +3,7 @@ import { prepareLoadedState } from '../prepareLoadedState.ts';
 import { defaultState } from '../defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
 import { calculateFoodCapacity } from '../selectors.js';
+import { DAYS_PER_YEAR, SECONDS_PER_DAY } from '../../engine/time.ts';
 
 const fakeCandidate = { id: 'cand1' };
 vi.mock('../../engine/candidates.ts', () => ({
@@ -70,5 +71,17 @@ describe('prepareLoadedState', () => {
     const state = prepareLoadedState(loaded);
     expect(state.foodPool.amount).toBe(15);
     expect(state.foodPool.capacity).toBe(calculateFoodCapacity(state));
+  });
+
+  it('ages settlers and advances year after offline progress', () => {
+    const now = Date.now();
+    const elapsed = DAYS_PER_YEAR * SECONDS_PER_DAY; // one year
+    const loaded = {
+      population: { settlers: [{ id: 1, ageDays: 0 }] },
+      lastSaved: now - elapsed * 1000,
+    };
+    const state = prepareLoadedState(loaded);
+    expect(state.gameTime.year).toBe(2);
+    expect(state.population.settlers[0].ageDays).toBe(elapsed / SECONDS_PER_DAY);
   });
 });
