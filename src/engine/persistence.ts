@@ -248,7 +248,7 @@ export function saveGame(state: any): any {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     return data;
   } catch (err) {
-    console.error('Save failed', err);
+    if (import.meta.env.DEV) console.error('Save failed', err);
     return state;
   }
 }
@@ -260,7 +260,7 @@ export function loadGame(): { state: any | null; error: any } {
     const { state } = load(raw);
     return { state, error: null };
   } catch (err) {
-    console.error('Load failed', err);
+    if (import.meta.env.DEV) console.error('Load failed', err);
     return { state: null, error: err };
   }
 }
@@ -269,7 +269,7 @@ export function deleteSave(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (err) {
-    console.error('Delete failed', err);
+    if (import.meta.env.DEV) console.error('Delete failed', err);
   }
 }
 

@@ -15,7 +15,7 @@ export function GameProvider({ children }) {
   const { state: loaded, error: loadErr } = loadGame();
   const [state, setState] = useState(() => {
     if (loadErr) {
-      console.warn('[loadGame] error:', loadErr);
+      if (import.meta.env.DEV) console.warn('[loadGame] error:', loadErr);
     }
     return loaded
       ? prepareLoadedState(loaded)

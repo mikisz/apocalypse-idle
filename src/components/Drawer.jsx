@@ -37,7 +37,7 @@ export default function Drawer() {
         const log = [createLogEntry(note), ...(loaded.log || [])].slice(0, 100);
         setState({ ...loaded, log });
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) console.error(err);
         setState((prev) => ({
           ...prev,
           log: [

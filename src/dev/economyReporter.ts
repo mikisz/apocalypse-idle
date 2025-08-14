@@ -363,7 +363,7 @@ export function main(args = process.argv.slice(2)) {
   const opts = parseArgs(args);
   const outStr = generateReport(opts);
   if (opts.out) fs.writeFileSync(opts.out, outStr);
-  else console.log(outStr);
+  else if (process.env.NODE_ENV !== 'production') console.log(outStr);
 }
 
 if (pathToFileURL(process.argv[1] ?? '').href === import.meta.url) {
