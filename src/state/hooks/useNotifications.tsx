@@ -129,13 +129,14 @@ export default function useNotifications(
 
     const prevHappy = prev.colony?.happiness?.value || 0;
     const currHappy = state.colony?.happiness?.value || 0;
-    const prevHappyRounded = Math.round(prevHappy);
-    const currHappyRounded = Math.round(currHappy);
-    if (prevHappyRounded >= 50 && currHappyRounded < 50) {
+    const normalize = (v: number): number => Math.round(v * 100) / 100;
+    const prevHappyNormalized = normalize(prevHappy);
+    const currHappyNormalized = normalize(currHappy);
+    if (prevHappyNormalized >= 50 && currHappyNormalized < 50) {
       const msg = 'Happiness dropped below 50%';
       toast({ description: msg });
       addLog(msg);
-    } else if (prevHappyRounded < 50 && currHappyRounded >= 50) {
+    } else if (prevHappyNormalized < 50 && currHappyNormalized >= 50) {
       const msg = 'Happiness increased above 50%';
       toast({ description: msg });
       addLog(msg);
