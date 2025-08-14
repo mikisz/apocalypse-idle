@@ -54,6 +54,48 @@ describe('persistence migrations and validation', () => {
     expect(() => validateSave(missingSettlers)).toThrow();
   });
 
+  it('rejects malformed resource data', () => {
+    const base = {
+      version: CURRENT_SAVE_VERSION,
+      resources: { wood: { amount: 1, discovered: true, produced: 0 } },
+      buildings: { loggingCamp: { count: 1, isDesiredOn: true } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0 },
+    };
+
+    const bad = JSON.parse(JSON.stringify(base));
+    bad.resources.wood.amount = 'oops';
+    expect(() => validateSave(bad)).toThrow();
+
+    const missing = JSON.parse(JSON.stringify(base));
+    delete missing.resources.wood.amount;
+    expect(() => validateSave(missing)).toThrow();
+  });
+
+  it('rejects malformed building data', () => {
+    const base = {
+      version: CURRENT_SAVE_VERSION,
+      resources: { wood: { amount: 1, discovered: true, produced: 0 } },
+      buildings: { loggingCamp: { count: 1, isDesiredOn: true } },
+      ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
+      log: [],
+      research: { current: null, completed: [], progress: {} },
+      population: { settlers: [], candidate: null },
+      colony: { radioTimer: 0 },
+    };
+
+    const bad = JSON.parse(JSON.stringify(base));
+    bad.buildings.loggingCamp.count = 'two';
+    expect(() => validateSave(bad)).toThrow();
+
+    const missing = JSON.parse(JSON.stringify(base));
+    delete missing.buildings.loggingCamp.count;
+    expect(() => validateSave(missing)).toThrow();
+  });
+
   it('converts string log entries to objects', () => {
     const oldSave = {
       version: 3,
