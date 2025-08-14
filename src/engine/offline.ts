@@ -60,8 +60,7 @@ export function applyOfflineProgress(
         totalFoodProdBase += rates[id]?.perSec || 0;
       }
     });
-    const bonusFoodPerSec =
-      totalFoodProdBase * (roleBonuses['farmer'] || 0);
+    const bonusFoodPerSec = totalFoodProdBase * (roleBonuses['farmer'] || 0);
 
     const settlersResult = processSettlersTick(
       current,
@@ -76,11 +75,19 @@ export function applyOfflineProgress(
         ...settlersResult.events.map((e: any) => ({ ...e, type: 'death' })),
       );
 
+    const prevCandidate = current.population?.candidate;
     const { candidate, radioTimer } = updateRadio(current, dt);
+    let log = current.log || [];
+    if (!prevCandidate && candidate) {
+      const entry = createLogEntry('Someone responded to the radio');
+      log = [entry, ...log].slice(0, 100);
+      events.push({ ...entry, type: 'candidate' });
+    }
     current = {
       ...current,
       population: { ...current.population, candidate },
       colony: { ...current.colony, radioTimer },
+      log,
     };
   }
 

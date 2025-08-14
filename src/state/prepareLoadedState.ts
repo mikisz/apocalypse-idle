@@ -60,11 +60,11 @@ export function prepareLoadedState(loaded: any) {
   const elapsed = Math.floor((now - (cloned.lastSaved || now)) / 1000);
   if (elapsed > 0) {
     const bonuses = computeRoleBonuses(base.population?.settlers || []);
-    const { state: progressed, gains, events } = applyOfflineProgress(
-      base,
-      elapsed,
-      bonuses,
-    );
+    const {
+      state: progressed,
+      gains,
+      events,
+    } = applyOfflineProgress(base, elapsed, bonuses);
     const resourceLogs = Object.entries(gains).map(([res, amt]) =>
       createLogEntry(
         `Gained ${formatAmount(amt)} ${(RESOURCES as any)[res].name} while offline`,
@@ -73,6 +73,7 @@ export function prepareLoadedState(loaded: any) {
     );
     const deathLogs = (events || []).filter((e) => e.type === 'death');
     const researchLogs = (events || []).filter((e) => e.type === 'research');
+    const candidateLogs = (events || []).filter((e) => e.type === 'candidate');
     const secondsAfter = (progressed.gameTime?.seconds || 0) + elapsed;
     const yearAfter = getYear({
       ...progressed,
@@ -85,7 +86,8 @@ export function prepareLoadedState(loaded: any) {
     const show =
       Object.keys(gains).length > 0 ||
       deathLogs.length > 0 ||
-      researchLogs.length > 0;
+      researchLogs.length > 0 ||
+      candidateLogs.length > 0;
     const log = [...resourceLogs, ...(progressed.log || [])].slice(0, 100);
     return {
       ...progressed,
@@ -99,6 +101,7 @@ export function prepareLoadedState(loaded: any) {
               gains,
               deaths: deathLogs.map((e) => e.text),
               research: researchLogs.map((e) => e.text),
+              candidates: candidateLogs.map((e) => e.text),
             }
           : null,
       },
