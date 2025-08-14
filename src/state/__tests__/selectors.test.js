@@ -15,7 +15,15 @@ describe('getResourceRates', () => {
 });
 
 describe('power selectors', () => {
-  it('returns power status with fallbacks', () => {
+  it('returns power status when present', () => {
+    const state = {
+      powerStatus: { supply: 1, demand: 2, stored: 3, capacity: 4 },
+    };
+    const ps = getPowerStatus(state);
+    expect(ps).toEqual({ supply: 1, demand: 2, stored: 3, capacity: 4 });
+  });
+
+  it('uses fallbacks when power status is missing', () => {
     const state = {
       resources: { power: { amount: 5 } },
       buildings: {},
@@ -23,6 +31,12 @@ describe('power selectors', () => {
     };
     const ps = getPowerStatus(state);
     expect(ps).toEqual({ supply: 0, demand: 0, stored: 5, capacity: 20 });
+  });
+
+  it('handles old saves without power resource', () => {
+    const state = { resources: {}, buildings: {}, research: { completed: [] } };
+    const ps = getPowerStatus(state);
+    expect(ps).toEqual({ supply: 0, demand: 0, stored: 0, capacity: 20 });
   });
 
   it('injects power status into energy section', () => {
