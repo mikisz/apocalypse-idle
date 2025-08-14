@@ -19,8 +19,20 @@ export function applyOfflineProgress(
   let current: any = { ...state };
   let events: any[] = [];
 
-  for (let i = 0; i < elapsedSeconds; i += 1) {
-    current = processTick(current, 1, productionBonuses);
+  const CHUNK_SECONDS = 60;
+  for (let remaining = elapsedSeconds; remaining > 0; ) {
+    const dt = Math.min(CHUNK_SECONDS, remaining);
+    remaining -= dt;
+
+    current = processTick(current, dt, productionBonuses);
+    if (dt > 0 && current.powerStatus) {
+      current.powerStatus = {
+        ...current.powerStatus,
+        supply: current.powerStatus.supply / dt,
+        demand: current.powerStatus.demand / dt,
+      };
+    }
+
     const rates = getResourceRates(current);
     let totalFoodProdBase = 0;
     Object.keys(RESOURCES).forEach((id) => {
@@ -30,16 +42,18 @@ export function applyOfflineProgress(
     });
     const bonusFoodPerSec =
       totalFoodProdBase * (roleBonuses['farmer'] || 0);
+
     const settlersResult = processSettlersTick(
       current,
-      1,
+      dt,
       bonusFoodPerSec,
       rng,
       roleBonuses,
     );
     current = settlersResult.state;
     if (settlersResult.events?.length) events.push(...settlersResult.events);
-    const { candidate, radioTimer } = updateRadio(current, 1);
+
+    const { candidate, radioTimer } = updateRadio(current, dt);
     current = {
       ...current,
       population: { ...current.population, candidate },
