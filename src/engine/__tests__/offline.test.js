@@ -88,4 +88,25 @@ describe('applyOfflineProgress', () => {
     expect(offline.resources.power).toEqual(online.resources.power);
     expect(offline.powerStatus).toEqual(online.powerStatus);
   });
+
+  it('handles multiple starvation events over long durations', () => {
+    const settlers = Array.from({ length: 5 }).map((_, i) => ({
+      id: `s${i}`,
+      firstName: 'A',
+      lastName: 'B',
+    }));
+    const state = {
+      buildings: {},
+      resources: { potatoes: { amount: 0, discovered: false, produced: 0 } },
+      population: { settlers, candidate: null },
+      colony: { radioTimer: 0, starvationTimerSeconds: 0 },
+    };
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
+    const seconds = 1000;
+    const { state: result, events } = applyOfflineProgress(state, seconds);
+    randSpy.mockRestore();
+    const living = result.population.settlers.filter((s) => !s.isDead).length;
+    expect(living).toBe(0);
+    expect(events.length).toBe(5);
+  });
 });

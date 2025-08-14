@@ -50,7 +50,6 @@ export function getFoodPoolAmount(state) {
  * @param {GameState} state
  */
 export function getFoodPoolCapacity(state) {
-  if (state.foodPool?.capacity != null) return state.foodPool.capacity;
   let total = 0;
   Object.keys(RESOURCES).forEach((id) => {
     if (RESOURCES[id].category !== 'FOOD') return;
@@ -58,12 +57,18 @@ export function getFoodPoolCapacity(state) {
     let fromBuildings = 0;
     BUILDINGS.forEach((b) => {
       const count = state.buildings?.[b.id]?.count || 0;
-      if (count > 0 && b.capacityAdd?.[id]) {
-        fromBuildings += b.capacityAdd[id] * count;
+      if (count > 0) {
+        if (b.capacityAdd?.[id]) fromBuildings += b.capacityAdd[id] * count;
       }
     });
     const bonus = getResearchStorageBonus(state, id);
     total += Math.floor((base + fromBuildings) * (1 + bonus));
+  });
+  BUILDINGS.forEach((b) => {
+    const count = state.buildings?.[b.id]?.count || 0;
+    if (count > 0 && b.capacityAdd?.FOOD) {
+      total += b.capacityAdd.FOOD * count;
+    }
   });
   return total;
 }
