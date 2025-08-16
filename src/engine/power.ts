@@ -1,23 +1,39 @@
-// @ts-nocheck
-import { BUILDINGS, BUILDING_MAP } from '../data/buildings.js';
+import {
+  BUILDINGS,
+  BUILDING_MAP,
+  type Building as BuildingDefinition,
+} from '../data/buildings.js';
+import type { GameState } from '../state/useGame.tsx';
 
-const TIER_ORDER: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
+export type PowerTier = 'A' | 'B' | 'C' | 'D';
 
-function getTier(building: any): 'A' | 'B' | 'C' | 'D' {
+const TIER_ORDER: Record<PowerTier, number> = { A: 0, B: 1, C: 2, D: 3 };
+
+function getTier(building: BuildingDefinition): PowerTier {
   if (building.category === 'Food') return 'A';
   if (building.type === 'processing') return 'B';
   if (building.category === 'Raw Materials') return 'C';
   return 'D';
 }
 
-export function getPoweredConsumerTypeIds(): string[] {
-  return BUILDINGS.filter((b) => b.requiresPower || b.poweredMode).map(
-    (b) => b.id,
-  );
+type PoweredBuilding = BuildingDefinition & { poweredMode?: boolean };
+
+export function getPoweredConsumerTypeIds(
+  buildings: PoweredBuilding[] = BUILDINGS as PoweredBuilding[],
+): string[] {
+  return buildings
+    .filter((b) => b.requiresPower || b.poweredMode)
+    .map((b) => b.id);
 }
 
-export function ensureValidTypeId(typeId: string): void {
-  const b = BUILDING_MAP[typeId];
+export function ensureValidTypeId(
+  typeId: string,
+  buildingMap: Record<string, PoweredBuilding> = BUILDING_MAP as Record<
+    string,
+    PoweredBuilding
+  >,
+): void {
+  const b = buildingMap[typeId];
   if (!b) throw new Error(`Unknown building typeId: ${typeId}`);
   if (!(b.requiresPower || b.poweredMode))
     throw new Error(`Building ${typeId} is not a powered consumer`);
@@ -28,13 +44,20 @@ export function getTypeOrderIndex(typeId: string, order: string[]): number {
   return idx === -1 ? Number.POSITIVE_INFINITY : idx;
 }
 
-export function buildInitialPowerTypeOrder(existing: string[] = []): string[] {
-  const powered = getPoweredConsumerTypeIds();
+export function buildInitialPowerTypeOrder(
+  existing: string[] = [],
+  buildings: PoweredBuilding[] = BUILDINGS as PoweredBuilding[],
+  buildingMap: Record<string, PoweredBuilding> = BUILDING_MAP as Record<
+    string,
+    PoweredBuilding
+  >,
+): string[] {
+  const powered = getPoweredConsumerTypeIds(buildings);
   const sorted = [...powered].sort((a, b) => {
-    const ta = TIER_ORDER[getTier(BUILDING_MAP[a])];
-    const tb = TIER_ORDER[getTier(BUILDING_MAP[b])];
+    const ta = TIER_ORDER[getTier(buildingMap[a])];
+    const tb = TIER_ORDER[getTier(buildingMap[b])];
     if (ta !== tb) return ta - tb;
-    return BUILDING_MAP[a].name.localeCompare(BUILDING_MAP[b].name);
+    return buildingMap[a].name.localeCompare(buildingMap[b].name);
   });
   const result: string[] = [];
   existing.forEach((id) => {
@@ -42,10 +65,10 @@ export function buildInitialPowerTypeOrder(existing: string[] = []): string[] {
   });
   sorted.forEach((id) => {
     if (result.includes(id)) return;
-    const tier = getTier(BUILDING_MAP[id]);
+    const tier = getTier(buildingMap[id]);
     let insert = result.length;
     for (let i = result.length - 1; i >= 0; i--) {
-      const otherTier = getTier(BUILDING_MAP[result[i]]);
+      const otherTier = getTier(buildingMap[result[i]]);
       if (otherTier === tier) {
         insert = i + 1;
         break;
@@ -58,4 +81,13 @@ export function buildInitialPowerTypeOrder(existing: string[] = []): string[] {
     result.splice(insert, 0, id);
   });
   return result;
+}
+
+export function allocatePower(
+  state: GameState,
+  _buildings: BuildingDefinition[] = BUILDINGS,
+): GameState {
+  // Power allocation is currently handled within the production tick. This
+  // placeholder is provided to keep the API typed.
+  return state;
 }
