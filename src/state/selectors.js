@@ -442,6 +442,7 @@ export function getResourceSections(state) {
   }
 
   return Object.entries(groups).map(([cat, items]) => ({
+    id: cat,
     title: CATEGORY_LABELS[cat] || cat,
     items,
     defaultOpen: true,
