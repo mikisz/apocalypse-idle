@@ -62,5 +62,6 @@ describe('useResourceSections', () => {
     expect(powerRow.stored).toBe(5);
     expect(powerRow.capacity).toBe(10);
     expect(powerRow.status).toBe('charging');
+    expect(powerRow.rate).toBe(0);
   });
 });

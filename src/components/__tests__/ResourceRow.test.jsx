@@ -9,10 +9,12 @@ import { BALANCE } from '../../data/balance.js';
 
 describe('ResourceRow', () => {
   it('shows capacity when amount is within epsilon of cap', () => {
-    const createRng = (seed = 1) => () => {
-      seed = (seed * 16807) % 2147483647;
-      return (seed - 1) / 2147483646;
-    };
+    const createRng =
+      (seed = 1) =>
+      () => {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
+      };
     const rng = createRng();
     const state = deepClone(defaultState);
     const cap = 200;
@@ -29,5 +31,10 @@ describe('ResourceRow', () => {
       />,
     );
     expect(screen.getByText('200 / 200')).toBeTruthy();
+  });
+
+  it('formats numeric rate', () => {
+    render(<ResourceRow name="Wood" amount={10} rate={0.5} />);
+    expect(screen.getByText('+0.5/s')).toBeTruthy();
   });
 });
