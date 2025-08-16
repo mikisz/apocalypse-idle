@@ -42,7 +42,7 @@ describe('radio building production', () => {
       buildings: { radio: { count: 1 } },
       resources: { power: { amount: 1 } },
     };
-    const next = applyProduction(state, 5);
+    const next = applyProduction(state, 5, {});
     expect(next.resources.power.amount).toBeCloseTo(0.5, 5);
   });
 
@@ -64,6 +64,6 @@ describe('buildings without inputs or outputs', () => {
 
   it('do not crash production calculations', () => {
     const state = { buildings: { shelter: { count: 1 } }, resources: {} };
-    expect(() => applyProduction(state, 5)).not.toThrow();
+    expect(() => applyProduction(state, 5, {})).not.toThrow();
   });
 });

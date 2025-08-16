@@ -1,8 +1,8 @@
-// @ts-nocheck
 import {
   PRODUCTION_BUILDINGS,
   BUILDING_MAP,
   getBuildingCost,
+  type Building as BuildingDefinition,
 } from '../data/buildings.js';
 import { RESOURCES } from '../data/resources.js';
 import {
@@ -23,24 +23,40 @@ import { clampResource } from './resources.ts';
 import { addResource, consumeResource } from './resourceOps.ts';
 import { setOfflineReason } from './powerHandling.ts';
 import { getTypeOrderIndex } from './power.ts';
+import type {
+  GameState,
+  BuildingEntry,
+  ResourceState,
+} from '../state/useGame.tsx';
+import type { RoleBonusMap } from './settlers.ts';
+
+type ProdBuilding = BuildingDefinition & {
+  seasonProfile?: 'constant' | Record<string, number>;
+};
+
+const RESOURCE_MAP = RESOURCES as Record<string, any>;
+const ROLE_BY_RESOURCE_MAP = ROLE_BY_RESOURCE as Record<string, string>;
+const BUILDING_ROLES_MAP = BUILDING_ROLES as Record<string, string>;
+const ROLE_BUILDINGS_MAP = ROLE_BUILDINGS as Record<string, string[]>;
 
 
 export function applyProduction(
-  state: any,
-  seconds: number = 1,
-  roleBonuses: Record<string, number> = {},
-): any {
+  state: GameState,
+  seconds = 1,
+  roleBonuses: RoleBonusMap,
+): GameState {
   ensureCapacityCache(state);
   const season = getSeason(state);
-  const resources = { ...state.resources };
-  const buildings = { ...state.buildings };
+  const resources: Record<string, ResourceState> = { ...state.resources };
+  const stateBuildings = state.buildings as Record<string, BuildingEntry>;
+  const buildings: Record<string, BuildingEntry> = { ...stateBuildings };
   let foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(resources).reduce(
           (sum, id) =>
             sum +
-            (RESOURCES[id].category === 'FOOD'
+            (RESOURCE_MAP[id].category === 'FOOD'
               ? resources[id]?.amount || 0
               : 0),
           0,
@@ -48,8 +64,8 @@ export function applyProduction(
         capacity: calculateFoodCapacity(state),
       };
 
-  const active = PRODUCTION_BUILDINGS.filter((b) => {
-    const entry = state.buildings?.[b.id];
+  const active = (PRODUCTION_BUILDINGS as ProdBuilding[]).filter((b) => {
+    const entry = stateBuildings[b.id];
     const count = entry?.count || 0;
     const on = entry?.isDesiredOn !== false;
     if (count <= 0 || !on) {
@@ -76,7 +92,7 @@ export function applyProduction(
   let supplyRemaining = 0;
 
   const runOutputs = (
-    b: any,
+    b: ProdBuilding,
     count: number,
     capFactors: Record<string, number>,
   ): void => {
@@ -85,13 +101,13 @@ export function applyProduction(
       if (res === 'power') return;
       const factor = capFactors[res] ?? 0;
       if (factor <= 0) return;
-      const category = RESOURCES[res].category;
+      const category = RESOURCE_MAP[res].category;
       let mult;
       if (b.seasonProfile === 'constant') mult = 1;
       else if (typeof b.seasonProfile === 'object')
         mult = b.seasonProfile[season.id] ?? 1;
       else mult = getSeasonMultiplier(season, category);
-      const role = ROLE_BY_RESOURCE[res];
+      const role = ROLE_BY_RESOURCE_MAP[res];
       const bonus = roleBonuses[role] || 0;
       const researchBonus = getResearchOutputBonus(state, res);
       const gain =
@@ -102,11 +118,15 @@ export function applyProduction(
         seconds *
         factor;
       addResource(state, resources, res, gain, foodPool);
-      if (resources[res]) resources[res].discovered = resources[res].discovered || count > 0;
+      resources[res].discovered = resources[res].discovered || count > 0;
     });
   };
 
-  const runInputs = (b, count, capFactor) => {
+  const runInputs = (
+    b: ProdBuilding,
+    count: number,
+    capFactor: number,
+  ): void => {
     if (!b.inputsPerSecBase) return;
     Object.entries(b.inputsPerSecBase).forEach(([res, base]) => {
       if (res === 'power') return;
@@ -116,7 +136,7 @@ export function applyProduction(
   };
 
   generators.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
+    const count = stateBuildings[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
 
     if (b.inputsPerSecBase) {
@@ -134,7 +154,7 @@ export function applyProduction(
 
     const base = b.outputsPerSecBase?.power || 0;
     let mult;
-    const category = RESOURCES.power.category;
+    const category = RESOURCE_MAP.power.category;
     if (b.seasonProfile === 'constant') mult = 1;
     else if (typeof b.seasonProfile === 'object')
       mult = b.seasonProfile[season.id] ?? 1;
@@ -152,7 +172,7 @@ export function applyProduction(
   });
 
   others.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
+    const count = stateBuildings[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
     const desiredOutputs = {} as Record<string, number>;
     Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
@@ -189,7 +209,7 @@ export function applyProduction(
   let demandTotal = 0;
 
   consumers.forEach((b) => {
-    const count = state.buildings?.[b.id]?.count || 0;
+    const count = stateBuildings[b.id]?.count || 0;
     setOfflineReason(buildings, b.id, count, null);
     const desiredOutputs = {} as Record<string, number>;
     Object.entries(b.outputsPerSecBase || {}).forEach(([res, base]) => {
@@ -251,14 +271,20 @@ export function applyProduction(
   });
 
   const powerStatus = { supply: supplyTotal, demand: demandTotal, stored, capacity };
-  return { ...state, resources, buildings, powerStatus, foodPool };
+  return {
+    ...state,
+    resources,
+    buildings: buildings as GameState['buildings'],
+    powerStatus,
+    foodPool,
+  } as GameState;
 }
 
 export function processTick(
-  state: any,
-  seconds: number = 1,
-  roleBonuses: Record<string, number> = {},
-): any {
+  state: GameState,
+  seconds = 1,
+  roleBonuses: RoleBonusMap,
+): GameState {
   return applyProduction(state, seconds, roleBonuses);
 }
 
@@ -268,14 +294,14 @@ export function buildBuilding(state: any, buildingId: string): any {
   if (!blueprint) return state;
   const count = state.buildings?.[buildingId]?.count || 0;
   const cost = getBuildingCost(blueprint, count);
-  const resources = { ...state.resources };
+  const resources: Record<string, ResourceState> = { ...state.resources };
   let foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(state.resources || {}).reduce(
           (sum, id) =>
             sum +
-            (RESOURCES[id].category === 'FOOD'
+            (RESOURCE_MAP[id].category === 'FOOD'
               ? state.resources[id]?.amount || 0
               : 0),
           0,
@@ -288,11 +314,11 @@ export function buildBuilding(state: any, buildingId: string): any {
   Object.entries(cost).forEach(([res, amt]) => {
     consumeResource(state, resources, res, amt, foodPool);
   });
-  const buildings = {
+  const buildings: Record<string, BuildingEntry> = {
     ...state.buildings,
     [buildingId]: { count: count + 1 },
   };
-  const newState = { ...state, buildings };
+  const newState: GameState = { ...state, buildings: buildings as GameState['buildings'] };
   ensureCapacityCache(newState);
   Object.keys(resources).forEach((res) => {
     addResource(newState, resources, res, 0, foodPool);
@@ -315,22 +341,25 @@ export function demolishBuilding(state: any, buildingId: string): any {
   if (!blueprint || count <= 0) return state;
   const prevCost = getBuildingCost(blueprint, count - 1);
   const refundRate = blueprint.refund ?? 0;
-  const buildings = { ...state.buildings, [buildingId]: { count: count - 1 } };
-  const resources = { ...state.resources };
+  const buildings: Record<string, BuildingEntry> = {
+    ...state.buildings,
+    [buildingId]: { count: count - 1 },
+  };
+  const resources: Record<string, ResourceState> = { ...state.resources };
   let foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(state.resources || {}).reduce(
           (sum, id) =>
             sum +
-            (RESOURCES[id].category === 'FOOD'
+            (RESOURCE_MAP[id].category === 'FOOD'
               ? state.resources[id]?.amount || 0
               : 0),
           0,
         ),
         capacity: calculateFoodCapacity(state),
       };
-  const newState = { ...state, buildings };
+  const newState: GameState = { ...state, buildings: buildings as GameState['buildings'] };
   ensureCapacityCache(newState);
   foodPool.capacity = calculateFoodCapacity(newState);
   Object.entries(prevCost).forEach(([res, amt]) => {
@@ -341,12 +370,12 @@ export function demolishBuilding(state: any, buildingId: string): any {
     addResource(newState, resources, res, 0, foodPool);
   });
   let settlers = state.population?.settlers || [];
-  const role = BUILDING_ROLES[buildingId];
+  const role = BUILDING_ROLES_MAP[buildingId];
   if (role) {
-    const relevant = ROLE_BUILDINGS[role].filter((b) => b !== buildingId);
+    const relevant = ROLE_BUILDINGS_MAP[role].filter((b) => b !== buildingId);
     const hasOther = relevant.some((b) => (buildings[b]?.count || 0) > 0);
     if ((buildings[buildingId]?.count || 0) <= 0 && !hasOther) {
-      settlers = settlers.map((s) =>
+      settlers = settlers.map((s: any) =>
         s.role === role ? { ...s, role: null } : s,
       );
     }
@@ -354,7 +383,7 @@ export function demolishBuilding(state: any, buildingId: string): any {
   if (blueprint.capacityAdd?.FOOD) {
     foodPool.capacity = calculateFoodCapacity(newState);
     Object.keys(resources).forEach((res) => {
-      if (RESOURCES[res].category === 'FOOD') {
+      if (RESOURCE_MAP[res].category === 'FOOD') {
         addResource(newState, resources, res, 0, foodPool);
       }
     });
