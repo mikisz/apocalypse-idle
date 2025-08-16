@@ -110,11 +110,11 @@ export function useResourceSections(state) {
       }
       rendered.push(section);
       if (hasRadioResearch && g.title === 'Science')
-        rendered.push({ title: 'Settlers', settlers: true });
+        rendered.push({ id: 'settlers', title: 'Settlers', settlers: true });
     });
-    if (hasRadioResearch && !rendered.some((e) => e.title === 'Settlers'))
-      rendered.push({ title: 'Settlers', settlers: true });
-    rendered.push({ title: 'Happiness', happiness: true });
+    if (hasRadioResearch && !rendered.some((e) => e.id === 'settlers'))
+      rendered.push({ id: 'settlers', title: 'Settlers', settlers: true });
+    rendered.push({ id: 'happiness', title: 'Happiness', happiness: true });
     return rendered;
   }, [resourceSections, hasRadioResearch, powerStatus, powerMessage]);
 
