@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ScrollArea } from './ui/scroll-area';
 import { Card, CardContent } from './ui/card';
+import { sanitize } from '../utils/sanitize.js';
 
 export default function EventLog({ log = [] }) {
   return (
@@ -14,7 +15,9 @@ export default function EventLog({ log = [] }) {
                 <span className="text-muted-foreground mr-2">
                   {new Date(entry.time).toLocaleString()}
                 </span>
-                {entry.text}
+                <span
+                  dangerouslySetInnerHTML={{ __html: sanitize(entry.text) }}
+                />
               </li>
             ))}
           </ul>

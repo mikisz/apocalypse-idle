@@ -1,7 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
 import EventLog from './EventLog.jsx';
+
+afterEach(cleanup);
 
 describe('EventLog', () => {
   it('renders without log prop', () => {
@@ -26,5 +28,13 @@ describe('EventLog', () => {
       /Second entry/,
     );
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  it('sanitizes malicious text', () => {
+    const malicious = '<img src=x onerror="alert(1)">';
+    render(<EventLog log={[{ id: 'x', text: malicious, time: 0 }]} />);
+    const item = screen.getByRole('listitem');
+    expect(item.innerHTML).not.toContain('<img');
+    expect(item.textContent).toContain(malicious);
   });
 });
