@@ -320,18 +320,25 @@ export function loadGame(): { state: any | null; error: any } {
 }
 
 export function restoreBackup(): boolean {
-  const backup = localStorage.getItem(STORAGE_BACKUP_KEY);
-  if (backup === null) return false;
-  localStorage.setItem(STORAGE_KEY, backup);
-  localStorage.removeItem(STORAGE_BACKUP_KEY);
-  return true;
+  try {
+    const backup = localStorage.getItem(STORAGE_BACKUP_KEY);
+    if (backup === null) return false;
+    localStorage.setItem(STORAGE_KEY, backup);
+    localStorage.removeItem(STORAGE_BACKUP_KEY);
+    return true;
+  } catch (err) {
+    if (import.meta.env.DEV) console.error('Restore backup failed', err);
+    return false;
+  }
 }
 
-export function deleteSave(): void {
+export function deleteSave(): boolean {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    return true;
   } catch (err) {
     if (import.meta.env.DEV) console.error('Delete failed', err);
+    return false;
   }
 }
 
