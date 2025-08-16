@@ -6,6 +6,7 @@ import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { candidateToSettler } from '../engine/candidates.ts';
 import { formatAge } from '../utils/format.js';
 import { DAYS_PER_YEAR } from '../engine/time.ts';
+import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
 import Accordion from './Accordion.jsx';
 import { Button } from './ui/button';
 
@@ -20,6 +21,7 @@ import {
 
 interface Skill {
   level: number;
+  xp?: number;
 }
 interface Candidate {
   firstName: string;
@@ -77,29 +79,46 @@ export default function CandidateBox(): JSX.Element | null {
         <Accordion title="Skills" contentClassName="p-2 space-y-2">
           <ul className="space-y-2">
             {sortedSkills.length > 0 ? (
-              sortedSkills.map(([id, s]) => (
-                <li
-                  key={id}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span className="flex items-center gap-1">
-                    {SKILL_LABELS[id] || id}
-                    <span className="px-1 bg-muted rounded text-xs">
-                      [{s.level}]
+              sortedSkills.map(([id, s]) => {
+                const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(s.level);
+                const prog =
+                  threshold > 0
+                    ? Math.min((s.xp || 0) / threshold, 1)
+                    : 0;
+                const pct = prog * 100;
+                return (
+                  <li
+                    key={id}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="flex items-center gap-1">
+                      {SKILL_LABELS[id] || id}
+                      <span className="px-1 bg-muted rounded text-xs">
+                        [{s.level}]
+                      </span>
                     </span>
-                  </span>
-                  <div className="flex items-center gap-1 w-32">
-                    <span className="text-xs">{s.level}</span>
-                    <div className="flex-1 h-2 bg-border rounded">
+                    <div className="flex items-center gap-1 w-32">
+                      <span className="text-xs">{s.level}</span>
                       <div
-                        className="h-full bg-green-600 rounded"
-                        style={{ width: '0%' }}
-                      />
+                        className="flex-1 h-2 bg-border rounded"
+                        role="progressbar"
+                        aria-valuenow={Math.round(pct)}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
+                        <div
+                          className="h-full bg-green-600 rounded"
+                          style={{ width: `${pct}%` }}
+                        />
+                        <span className="sr-only">
+                          {Math.round(pct)}% to next level
+                        </span>
+                      </div>
+                      <span className="text-xs">{s.level + 1}</span>
                     </div>
-                    <span className="text-xs">{s.level + 1}</span>
-                  </div>
-                </li>
-              ))
+                  </li>
+                );
+              })
             ) : (
               <li className="text-xs text-muted-foreground">
                 No notable skills
