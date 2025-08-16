@@ -1,18 +1,44 @@
-// @ts-nocheck
 import { createLogEntry } from '../utils/log.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
 import { deepClone } from '../utils/clone.ts';
+import type {
+  GameState,
+  BuildingEntry,
+  ResourceState,
+} from '../state/useGame.tsx';
 
 const STORAGE_KEY = 'apocalypse-idle-save';
 const STORAGE_BACKUP_KEY = `${STORAGE_KEY}-backup`;
 
 export const CURRENT_SAVE_VERSION = 7;
 
-export const migrations = [
+export interface SaveFile extends Partial<GameState> {
+  version: number;
+  schemaVersion?: number;
+}
+
+export interface Migration {
+  from: number;
+  to: number;
+  up: (save: SaveFile) => SaveFile | void;
+}
+
+export interface LoadResult {
+  state: GameState;
+  migratedFrom: number | null;
+}
+
+interface LogEntry {
+  id: string;
+  text: string;
+  time?: number;
+}
+
+export const migrations: Migration[] = [
   {
     from: 1,
     to: 2,
-    up(save: any) {
+    up(save) {
       if (typeof save.gameTime === 'number') {
         save.gameTime = { seconds: save.gameTime };
       } else if (!save.gameTime) {
@@ -25,7 +51,7 @@ export const migrations = [
   {
     from: 2,
     to: 3,
-    up(save: any) {
+    up(save) {
       if (!save.ui || typeof save.ui !== 'object' || Array.isArray(save.ui)) {
         save.ui = {
           activeTab: 'base',
@@ -55,7 +81,7 @@ export const migrations = [
             : {};
       }
       if (!save.population || typeof save.population !== 'object') {
-        save.population = { settlers: [] };
+        save.population = { settlers: [] } as GameState['population'];
       } else if (!Array.isArray(save.population.settlers)) {
         save.population.settlers = [];
       }
@@ -65,19 +91,20 @@ export const migrations = [
   {
     from: 3,
     to: 4,
-    up(save: any) {
+    up(save) {
       if (!Array.isArray(save.log)) {
         save.log = [];
       } else {
         save.log = save.log.map((entry) => {
           if (typeof entry === 'string') return createLogEntry(entry);
           if (entry && typeof entry === 'object') {
+            const obj = entry as Partial<LogEntry>;
             const id =
-              typeof entry.id === 'string' ? entry.id : createLogEntry('').id;
+              typeof obj.id === 'string' ? obj.id : createLogEntry('').id;
             const text =
-              typeof entry.text === 'string'
-                ? entry.text
-                : String(entry.text ?? '');
+              typeof obj.text === 'string'
+                ? obj.text
+                : String((obj as { text?: unknown }).text ?? '');
             return { id, text };
           }
           return createLogEntry(String(entry));
@@ -89,16 +116,16 @@ export const migrations = [
   {
     from: 4,
     to: 5,
-    up(save: any) {
+    up(save) {
       if (!save.population || typeof save.population !== 'object') {
-        save.population = { settlers: [], candidate: null };
+        save.population = { settlers: [], candidate: null } as GameState['population'];
       } else {
         if (!Array.isArray(save.population.settlers))
           save.population.settlers = [];
         if (!('candidate' in save.population)) save.population.candidate = null;
       }
       if (!save.colony || typeof save.colony !== 'object') {
-        save.colony = { radioTimer: RADIO_BASE_SECONDS };
+        save.colony = { radioTimer: RADIO_BASE_SECONDS } as GameState['colony'];
       } else if (typeof save.colony.radioTimer !== 'number') {
         save.colony.radioTimer = RADIO_BASE_SECONDS;
       }
@@ -108,14 +135,17 @@ export const migrations = [
   {
     from: 5,
     to: 6,
-    up(save: any) {
+    up(save) {
       if (!Array.isArray(save.log)) {
         save.log = [];
       } else {
         const now = Date.now();
         save.log = save.log.map((entry) => ({
-          ...entry,
-          time: typeof entry.time === 'number' ? entry.time : now,
+          ...(entry as LogEntry),
+          time:
+            typeof (entry as LogEntry).time === 'number'
+              ? (entry as LogEntry).time
+              : now,
         }));
       }
       return save;
@@ -124,11 +154,12 @@ export const migrations = [
   {
     from: 6,
     to: 7,
-    up(save: any) {
+    up(save) {
       if (save.buildings && typeof save.buildings === 'object') {
         Object.values(save.buildings).forEach((b) => {
-          if (b && typeof b === 'object' && !('isDesiredOn' in b)) {
-            b.isDesiredOn = true;
+          const building = b as BuildingEntry & Record<string, unknown>;
+          if (building && typeof building === 'object' && !('isDesiredOn' in building)) {
+            building.isDesiredOn = true;
           }
         });
       }
@@ -137,7 +168,7 @@ export const migrations = [
   },
 ];
 
-export function applyMigrations(save: any): any {
+export function applyMigrations(save: SaveFile): SaveFile {
   while (save.version < CURRENT_SAVE_VERSION) {
     const migration = migrations.find((m) => m.from === save.version);
     if (!migration) throw new Error(`Missing migration from v${save.version}`);
@@ -147,7 +178,7 @@ export function applyMigrations(save: any): any {
   return save;
 }
 
-export function validateSave(obj: any): boolean {
+export function validateSave(obj: SaveFile): void {
   if (!obj || typeof obj !== 'object')
     throw new Error('Invalid save: not an object');
   if (!('resources' in obj)) throw new Error('Invalid save: missing resources');
@@ -157,22 +188,24 @@ export function validateSave(obj: any): boolean {
     Array.isArray(obj.resources)
   )
     throw new Error('Invalid save: resources must be object');
-  Object.entries(obj.resources).forEach(([id, r]: [string, any]) => {
-    if (!r || typeof r !== 'object' || Array.isArray(r))
-      throw new Error(`Invalid save: resource "${id}" must be object`);
-    if (typeof r.amount !== 'number')
-      throw new Error(
-        `Invalid save: resource "${id}" has non-numeric amount`,
-      );
-    if ('produced' in r && typeof r.produced !== 'number')
-      throw new Error(
-        `Invalid save: resource "${id}" has non-numeric produced`,
-      );
-    if ('discovered' in r && typeof r.discovered !== 'boolean')
-      throw new Error(
-        `Invalid save: resource "${id}" has invalid discovered flag`,
-      );
-  });
+  Object.entries(obj.resources as Record<string, ResourceState>).forEach(
+    ([id, r]) => {
+      if (!r || typeof r !== 'object')
+        throw new Error(`Invalid save: resource "${id}" must be object`);
+      if (typeof r.amount !== 'number')
+        throw new Error(
+          `Invalid save: resource "${id}" has non-numeric amount`,
+        );
+      if ('produced' in r && typeof r.produced !== 'number')
+        throw new Error(
+          `Invalid save: resource "${id}" has non-numeric produced`,
+        );
+      if ('discovered' in r && typeof r.discovered !== 'boolean')
+        throw new Error(
+          `Invalid save: resource "${id}" has invalid discovered flag`,
+        );
+    },
+  );
   if (!('buildings' in obj)) throw new Error('Invalid save: missing buildings');
   if (
     typeof obj.buildings !== 'object' ||
@@ -180,28 +213,30 @@ export function validateSave(obj: any): boolean {
     Array.isArray(obj.buildings)
   )
     throw new Error('Invalid save: buildings must be object');
-  Object.entries(obj.buildings).forEach(([id, b]: [string, any]) => {
-    if (!b || typeof b !== 'object' || Array.isArray(b))
-      throw new Error(`Invalid save: building "${id}" must be object`);
-    if (typeof b.count !== 'number')
-      throw new Error(
-        `Invalid save: building "${id}" has non-numeric count`,
-      );
-    if ('isDesiredOn' in b) {
-      if (typeof b.isDesiredOn !== 'boolean')
+  Object.entries(obj.buildings as Record<string, BuildingEntry>).forEach(
+    ([id, b]) => {
+      if (!b || typeof b !== 'object')
+        throw new Error(`Invalid save: building "${id}" must be object`);
+      if (typeof b.count !== 'number')
         throw new Error(
-          `Invalid save: building "${id}" has invalid isDesiredOn flag`,
+          `Invalid save: building "${id}" has non-numeric count`,
         );
-    } else if (obj.version >= 7) {
-      throw new Error(
-        `Invalid save: building "${id}" missing isDesiredOn flag`,
-      );
-    }
-    if ('offlineReason' in b && typeof b.offlineReason !== 'string')
-      throw new Error(
-        `Invalid save: building "${id}" has invalid offlineReason`,
-      );
-  });
+      if ('isDesiredOn' in b) {
+        if (typeof b.isDesiredOn !== 'boolean')
+          throw new Error(
+            `Invalid save: building "${id}" has invalid isDesiredOn flag`,
+          );
+      } else if (obj.version >= 7) {
+        throw new Error(
+          `Invalid save: building "${id}" missing isDesiredOn flag`,
+        );
+      }
+      if ('offlineReason' in b && typeof b.offlineReason !== 'string')
+        throw new Error(
+          `Invalid save: building "${id}" has invalid offlineReason`,
+        );
+    },
+  );
   if (!('population' in obj))
     throw new Error('Invalid save: missing population');
   if (
@@ -225,13 +260,13 @@ export function validateSave(obj: any): boolean {
       throw new Error('Invalid save: log must be array');
     if (
       obj.version >= 4 &&
-      !obj.log.every(
+      !(obj.log as unknown[]).every(
         (e) =>
           e &&
           typeof e === 'object' &&
-          typeof e.id === 'string' &&
-          typeof e.text === 'string' &&
-          (obj.version < 6 || typeof e.time === 'number'),
+          typeof (e as LogEntry).id === 'string' &&
+          typeof (e as LogEntry).text === 'string' &&
+          (obj.version < 6 || typeof (e as LogEntry).time === 'number'),
       )
     )
       throw new Error(
@@ -255,15 +290,15 @@ export function validateSave(obj: any): boolean {
         throw new Error('Invalid save: missing colony');
     }
   }
-  return true;
 }
 
-export function save(state: any): any {
+export function save(state: GameState): SaveFile {
   return { ...state, version: CURRENT_SAVE_VERSION, lastSaved: Date.now() };
 }
 
-export function load(raw: any): { state: any; migratedFrom: number | null } {
-  const save = typeof raw === 'string' ? JSON.parse(raw) : deepClone(raw);
+export function load(raw: string | SaveFile): LoadResult {
+  const save: SaveFile =
+    typeof raw === 'string' ? JSON.parse(raw) : deepClone(raw);
   const parsedVersion = Number(save.version ?? save.schemaVersion);
   save.version = Number.isNaN(parsedVersion) ? 1 : parsedVersion;
   if (save.version > CURRENT_SAVE_VERSION) {
@@ -275,10 +310,13 @@ export function load(raw: any): { state: any; migratedFrom: number | null } {
   const start = save.version;
   applyMigrations(save);
   validateSave(save);
-  return { state: save, migratedFrom: start < save.version ? start : null };
+  return {
+    state: save as GameState,
+    migratedFrom: start < save.version ? start : null,
+  };
 }
 
-export function saveGame(state: any): any {
+export function saveGame(state: GameState): SaveFile {
   let hadBackup = false;
   try {
     const data = save(state);
@@ -307,7 +345,7 @@ export function saveGame(state: any): any {
   }
 }
 
-export function loadGame(): { state: any | null; error: any } {
+export function loadGame(): { state: GameState | null; error: unknown } {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return { state: null, error: null };
   try {
@@ -342,7 +380,7 @@ export function deleteSave(): boolean {
   }
 }
 
-export function exportSaveFile(state: any): any {
+export function exportSaveFile(state: GameState): SaveFile {
   const data = save(state);
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
@@ -356,3 +394,4 @@ export function exportSaveFile(state: any): any {
   URL.revokeObjectURL(url);
   return data;
 }
+
