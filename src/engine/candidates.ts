@@ -2,11 +2,11 @@ import { FIRST_NAMES, LAST_NAMES } from '../data/names.js';
 import { ROLE_LIST } from '../data/roles.js';
 import { DAYS_PER_YEAR } from './time.ts';
 
-interface SkillEntry {
+export interface SkillEntry {
   level: number;
 }
 
-type SkillMap = Record<string, SkillEntry>;
+export type SkillMap = Record<string, SkillEntry>;
 
 export interface Candidate {
   id: string;
