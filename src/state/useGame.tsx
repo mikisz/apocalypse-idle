@@ -8,6 +8,12 @@ import { defaultState } from './defaultState.js';
 
 export type GameState = typeof defaultState;
 
+export interface BuildingEntry {
+  count: number;
+  isDesiredOn?: boolean;
+  offlineReason?: string;
+}
+
 export interface GameContextValue {
   state: GameState;
   setActiveTab: (tab: string) => void;

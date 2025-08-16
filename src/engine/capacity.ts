@@ -1,4 +1,5 @@
 import { RESOURCES } from '../data/resources.js';
+const RESOURCES_MAP = RESOURCES as Record<string, { category: string }>;
 import { getCapacity } from '../state/capacityCache.ts';
 
 function getAmount(resources: Record<string, any>, res: string): number {
@@ -16,7 +17,7 @@ export function getOutputCapacityFactors(
   const factors: Record<string, number> = {};
   let foodRoom = foodCapacity - totalFoodAmount;
   Object.entries(desiredOutputs).forEach(([res, amount]) => {
-    if (RESOURCES[res].category === 'FOOD') {
+    if (RESOURCES_MAP[res].category === 'FOOD') {
       const room = Math.max(0, foodRoom);
       const factor = amount > 0 ? Math.min(1, room / amount) : 1;
       factors[res] = Math.max(0, factor);
