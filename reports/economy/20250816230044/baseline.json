@@ -1,0 +1,566 @@
+{
+  "meta": {
+    "analyzed": 20,
+    "season": "average",
+    "weights": {
+      "wood": 1,
+      "stone": 1.3,
+      "scrap": 2.2,
+      "planks": 4,
+      "metalParts": 6,
+      "power": 1,
+      "potatoes": 0.9,
+      "meat": 1.4,
+      "science": 2.5
+    },
+    "targets": [
+      1,
+      10,
+      50
+    ],
+    "thresholds": {
+      "generators": {
+        "pbt1": [
+          60,
+          120
+        ],
+        "pbt10": [
+          180,
+          480
+        ],
+        "pbt50": [
+          900,
+          2700
+        ]
+      },
+      "converters": {
+        "pbt1": [
+          90,
+          150
+        ],
+        "pbt10": [
+          240,
+          600
+        ],
+        "pbt50": [
+          1200,
+          3600
+        ]
+      }
+    },
+    "outliers": {
+      "tooFast": 0,
+      "tooSlow": 15
+    }
+  },
+  "buildings": [
+    {
+      "id": "potatoField",
+      "category": "Food",
+      "type": "production",
+      "growth": 1.12,
+      "pbt": {
+        "1": 64.99402628434886,
+        "10": 183.51254480286735,
+        "50": 16772.28195937873
+      },
+      "outputs": {
+        "potatoes": 0.375
+      },
+      "inputs": {}
+    },
+    {
+      "id": "huntersHut",
+      "category": "Food",
+      "type": "production",
+      "growth": 1.15,
+      "pbt": {
+        "1": 193.001443001443,
+        "10": 687.5901875901876,
+        "50": 181877.34487734488
+      },
+      "outputs": {
+        "meat": 0.22
+      },
+      "inputs": {}
+    },
+    {
+      "id": "loggingCamp",
+      "category": "Raw Materials",
+      "type": "production",
+      "growth": 1.12,
+      "pbt": {
+        "1": 115.78947368421053,
+        "10": 324.21052631578954,
+        "50": 29881.403508771935
+      },
+      "outputs": {
+        "wood": 0.3
+      },
+      "inputs": {}
+    },
+    {
+      "id": "scrapyard",
+      "category": "Raw Materials",
+      "type": "production",
+      "growth": 1.12,
+      "pbt": {
+        "1": 71.77033492822966,
+        "10": 203.3492822966507,
+        "50": 18522.727272727272
+      },
+      "outputs": {
+        "scrap": 0.08
+      },
+      "inputs": {}
+    },
+    {
+      "id": "quarry",
+      "category": "Raw Materials",
+      "type": "production",
+      "growth": 1.12,
+      "pbt": {
+        "1": 209.17678812415656,
+        "10": 585.6950067476384,
+        "50": 53989.20377867747
+      },
+      "outputs": {
+        "stone": 0.12
+      },
+      "inputs": {}
+    },
+    {
+      "id": "brickKiln",
+      "category": "Construction Materials",
+      "type": "processing",
+      "growth": 1.13,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {
+        "bricks": 0.4
+      },
+      "inputs": {
+        "stone": 0.4,
+        "wood": 0.3
+      }
+    },
+    {
+      "id": "sawmill",
+      "category": "Construction Materials",
+      "type": "processing",
+      "growth": 1.13,
+      "pbt": {
+        "1": 94.91666666666667,
+        "10": 288.50000000000006,
+        "50": 37862.00000000001
+      },
+      "outputs": {
+        "planks": 0.5
+      },
+      "inputs": {
+        "wood": 0.8
+      }
+    },
+    {
+      "id": "metalWorkshop",
+      "category": "Construction Materials",
+      "type": "processing",
+      "growth": 1.13,
+      "pbt": {
+        "1": 98.02631578947367,
+        "10": 299.67105263157896,
+        "50": 39102.697368421046
+      },
+      "outputs": {
+        "metalParts": 0.4
+      },
+      "inputs": {
+        "scrap": 0.4
+      }
+    },
+    {
+      "id": "toolsmithy",
+      "category": "Construction Materials",
+      "type": "processing",
+      "growth": 1.13,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {
+        "tools": 0.18
+      },
+      "inputs": {
+        "planks": 0.25,
+        "metalParts": 0.15,
+        "power": 0.4
+      }
+    },
+    {
+      "id": "school",
+      "category": "Science",
+      "type": "production",
+      "growth": 1.13,
+      "pbt": {
+        "1": 64,
+        "10": 196,
+        "50": 25530.222222222223
+      },
+      "outputs": {
+        "science": 0.45
+      },
+      "inputs": {}
+    },
+    {
+      "id": "woodGenerator",
+      "category": "Energy",
+      "type": "production",
+      "growth": 1.13,
+      "pbt": {
+        "1": 270.6666666666667,
+        "10": 828.4,
+        "50": 107968.93333333333
+      },
+      "outputs": {
+        "power": 1
+      },
+      "inputs": {
+        "wood": 0.25
+      }
+    },
+    {
+      "id": "shelter",
+      "category": "Settlement",
+      "type": "production",
+      "growth": 1.8,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "radio",
+      "category": "Utilities",
+      "type": "production",
+      "growth": 1,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {
+        "power": 0.1
+      }
+    },
+    {
+      "id": "foodStorage",
+      "category": "",
+      "type": "storage",
+      "growth": 1.22,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "largeGranary",
+      "category": "",
+      "type": "storage",
+      "growth": 1.15,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "rawStorage",
+      "category": "",
+      "type": "storage",
+      "growth": 1.22,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "largeWarehouse",
+      "category": "",
+      "type": "storage",
+      "growth": 1.15,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "materialsDepot",
+      "category": "",
+      "type": "storage",
+      "growth": 1.22,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "largeMaterialsDepot",
+      "category": "",
+      "type": "storage",
+      "growth": 1.15,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    },
+    {
+      "id": "battery",
+      "category": "",
+      "type": "storage",
+      "growth": 1.22,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "outputs": {},
+      "inputs": {}
+    }
+  ],
+  "converters": [
+    {
+      "id": "brickKiln",
+      "growth": 1.13,
+      "inputs": {
+        "stone": 0.4,
+        "wood": 0.3
+      },
+      "outputs": {
+        "bricks": 0.4
+      },
+      "ratio": 0,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "mode": "all-or-nothing"
+    },
+    {
+      "id": "sawmill",
+      "growth": 1.13,
+      "inputs": {
+        "wood": 0.8
+      },
+      "outputs": {
+        "planks": 0.5
+      },
+      "ratio": 2.5,
+      "pbt": {
+        "1": 94.91666666666667,
+        "10": 288.50000000000006,
+        "50": 37862.00000000001
+      },
+      "mode": "all-or-nothing"
+    },
+    {
+      "id": "metalWorkshop",
+      "growth": 1.13,
+      "inputs": {
+        "scrap": 0.4
+      },
+      "outputs": {
+        "metalParts": 0.4
+      },
+      "ratio": 2.7272727272727275,
+      "pbt": {
+        "1": 98.02631578947367,
+        "10": 299.67105263157896,
+        "50": 39102.697368421046
+      },
+      "mode": "all-or-nothing"
+    },
+    {
+      "id": "toolsmithy",
+      "growth": 1.13,
+      "inputs": {
+        "planks": 0.25,
+        "metalParts": 0.15,
+        "power": 0.4
+      },
+      "outputs": {
+        "tools": 0.18
+      },
+      "ratio": 0,
+      "pbt": {
+        "1": null,
+        "10": null,
+        "50": null
+      },
+      "mode": "all-or-nothing"
+    }
+  ],
+  "storage": [
+    {
+      "id": "foodStorage",
+      "growth": 1.22,
+      "capacity": {
+        "FOOD": 225
+      }
+    },
+    {
+      "id": "largeGranary",
+      "growth": 1.15,
+      "capacity": {
+        "FOOD": 600
+      }
+    },
+    {
+      "id": "rawStorage",
+      "growth": 1.22,
+      "capacity": {
+        "wood": 120,
+        "scrap": 80,
+        "stone": 60
+      }
+    },
+    {
+      "id": "largeWarehouse",
+      "growth": 1.15,
+      "capacity": {
+        "wood": 400,
+        "stone": 160,
+        "scrap": 240
+      }
+    },
+    {
+      "id": "materialsDepot",
+      "growth": 1.22,
+      "capacity": {
+        "planks": 100,
+        "metalParts": 40
+      }
+    },
+    {
+      "id": "largeMaterialsDepot",
+      "growth": 1.15,
+      "capacity": {
+        "planks": 180,
+        "metalParts": 90,
+        "bricks": 180
+      }
+    },
+    {
+      "id": "battery",
+      "growth": 1.22,
+      "capacity": {
+        "power": 40
+      }
+    }
+  ],
+  "outliers": {
+    "tooFast": [],
+    "tooSlow": [
+      {
+        "id": "potatoField",
+        "target": 50,
+        "value": 16772.28195937873
+      },
+      {
+        "id": "huntersHut",
+        "target": 1,
+        "value": 193.001443001443
+      },
+      {
+        "id": "huntersHut",
+        "target": 10,
+        "value": 687.5901875901876
+      },
+      {
+        "id": "huntersHut",
+        "target": 50,
+        "value": 181877.34487734488
+      },
+      {
+        "id": "loggingCamp",
+        "target": 50,
+        "value": 29881.403508771935
+      },
+      {
+        "id": "scrapyard",
+        "target": 50,
+        "value": 18522.727272727272
+      },
+      {
+        "id": "quarry",
+        "target": 1,
+        "value": 209.17678812415656
+      },
+      {
+        "id": "quarry",
+        "target": 10,
+        "value": 585.6950067476384
+      },
+      {
+        "id": "quarry",
+        "target": 50,
+        "value": 53989.20377867747
+      },
+      {
+        "id": "sawmill",
+        "target": 50,
+        "value": 37862.00000000001
+      },
+      {
+        "id": "metalWorkshop",
+        "target": 50,
+        "value": 39102.697368421046
+      },
+      {
+        "id": "school",
+        "target": 50,
+        "value": 25530.222222222223
+      },
+      {
+        "id": "woodGenerator",
+        "target": 1,
+        "value": 270.6666666666667
+      },
+      {
+        "id": "woodGenerator",
+        "target": 10,
+        "value": 828.4
+      },
+      {
+        "id": "woodGenerator",
+        "target": 50,
+        "value": 107968.93333333333
+      }
+    ]
+  }
+}

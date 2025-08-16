@@ -1,4 +1,4 @@
-{
+export default {
   "version": "1b5f7109aeab326544a4b683f2c570a0e9933e3d",
   "saveVersion": 7,
   "tickSeconds": 1,
@@ -1475,3 +1475,4 @@
     "shelter": 1
   }
 }
+
