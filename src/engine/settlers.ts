@@ -13,6 +13,8 @@ import { RESOURCES } from '../data/resources.js';
 import { addResource, consumeResource } from './resourceOps.ts';
 import { createLogEntry } from '../utils/log.js';
 
+export type RoleBonusMap = Record<string, number>;
+
 export function computeRoleBonuses(settlers: any[]): Record<string, number> {
   const bonuses: Record<string, number> = {};
   settlers.forEach((s) => {
