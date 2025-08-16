@@ -2,8 +2,13 @@ import { useGame } from '../state/useGame.tsx';
 import {
   PRODUCTION_BUILDINGS,
   STORAGE_BUILDINGS,
-  type Building,
+  type Building as BuildingDefinition,
 } from '../data/buildings.js';
+
+export interface BuildingGroup {
+  name: string;
+  buildings: BuildingDefinition[];
+}
 
 const GROUP_ORDER = [
   'Food',
@@ -15,19 +20,23 @@ const GROUP_ORDER = [
   'Utilities',
 ];
 
-export function useBuildingGroups() {
+export function useBuildingGroups(): {
+  productionGroups: BuildingGroup[];
+  storageBuildings: BuildingDefinition[];
+  completedResearch: string[];
+} {
   const { state } = useGame();
-  const completedResearch = state.research.completed || [];
+  const completedResearch: string[] = state.research.completed || [];
 
-  const isUnlocked = (b: Building) =>
+  const isUnlocked = (b: BuildingDefinition) =>
     !b.requiresResearch ||
     completedResearch.includes(b.requiresResearch) ||
-    (state.buildings[b.id]?.count || 0) > 0;
+    ((state.buildings as Record<string, { count: number }>)[b.id]?.count || 0) > 0;
 
   const prodBuildings = PRODUCTION_BUILDINGS.filter(isUnlocked);
-  const storageBuildings = STORAGE_BUILDINGS.filter(isUnlocked);
+  const storageBuildings: BuildingDefinition[] = STORAGE_BUILDINGS.filter(isUnlocked);
 
-  const prodGroups: Record<string, Building[]> = {};
+  const prodGroups: Record<string, BuildingDefinition[]> = {};
   prodBuildings.forEach((b) => {
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
@@ -39,11 +48,10 @@ export function useBuildingGroups() {
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
   ];
 
-  const productionGroups: { name: string; buildings: Building[] }[] =
-    prodGroupKeys.map((key) => ({
-      name: key,
-      buildings: prodGroups[key],
-    }));
+  const productionGroups: BuildingGroup[] = prodGroupKeys.map((key) => ({
+    name: key,
+    buildings: prodGroups[key],
+  }));
 
   return { productionGroups, storageBuildings, completedResearch };
 }
