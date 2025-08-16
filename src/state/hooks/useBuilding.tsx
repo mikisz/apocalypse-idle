@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useGame } from '../useGame.tsx';
+import { useGame, type GameState, type BuildingEntry } from '../useGame.tsx';
 import {
   getBuildingCostEntries,
   getBuildingOutputs,
@@ -9,37 +9,53 @@ import {
 } from '../selectors.js';
 import { demolishBuilding, buildBuilding } from '../../engine/production.ts';
 import { RESEARCH_MAP } from '../../data/research.js';
-import type { Building } from '../../data/buildings.js';
+import type { Building as BuildingDefinition } from '../../data/buildings.js';
 
-interface BuildingState {
+export interface UseBuilding {
   count: number;
-  isDesiredOn?: boolean;
+  atMax: boolean;
+  costEntries: [string, number][];
+  perOutputs: { res: string; perSec: number }[];
+  perInputs: { res: string; perSec: number }[];
+  canAfford: boolean;
+  unlocked: boolean;
   offlineReason?: string;
+  isDesiredOn: boolean;
+  resourceShortage: boolean;
+  buildTooltip: string | null;
+  showPowerWarning: boolean;
+  onBuild: () => void;
+  onDemolish: () => void;
+  onToggle: (on: boolean) => void;
 }
 
 export default function useBuilding(
-  building: Building,
+  building: BuildingDefinition,
   completedResearch: string[] = [],
-) {
+): UseBuilding {
   const { state, setState } = useGame();
-  const count = state.buildings[building.id]?.count || 0;
-  const isDesiredOn = state.buildings[building.id]?.isDesiredOn ?? true;
+  const buildings = state.buildings as Record<string, BuildingEntry>;
+  const count = buildings[building.id]?.count || 0;
+  const isDesiredOn = buildings[building.id]?.isDesiredOn ?? true;
   const atMax = building.maxCount != null && count >= building.maxCount;
   const costEntries = getBuildingCostEntries(state, building);
   const perOutputs = getBuildingOutputs(state, building);
   const perInputs = getBuildingInputs(state, building);
   const canAfford = canAffordBuilding(state, building);
-  const offlineReason = state.buildings[building.id]?.offlineReason;
+  const offlineReason = buildings[building.id]?.offlineReason;
+  const resources = state.resources as Record<string, { amount?: number }>;
   const resourceShortage =
     isDesiredOn &&
     perInputs.some(
-      (i) => i.res !== 'power' && (state.resources[i.res]?.amount || 0) <= 0,
+      (i) => i.res !== 'power' && (resources[i.res]?.amount || 0) <= 0,
     );
   const unlocked =
     !building.requiresResearch ||
     completedResearch.includes(building.requiresResearch);
   const buildTooltip = !unlocked
-    ? `Requires: ${RESEARCH_MAP[building.requiresResearch]?.name || building.requiresResearch}`
+    ? `Requires: ${
+        RESEARCH_MAP[building.requiresResearch!]?.name || building.requiresResearch
+      }`
     : atMax
       ? `Max ${building.maxCount}`
       : null;
@@ -47,20 +63,20 @@ export default function useBuilding(
     building.outputsPerSecBase?.power && getCapacity(state, 'power') <= 0,
   );
 
-  const onBuild = useCallback(() => {
+  const onBuild = useCallback((): void => {
     if (!canAfford || !unlocked || atMax) return;
-    setState((prev) => buildBuilding(prev, building.id));
+    setState((prev: GameState): GameState => buildBuilding(prev, building.id));
   }, [canAfford, unlocked, atMax, setState, building.id]);
 
-  const onDemolish = useCallback(() => {
+  const onDemolish = useCallback((): void => {
     if (count <= 0) return;
-    setState((prev) => demolishBuilding(prev, building.id));
+    setState((prev: GameState): GameState => demolishBuilding(prev, building.id));
   }, [count, setState, building.id]);
 
   const onToggle = useCallback(
-    (on: boolean) => {
-      setState((prev) => {
-        const prevBuildings = prev.buildings as Record<string, BuildingState>;
+    (on: boolean): void => {
+      setState((prev: GameState): GameState => {
+        const prevBuildings = prev.buildings as Record<string, BuildingEntry>;
         const prevEntry = prevBuildings[building.id] || { count: 0 };
         return {
           ...prev,
@@ -68,7 +84,7 @@ export default function useBuilding(
             ...prevBuildings,
             [building.id]: { ...prevEntry, isDesiredOn: on },
           },
-        };
+        } as GameState;
       });
     },
     [setState, building.id],

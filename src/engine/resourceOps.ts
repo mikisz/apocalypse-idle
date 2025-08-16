@@ -1,4 +1,5 @@
 import { RESOURCES } from '../data/resources.js';
+const RESOURCES_MAP = RESOURCES as Record<string, { category?: string }>;
 import { clampResource } from './resources.ts';
 import { getCapacity } from '../state/capacityCache.ts';
 
@@ -13,7 +14,7 @@ export function addResource(
   foodPool?: { amount: number; capacity: number },
 ): number {
   const entry = resources[id] || { amount: 0, discovered: false, produced: 0 };
-  const category = RESOURCES[id]?.category;
+  const category = RESOURCES_MAP[id]?.category;
   if (category === 'FOOD') {
     const cap = foodPool?.capacity ?? 0;
     const room = cap - (foodPool?.amount ?? 0);
@@ -49,7 +50,7 @@ export function consumeResource(
   foodPool?: { amount: number; capacity: number },
 ): number {
   const entry = resources[id] || { amount: 0, discovered: false, produced: 0 };
-  const category = RESOURCES[id]?.category;
+  const category = RESOURCES_MAP[id]?.category;
   const consume = Math.min(entry.amount, amount);
   const remaining = Math.max(0, entry.amount - consume);
   if (category === 'FOOD') {
