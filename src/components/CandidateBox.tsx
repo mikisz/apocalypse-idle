@@ -1,9 +1,12 @@
-// @ts-nocheck
 import type { JSX } from 'react';
-import { useGame } from '../state/useGame.tsx';
+import { useGame, type GameState } from '../state/useGame.tsx';
 import { SKILL_LABELS } from '../data/roles.js';
 import { RADIO_BASE_SECONDS } from '../data/settlement.js';
-import { candidateToSettler } from '../engine/candidates.ts';
+import {
+  candidateToSettler,
+  type Candidate,
+  type Settler,
+} from '../engine/candidates.ts';
 import { formatAge } from '../utils/format.js';
 import { DAYS_PER_YEAR } from '../engine/time.ts';
 import { XP_TIME_TO_NEXT_LEVEL_SECONDS } from '../data/balance.js';
@@ -23,24 +26,20 @@ interface Skill {
   level: number;
   xp?: number;
 }
-interface Candidate {
-  firstName: string;
-  lastName: string;
-  sex: 'M' | 'F';
-  age: number;
-  skills?: Record<string, Skill>;
-}
-
 export default function CandidateBox(): JSX.Element | null {
   const { state, setState } = useGame();
-  const candidate = state.population?.candidate as Candidate | null;
-  if (!candidate) return null;
+  if (!state.population?.candidate) return null;
+  const candidate: Candidate = state.population.candidate;
 
   const updateAfterDecision = (accepted: boolean): void => {
-    setState((prev) => {
-      const newSettler = candidateToSettler(
-        candidate,
-      ) as (typeof prev.population.settlers)[number];
+    setState((prev: GameState) => {
+      const baseSettler: Settler = candidateToSettler(candidate);
+      const newSettler: GameState['population']['settlers'][number] = {
+        ...baseSettler,
+        role: null,
+        happiness: prev.colony.happiness.value,
+        happinessBreakdown: prev.colony.happiness.breakdown,
+      };
       const settlers = accepted
         ? [...prev.population.settlers, newSettler]
         : prev.population.settlers;
@@ -55,7 +54,8 @@ export default function CandidateBox(): JSX.Element | null {
   const accept = (): void => updateAfterDecision(true);
   const reject = (): void => updateAfterDecision(false);
 
-  const sortedSkills = Object.entries(candidate.skills || {})
+  const skills: Record<string, Skill> = candidate.skills;
+  const sortedSkills = Object.entries(skills)
     .filter(([, s]) => s.level > 0)
     .sort((a, b) => b[1].level - a[1].level);
 
@@ -76,7 +76,12 @@ export default function CandidateBox(): JSX.Element | null {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <Accordion title="Skills" contentClassName="p-2 space-y-2">
+        <Accordion
+          title="Skills"
+          contentClassName="p-2 space-y-2"
+          action={undefined}
+          noBottomBorder={undefined}
+        >
           <ul className="space-y-2">
             {sortedSkills.length > 0 ? (
               sortedSkills.map(([id, s]) => {
