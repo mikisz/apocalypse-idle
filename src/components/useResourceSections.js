@@ -7,17 +7,45 @@ import {
 } from '../state/selectors.js';
 
 export function useResourceSections(state) {
-  const settlers = state.population?.settlers?.filter((s) => !s.isDead) || [];
+  const {
+    resources,
+    buildings,
+    research,
+    population,
+    gameTime,
+    foodPool,
+    colony,
+  } = state;
+
+  const populationSettlers = population?.settlers;
+  const populationCandidate = population?.candidate;
+  const researchCompleted = research?.completed;
+
+  const settlers = populationSettlers?.filter((s) => !s.isDead) || [];
 
   const resourceSections = useMemo(
-    () => getResourceSectionsSelector(state),
+    () =>
+      getResourceSectionsSelector({
+        resources,
+        buildings,
+        research: { completed: researchCompleted },
+        population: {
+          settlers: populationSettlers,
+          candidate: populationCandidate,
+        },
+        gameTime,
+        foodPool,
+        colony,
+      }),
     [
-      state.resources,
-      state.buildings,
-      state.research?.completed,
-      state.population?.settlers,
-      state.gameTime,
-      state.foodPool,
+      resources,
+      buildings,
+      researchCompleted,
+      populationSettlers,
+      populationCandidate,
+      gameTime,
+      foodPool,
+      colony,
     ],
   );
 
@@ -34,10 +62,10 @@ export function useResourceSections(state) {
   let color = 'text-green-400';
   if (ratio > 1) color = 'text-red-500';
   else if (ratio > 0.8) color = 'text-yellow-400';
-  const radioCount = state.buildings?.radio?.count || 0;
-  const candidatePending = !!state.population?.candidate;
-  const hasRadioResearch = (state.research.completed || []).includes('radio');
-  const powered = (state.resources.power?.amount || 0) > 0;
+  const radioCount = buildings?.radio?.count || 0;
+  const candidatePending = !!populationCandidate;
+  const hasRadioResearch = (researchCompleted || []).includes('radio');
+  const powered = (resources.power?.amount || 0) > 0;
   let radioLine = hasRadioResearch
     ? 'Radio: not built'
     : 'Radio research not complete';
@@ -48,7 +76,7 @@ export function useResourceSections(state) {
     } else if (!powered) {
       radioLine = 'Radio: inactive (no power)';
     } else {
-      const timer = state.colony?.radioTimer ?? RADIO_BASE_SECONDS;
+      const timer = colony?.radioTimer ?? RADIO_BASE_SECONDS;
       const mm = String(Math.floor(timer / 60)).padStart(2, '0');
       const ss = String(Math.floor(timer % 60)).padStart(2, '0');
       radioLine = `Next settler in: ${mm}:${ss}`;
@@ -101,9 +129,9 @@ export function useResourceSections(state) {
     powered,
   };
 
-  const happinessBreakdown = state.colony?.happiness?.breakdown || [];
+  const happinessBreakdown = colony?.happiness?.breakdown || [];
   const happinessInfo = {
-    avg: Math.round(state.colony?.happiness?.value || 0),
+    avg: Math.round(colony?.happiness?.value || 0),
     total: totalSettlers,
     capacity,
     breakdown: happinessBreakdown,
