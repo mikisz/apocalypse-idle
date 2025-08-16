@@ -18,14 +18,14 @@ export default function ResourceSidebar() {
       {sections.map((g, i) =>
         g.settlers ? (
           <SettlerSection
-            key={g.title}
+            key={g.id || g.title}
             title={g.title}
             info={settlersInfo}
             noBottomBorder={i === sections.length - 1}
           />
         ) : g.happiness ? (
           <Accordion
-            key={g.title}
+            key={g.id || g.title}
             title={g.title}
             contentClassName="p-0"
             noBottomBorder={i === sections.length - 1}
@@ -60,7 +60,7 @@ export default function ResourceSidebar() {
           </Accordion>
         ) : (
           <Accordion
-            key={g.title}
+            key={g.id || g.title}
             title={g.title}
             defaultOpen={g.defaultOpen}
             contentClassName="p-0"

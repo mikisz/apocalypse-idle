@@ -110,12 +110,12 @@ export function useResourceSections(state) {
       }
       rendered.push(section);
       if (hasRadioResearch && g.title === 'Science')
-        rendered.push({ title: 'Settlers', settlers: true });
+        rendered.push({ id: 'settlers', title: 'Settlers', settlers: true });
     });
     if (hasRadioResearch && !rendered.some((e) => e.title === 'Settlers'))
-      rendered.push({ title: 'Settlers', settlers: true });
-    rendered.push({ title: 'Happiness', happiness: true });
-    return rendered;
+      rendered.push({ id: 'settlers', title: 'Settlers', settlers: true });
+    rendered.push({ id: 'happiness', title: 'Happiness', happiness: true });
+    return rendered.map((s, i) => ({ ...s, id: s.id ?? String(i) }));
   }, [resourceSections, hasRadioResearch, powerStatus, powerMessage]);
 
   const settlersInfo = {
