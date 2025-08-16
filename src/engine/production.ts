@@ -43,7 +43,7 @@ const ROLE_BUILDINGS_MAP = ROLE_BUILDINGS as Record<string, string[]>;
 export function applyProduction(
   state: GameState,
   seconds = 1,
-  roleBonuses: RoleBonusMap,
+  roleBonuses: RoleBonusMap = {},
 ): GameState {
   ensureCapacityCache(state);
   const season = getSeason(state);
@@ -283,7 +283,7 @@ export function applyProduction(
 export function processTick(
   state: GameState,
   seconds = 1,
-  roleBonuses: RoleBonusMap,
+  roleBonuses: RoleBonusMap = {},
 ): GameState {
   return applyProduction(state, seconds, roleBonuses);
 }

@@ -56,10 +56,14 @@ describe('applyProduction', () => {
     (RESOURCES as any).metal = { category: 'METAL' };
 
     const roleBonuses = { farmer: 0.1, builder: 0.05 };
-    const result = applyProduction({ population: { settlers: [] } }, 1, roleBonuses);
+    const result = applyProduction(
+      { population: { settlers: [] } } as any,
+      1,
+      roleBonuses,
+    );
 
     expect(processTick).toHaveBeenCalledWith(
-      { population: { settlers: [] } },
+      { population: { settlers: [] } } as any,
       1,
       { builder: 0.05 },
     );
@@ -87,11 +91,15 @@ describe('applyProduction', () => {
     (calculateFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
 
-    const result = applyProduction({ population: { settlers: [] } }, 1, {
-      farmer: 1,
-    });
+    const result = applyProduction(
+      { population: { settlers: [] } } as any,
+      1,
+      {
+        farmer: 1,
+      },
+    );
 
-    expect(result.state.resources.potatoes.amount).toBe(100);
+    expect((result.state as any).resources.potatoes.amount).toBe(100);
   });
 });
 
@@ -101,9 +109,14 @@ describe('applySettlers', () => {
     (processSettlersTick as any).mockReturnValue({
       state: 'settlersProcessed',
       telemetry: 'tele',
+      events: [],
     });
     const rng = () => 0.5;
-    const result = applySettlers({ population: { settlers: [] } }, 1, rng);
+    const result = applySettlers(
+      { population: { settlers: [] } } as any,
+      1,
+      rng,
+    );
     expect(computeRoleBonuses).toHaveBeenCalledWith([]);
     expect(processSettlersTick).toHaveBeenCalledWith(
       { population: { settlers: [] } },
@@ -115,6 +128,7 @@ describe('applySettlers', () => {
     expect(result).toEqual({
       state: 'settlersProcessed',
       telemetry: 'tele',
+      events: [],
       roleBonuses: { farmer: 0.2 },
     });
   });
@@ -133,14 +147,14 @@ describe('applyYearUpdate', () => {
       colony: {},
       meta: {},
     };
-    const telemetry = { some: 'data' };
+    const telemetry = { some: 'data' } as any;
     const result = applyYearUpdate(state as any, 10, telemetry);
-    expect(result.population).toMatchObject({
+    expect((result as any).population).toMatchObject({
       settlers: [{ id: 1, ageDays: DAYS_PER_YEAR }],
       candidate: 'cand',
     });
-    expect(result.colony.radioTimer).toBe(5);
-    expect(result.gameTime).toEqual({ seconds: 10, year: 2 });
-    expect(result.meta?.telemetry?.settlers).toBe(telemetry);
+    expect((result as any).colony.radioTimer).toBe(5);
+    expect((result as any).gameTime).toEqual({ seconds: 10, year: 2 });
+    expect((result as any).meta?.telemetry?.settlers).toBe(telemetry);
   });
 });
