@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import { RESEARCH_MAP } from '../../data/research.js';
 import { RESOURCES } from '../../data/resources.js';
@@ -6,8 +5,15 @@ import { BUILDING_MAP } from '../../data/buildings.js';
 import { SKILL_LABELS } from '../../data/roles.js';
 import { useToast } from '../../components/ui/toast.tsx';
 import { getCapacity } from '../selectors.js';
-import type { GameState } from '../useGame.tsx';
+import type {
+  GameState,
+  BuildingEntry,
+  ResourceState,
+} from '../useGame.tsx';
+import type { Settler, SkillMap } from '../../engine/candidates.ts';
 import { createLogEntry } from '../../utils/log.js';
+
+type SettlerState = Settler & { name?: string };
 
 export default function useNotifications(
   state: GameState,
@@ -20,21 +26,27 @@ export default function useNotifications(
   const { toast } = useToast();
 
   const addLog = (text: string): void => {
-    setState((prev) => ({
-      ...prev,
-      log: [createLogEntry(text), ...(prev.log || [])].slice(0, 100),
-    }));
+    setState(
+      (prev: GameState): GameState => ({
+        ...prev,
+        log: ([
+          createLogEntry(text),
+          ...(prev.log || []),
+        ].slice(0, 100) as GameState['log']),
+      }),
+    );
   };
 
   useEffect(() => {
     const prev = prevRef.current;
 
+    const prevResearchCurrent = prev.research.current as { id: string } | null;
     if (
-      prev.research.current &&
+      prevResearchCurrent &&
       !state.research.current &&
-      state.research.completed.includes(prev.research.current.id)
+      (state.research.completed as string[]).includes(prevResearchCurrent.id)
     ) {
-      const id = prev.research.current.id;
+      const id = prevResearchCurrent.id;
       const name = RESEARCH_MAP[id]?.name || id;
       const msg = `${name} research complete`;
       toast({ description: msg });
@@ -47,12 +59,14 @@ export default function useNotifications(
       addLog(msg);
     }
 
-    const prevSettlers = prev.population.settlers;
+    const prevSettlers = prev.population.settlers as SettlerState[];
     const alivePrev = new Set(
       prevSettlers.filter((s) => !s.isDead).map((s) => s.id),
     );
-    const prevSettlerMap = new Map(prevSettlers.map((s) => [s.id, s]));
-    state.population.settlers.forEach((s) => {
+    const prevSettlerMap = new Map<string, SettlerState>(
+      prevSettlers.map((s) => [s.id, s]),
+    );
+    state.population.settlers.forEach((s: SettlerState) => {
       if (s.isDead && alivePrev.has(s.id)) {
         const name = s.name
           ? `${s.name} has died`
@@ -61,26 +75,30 @@ export default function useNotifications(
       } else {
         const prevS = prevSettlerMap.get(s.id);
         if (prevS) {
-          Object.entries(s.skills || {}).forEach(([skill, entry]: [string, any]) => {
-            const prevLvl = prevS.skills?.[skill]?.level || 0;
-            if (entry.level > prevLvl) {
-              const fullName = s.name
-                ? s.name
-                : `${s.firstName || ''} ${s.lastName || ''}`.trim() ||
-                  'A settler';
-              const skillName = SKILL_LABELS[skill] || skill;
-              const msg = `${fullName} reached ${skillName} level ${entry.level}`;
-              toast({ description: msg });
-              addLog(msg);
-            }
-          });
+          Object.entries((s.skills || {}) as SkillMap).forEach(
+            ([skill, entry]: [string, SkillMap[string]]) => {
+              const prevLvl = prevS.skills?.[skill]?.level || 0;
+              if (entry.level > prevLvl) {
+                const fullName = s.name
+                  ? s.name
+                  : `${s.firstName || ''} ${s.lastName || ''}`.trim() ||
+                    'A settler';
+                const skillName = SKILL_LABELS[skill] || skill;
+                const msg = `${fullName} reached ${skillName} level ${entry.level}`;
+                toast({ description: msg });
+                addLog(msg);
+              }
+            },
+          );
         }
       }
     });
 
-    Object.entries(state.buildings as Record<string, any>).forEach(([id, b]) => {
+    const buildings = state.buildings as Record<string, BuildingEntry>;
+    const prevBuildings = prev.buildings as Record<string, BuildingEntry>;
+    Object.entries(buildings).forEach(([id, b]: [string, BuildingEntry]) => {
       const currReason = b?.offlineReason;
-      const prevReason = (prev.buildings as any)?.[id]?.offlineReason;
+      const prevReason = prevBuildings?.[id]?.offlineReason;
       if (
         currReason === 'power' &&
         prevReason !== 'power' &&
@@ -110,8 +128,10 @@ export default function useNotifications(
         resourceShortageNotified.current.delete(id);
     });
 
-    Object.entries(state.resources as Record<string, any>).forEach(([id, res]: [string, any]) => {
-      const prevAmt = prev.resources?.[id]?.amount || 0;
+    const resources = state.resources as Record<string, ResourceState>;
+    const prevResources = prev.resources as Record<string, ResourceState>;
+    Object.entries(resources).forEach(([id, res]: [string, ResourceState]) => {
+      const prevAmt = prevResources?.[id]?.amount || 0;
       const currAmt = res.amount;
       const cap = getCapacity(state, id);
       if (

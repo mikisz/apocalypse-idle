@@ -14,6 +14,12 @@ export interface BuildingEntry {
   offlineReason?: string;
 }
 
+export interface ResourceState {
+  amount: number;
+  discovered?: boolean;
+  produced?: number;
+}
+
 export interface GameContextValue {
   state: GameState;
   setActiveTab: (tab: string) => void;
