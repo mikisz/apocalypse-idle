@@ -1,8 +1,9 @@
-// @ts-nocheck
 import { useGame } from '../state/useGame.tsx';
-import { PRODUCTION_BUILDINGS, STORAGE_BUILDINGS } from '../data/buildings.js';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  PRODUCTION_BUILDINGS,
+  STORAGE_BUILDINGS,
+  type Building,
+} from '../data/buildings.js';
 
 const GROUP_ORDER = [
   'Food',
@@ -18,7 +19,7 @@ export function useBuildingGroups() {
   const { state } = useGame();
   const completedResearch = state.research.completed || [];
 
-  const isUnlocked = (b: any) =>
+  const isUnlocked = (b: Building) =>
     !b.requiresResearch ||
     completedResearch.includes(b.requiresResearch) ||
     (state.buildings[b.id]?.count || 0) > 0;
@@ -26,7 +27,7 @@ export function useBuildingGroups() {
   const prodBuildings = PRODUCTION_BUILDINGS.filter(isUnlocked);
   const storageBuildings = STORAGE_BUILDINGS.filter(isUnlocked);
 
-  const prodGroups: Record<string, any[]> = {};
+  const prodGroups: Record<string, Building[]> = {};
   prodBuildings.forEach((b) => {
     const cat = b.category || 'Production';
     if (!prodGroups[cat]) prodGroups[cat] = [];
@@ -38,10 +39,11 @@ export function useBuildingGroups() {
     ...Object.keys(prodGroups).filter((k) => !GROUP_ORDER.includes(k)),
   ];
 
-  const productionGroups = prodGroupKeys.map((key) => ({
-    name: key,
-    buildings: prodGroups[key],
-  }));
+  const productionGroups: { name: string; buildings: Building[] }[] =
+    prodGroupKeys.map((key) => ({
+      name: key,
+      buildings: prodGroups[key],
+    }));
 
   return { productionGroups, storageBuildings, completedResearch };
 }

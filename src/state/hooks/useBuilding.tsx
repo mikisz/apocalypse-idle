@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { useGame } from '../useGame.tsx';
 import {
@@ -10,8 +9,18 @@ import {
 } from '../selectors.js';
 import { demolishBuilding, buildBuilding } from '../../engine/production.ts';
 import { RESEARCH_MAP } from '../../data/research.js';
+import type { Building } from '../../data/buildings.js';
 
-export default function useBuilding(building: any, completedResearch: string[] = []) {
+interface BuildingState {
+  count: number;
+  isDesiredOn?: boolean;
+  offlineReason?: string;
+}
+
+export default function useBuilding(
+  building: Building,
+  completedResearch: string[] = [],
+) {
   const { state, setState } = useGame();
   const count = state.buildings[building.id]?.count || 0;
   const isDesiredOn = state.buildings[building.id]?.isDesiredOn ?? true;
@@ -21,11 +30,14 @@ export default function useBuilding(building: any, completedResearch: string[] =
   const perInputs = getBuildingInputs(state, building);
   const canAfford = canAffordBuilding(state, building);
   const offlineReason = state.buildings[building.id]?.offlineReason;
-  const resourceShortage = isDesiredOn && perInputs.some(
-    (i) => i.res !== 'power' && (state.resources[i.res]?.amount || 0) <= 0,
-  );
+  const resourceShortage =
+    isDesiredOn &&
+    perInputs.some(
+      (i) => i.res !== 'power' && (state.resources[i.res]?.amount || 0) <= 0,
+    );
   const unlocked =
-    !building.requiresResearch || completedResearch.includes(building.requiresResearch);
+    !building.requiresResearch ||
+    completedResearch.includes(building.requiresResearch);
   const buildTooltip = !unlocked
     ? `Requires: ${RESEARCH_MAP[building.requiresResearch]?.name || building.requiresResearch}`
     : atMax
@@ -48,14 +60,15 @@ export default function useBuilding(building: any, completedResearch: string[] =
   const onToggle = useCallback(
     (on: boolean) => {
       setState((prev) => {
-        const prevEntry = (prev.buildings as Record<string, any>)[building.id] || { count: 0 };
+        const prevBuildings = prev.buildings as Record<string, BuildingState>;
+        const prevEntry = prevBuildings[building.id] || { count: 0 };
         return {
           ...prev,
           buildings: {
-            ...prev.buildings,
+            ...prevBuildings,
             [building.id]: { ...prevEntry, isDesiredOn: on },
           },
-        } as any;
+        };
       });
     },
     [setState, building.id],
