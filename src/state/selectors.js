@@ -143,8 +143,7 @@ function aggregateBuildingRates(state, roleBonuses) {
         sum + (RESOURCES[id].category === 'FOOD' ? resources[id] : 0),
       0,
     );
-  const foodCapacity =
-    state.foodPool?.capacity ?? calculateFoodCapacity(state);
+  const foodCapacity = state.foodPool?.capacity ?? calculateFoodCapacity(state);
   PRODUCTION_BUILDINGS.forEach((b) => {
     const entry = state.buildings?.[b.id];
     const count = entry?.count || 0;
@@ -234,11 +233,7 @@ function aggregateBuildingRates(state, roleBonuses) {
         const bonus = roleBonuses[role] || 0;
         const researchBonus = getResearchOutputBonus(state, resId);
         let gain =
-          base *
-          mult *
-          count *
-          (1 + bonus + researchBonus) *
-          factorRes;
+          base * mult * count * (1 + bonus + researchBonus) * factorRes;
         if (category === 'FOOD') {
           const room = foodCapacity - totalFoodAmount;
           gain = room > 0 ? Math.min(gain, room) : 0;
@@ -390,7 +385,7 @@ function buildResourceGroups(state, netRates, prodRates) {
         amount,
         capacity,
         capped,
-        rate: rateInfo.label,
+        rate: rateInfo.perSec,
         tooltip: undefined,
       };
       if (isPower) {
@@ -421,7 +416,7 @@ function createFoodTotalRow(state, foodIds, netRates) {
     name: 'Total',
     amount: totalAmount,
     capacity: totalCapacity,
-    rate: formatRate(totalNetRate),
+    rate: totalNetRate,
   };
 }
 

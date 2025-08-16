@@ -45,7 +45,9 @@ export default function ResourceRow({
             {capacity != null && ` / ${formatAmount(capacity)}`}
           </span>
         ) : rate != null ? (
-          <span className="text-xs text-muted-foreground">{rate}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatRate(rate)}
+          </span>
         ) : null}
       </span>
     </li>
@@ -67,7 +69,7 @@ ResourceRow.propTypes = {
   amount: PropTypes.number.isRequired,
   capacity: PropTypes.number,
   capped: PropTypes.bool,
-  rate: PropTypes.string,
+  rate: PropTypes.number,
   tooltip: PropTypes.node,
   supply: PropTypes.number,
   demand: PropTypes.number,

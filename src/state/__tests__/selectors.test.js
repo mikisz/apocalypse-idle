@@ -5,7 +5,6 @@ import {
   getPowerStatus,
   calculateFoodCapacity,
   getCapacity,
-
 } from '../selectors.js';
 import { defaultState } from '../defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
@@ -64,9 +63,9 @@ describe('power selectors', () => {
     expect(row.demand).toBe(1);
     expect(row.amount).toBe(3);
     expect(row.capacity).toBe(10);
+    expect(row.rate).toBe(0);
   });
 });
-
 
 describe('capacity calculations', () => {
   it('getCapacity accounts for storage buildings', () => {
@@ -82,6 +81,5 @@ describe('capacity calculations', () => {
     expect(base).toBe(300);
     state.buildings.foodStorage = { count: 1 };
     expect(calculateFoodCapacity(state)).toBe(525);
-
   });
 });
