@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   BALANCE,
   XP_TIME_TO_NEXT_LEVEL_SECONDS,
@@ -7,17 +6,36 @@ import {
   XP_MULTIPLIER_FROM_HAPPINESS,
 } from '../data/balance.js';
 import { getSettlerCapacity } from '../state/selectors.js';
-import { calculateFoodCapacity, ensureCapacityCache } from '../state/capacityCache.ts';
+import {
+  calculateFoodCapacity,
+  ensureCapacityCache,
+} from '../state/capacityCache.ts';
 import { SECONDS_PER_DAY } from './time.ts';
 import { RESOURCES } from '../data/resources.js';
 import { addResource, consumeResource } from './resourceOps.ts';
 import { createLogEntry } from '../utils/log.js';
+import type { Settler, SkillEntry } from './candidates.ts';
+import type { GameState } from '../state/useGame.tsx';
+import type {
+  TickEvent as TelemetryEvent,
+  TickTelemetry as Telemetry,
+} from './gameTick.types.ts';
 
 export type RoleBonusMap = Record<string, number>;
 
-export function computeRoleBonuses(settlers: any[]): Record<string, number> {
+interface SkillProgress extends SkillEntry {
+  xp?: number;
+}
+
+type SettlerState = Settler & {
+  happiness?: number;
+  happinessBreakdown?: { label: string; value: number }[];
+  skills?: Record<string, SkillProgress>;
+};
+
+export function computeRoleBonuses(settlers: Settler[]): Record<string, number> {
   const bonuses: Record<string, number> = {};
-  settlers.forEach((s) => {
+  settlers.forEach((s: Settler) => {
     if (s.isDead || !s.role) return;
     const skill = s.skills?.[s.role] || { level: 0 };
     const bonus = ROLE_BONUS_PER_SETTLER(skill.level);
@@ -26,35 +44,38 @@ export function computeRoleBonuses(settlers: any[]): Record<string, number> {
   return bonuses;
 }
 
-export function assignmentsSummary(settlers: any[]): { assigned: number; living: number } {
-  const living = settlers.filter((s: any) => !s.isDead);
-  const assigned = living.filter((s: any) => s.role != null);
+export function assignmentsSummary(settlers: Settler[]): { assigned: number; living: number } {
+  const living = settlers.filter((s: Settler) => !s.isDead);
+  const assigned = living.filter((s: Settler) => s.role != null);
   return { assigned: assigned.length, living: living.length };
 }
 
-export function processSettlersTick(
-  state: any,
-  seconds: number = BALANCE.TICK_SECONDS,
+export function ageSettlers(
+  state: GameState,
+  dt: number = BALANCE.TICK_SECONDS,
   bonusFoodPerSec: number = 0,
   rng: () => number = Math.random,
   roleBonuses: Record<string, number> | null = null,
-): { state: any; telemetry: any; events: any[] } {
+): { state: GameState; telemetry: Telemetry; events: TelemetryEvent[] } {
   ensureCapacityCache(state);
-  const settlers = state.population?.settlers
-    ? [...state.population.settlers]
+  const settlers: SettlerState[] = state.population?.settlers
+    ? ([...state.population.settlers] as SettlerState[])
     : [];
-  const events = [];
-  const living = settlers.filter((s) => !s.isDead);
+  const events: TelemetryEvent[] = [];
+  const living: SettlerState[] = settlers.filter((s: SettlerState) => !s.isDead);
+
+  const resMap = RESOURCES as Record<string, any>;
+  const stateRes = state.resources as Record<string, any>;
 
   // Happiness calculation
   const settlerCap = getSettlerCapacity(state);
   const overcrowded = Math.max(0, living.length - settlerCap);
   const overcrowdingPenalty =
     -overcrowded * BALANCE.HAPPINESS_OVERCR_PENALTY_PER;
-  const foodTypes = Object.keys(RESOURCES).filter(
+  const foodTypes = Object.keys(resMap).filter(
     (id) =>
-      RESOURCES[id].category === 'FOOD' &&
-      (state.resources[id]?.amount || 0) > 0,
+      resMap[id].category === 'FOOD' &&
+      (stateRes[id]?.amount || 0) > 0,
   ).length;
   const foodVarietyBonus = FOOD_VARIETY_BONUS(foodTypes);
   const base = BALANCE.HAPPINESS_BASE;
@@ -74,7 +95,7 @@ export function processSettlersTick(
   const xpMultiplier = XP_MULTIPLIER_FROM_HAPPINESS(happinessValue);
 
   // Compute bonuses
-  const bonuses = roleBonuses || computeRoleBonuses(living);
+  const bonuses: RoleBonusMap = roleBonuses || computeRoleBonuses(living);
   const totalFoodBonusPercent = (bonuses['farmer'] || 0) * 100;
 
   const bonusGainPerSec = bonusFoodPerSec;
@@ -86,22 +107,17 @@ export function processSettlersTick(
   let foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
-        amount: Object.keys(state.resources).reduce(
+        amount: Object.keys(stateRes).reduce(
           (sum, id) =>
-            sum +
-            (RESOURCES[id].category === 'FOOD'
-              ? state.resources[id]?.amount || 0
-              : 0),
+            sum + (resMap[id].category === 'FOOD' ? stateRes[id]?.amount || 0 : 0),
           0,
         ),
         capacity: calculateFoodCapacity(state),
       };
-  const resources = { ...state.resources };
+  const resources = { ...state.resources } as Record<string, any>;
 
-  let remaining = totalSettlersConsumption * seconds;
-  const foodIds = Object.keys(RESOURCES).filter(
-    (id) => RESOURCES[id].category === 'FOOD',
-  );
+  let remaining = totalSettlersConsumption * dt;
+  const foodIds = Object.keys(resMap).filter((id) => resMap[id].category === 'FOOD');
   const prioritized = ['potatoes', ...foodIds.filter((id) => id !== 'potatoes')];
   for (const id of prioritized) {
     if (remaining <= 0) break;
@@ -109,7 +125,7 @@ export function processSettlersTick(
     remaining -= consumed;
   }
 
-  const bonusGain = Math.max(0, bonusGainPerSec * seconds);
+  const bonusGain = Math.max(0, bonusGainPerSec * dt);
   addResource(state, resources, 'potatoes', bonusGain, foodPool);
 
   const foodAmount = foodPool.amount;
@@ -118,20 +134,24 @@ export function processSettlersTick(
   if (foodAmount > 0) {
     starvationTimer = 0;
   } else {
-    starvationTimer += seconds;
+    starvationTimer += dt;
     if (starvationTimer >= BALANCE.STARVATION_DEATH_TIMER_SECONDS) {
-      const oldest = Math.max(...living.map((s) => s.ageDays || 0));
-      const victims = living.filter((s) => (s.ageDays || 0) === oldest);
+      const oldest = Math.max(...living.map((s: SettlerState) => s.ageDays || 0));
+      const victims = living.filter(
+        (s: SettlerState) => (s.ageDays || 0) === oldest,
+      );
       if (victims.length > 0) {
         const idx = Math.floor(rng() * victims.length);
         const victim = victims[idx];
-        const victimIndex = settlers.findIndex((s) => s.id === victim.id);
+        const victimIndex = settlers.findIndex(
+          (s: SettlerState) => s.id === victim.id,
+        );
         if (victimIndex >= 0) {
           const updated = {
             ...settlers[victimIndex],
             isDead: true,
             role: null,
-          };
+          } as SettlerState;
           settlers[victimIndex] = updated;
           events.push(
             createLogEntry(
@@ -152,14 +172,14 @@ export function processSettlersTick(
   // Aging and XP
   for (const s of settlers) {
     if (!s.isDead) {
-      s.ageDays = (s.ageDays || 0) + seconds / SECONDS_PER_DAY;
+      s.ageDays = (s.ageDays || 0) + dt / SECONDS_PER_DAY;
       if (s.role) {
-        if (!s.skills) s.skills = {};
-        const entry = s.skills[s.role] || { level: 0, xp: 0 };
+        if (!s.skills) s.skills = {} as Record<string, SkillProgress>;
+        const entry: SkillProgress = s.skills[s.role] || { level: 0, xp: 0 };
         if (entry.level < BALANCE.MAX_LEVEL) {
           entry.xp =
             (entry.xp || 0) +
-            BALANCE.XP_GAIN_PER_SECOND_ACTIVE * seconds * xpMultiplier;
+            BALANCE.XP_GAIN_PER_SECOND_ACTIVE * dt * xpMultiplier;
           let lvl = entry.level;
           let xp = entry.xp;
           while (lvl < BALANCE.MAX_LEVEL) {
@@ -186,7 +206,7 @@ export function processSettlersTick(
     }
   }
 
-  const telemetry = {
+  const telemetry: Telemetry = {
     netFoodPerSec,
     bonusFoodPerSec: bonusGainPerSec,
     totalFoodBonusPercent,
@@ -209,8 +229,10 @@ export function processSettlersTick(
       foodPool,
       population: { ...state.population, settlers },
       log,
-    },
+    } as GameState,
     telemetry,
     events,
   };
 }
+
+export { ageSettlers as processSettlersTick };
