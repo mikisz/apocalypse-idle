@@ -172,7 +172,6 @@ const ResearchNode = forwardRef(({ node, status, onStart }, ref) => {
         </div>
       </PopoverTrigger>
       <PopoverContent
-        side="bottom"
         align="center"
         onMouseLeave={() => !isTouch && setOpen(false)}
       >
