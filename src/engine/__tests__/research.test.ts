@@ -76,7 +76,7 @@ describe('research engine', () => {
 
   it('unlocks radio after industry research', () => {
     const state: GameState = deepClone(defaultState);
-    state.resources.science.amount = 1000;
+    state.resources.science.amount = 2000;
     let s = startResearch(state, 'industry1');
     s = processResearchTick(s, RESEARCH_MAP['industry1'].timeSec);
     s = startResearch(s, 'woodworking1');

@@ -103,7 +103,7 @@ export const RESEARCH = [
     name: 'Industry Production',
     type: 'efficiency',
     shortDesc: '+5% output for construction materials.',
-    cost: { science: 170 },
+    cost: { science: 220 },
     timeSec: 270,
     prereqs: ['woodworking1', 'salvaging1', 'logistics1'],
     effects: [
@@ -117,7 +117,7 @@ export const RESEARCH = [
     name: 'Masonry II',
     type: 'unlock',
     shortDesc: 'Unlocks larger storage buildings.',
-    cost: { science: 140 },
+    cost: { science: 240 },
     timeSec: 210,
     prereqs: ['masonry1', 'logistics1'],
     unlocks: {
@@ -132,7 +132,7 @@ export const RESEARCH = [
     name: 'Woodworking II',
     type: 'efficiency',
     shortDesc: 'Additional +5% to wood and planks.',
-    cost: { science: 220 },
+    cost: { science: 500 },
     timeSec: 360,
     prereqs: [
       'industry2',
@@ -150,7 +150,7 @@ export const RESEARCH = [
     name: 'Salvaging II',
     type: 'efficiency',
     shortDesc: 'Additional +5% to scrap and metal parts.',
-    cost: { science: 220 },
+    cost: { science: 500 },
     timeSec: 360,
     prereqs: [
       'industry2',
@@ -169,7 +169,7 @@ export const RESEARCH = [
     type: 'efficiency',
     shortDesc:
       'Additional +5% storage capacity for raw materials and construction materials.',
-    cost: { science: 230 },
+    cost: { science: 500 },
     timeSec: 360,
     prereqs: [
       'industry2',
@@ -192,7 +192,7 @@ export const RESEARCH = [
     type: 'unlock',
     shortDesc:
       'Learn the fundamentals of generating and storing electrical power.',
-    cost: { science: 150 },
+    cost: { science: 300 },
     timeSec: 210,
     prereqs: ['industry2'],
     unlocks: {
@@ -209,7 +209,7 @@ export const RESEARCH = [
     name: 'Radio',
     type: 'unlock',
     shortDesc: 'Unlocks radio broadcasts to attract settlers.',
-    cost: { science: 150 },
+    cost: { science: 400 },
     timeSec: 240,
     prereqs: ['basicEnergy'],
     unlocks: { buildings: ['radio'] },
