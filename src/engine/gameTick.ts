@@ -109,7 +109,11 @@ export function applyYearUpdate(
   }
   return {
     ...state,
-    population: { ...state.population, settlers, candidate } as GameState['population'],
+    population: {
+      ...state.population,
+      settlers,
+      candidate,
+    } as GameState['population'],
     colony: { ...state.colony, radioTimer } as GameState['colony'],
     gameTime: { seconds: nextSeconds, year } as GameState['gameTime'],
     meta: {
@@ -121,4 +125,3 @@ export function applyYearUpdate(
     } as GameState['meta'],
   } as GameState;
 }
-

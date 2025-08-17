@@ -5,7 +5,9 @@ import usePopulationActions from '../usePopulationActions';
 describe('usePopulationActions', () => {
   it('sets settler role when building available', () => {
     let state: any = {
-      population: { settlers: [{ id: 's1', firstName: 'A', lastName: 'B', role: null }] },
+      population: {
+        settlers: [{ id: 's1', firstName: 'A', lastName: 'B', role: null }],
+      },
       buildings: { potatoField: { count: 1 } },
       log: [],
     };
@@ -19,7 +21,9 @@ describe('usePopulationActions', () => {
 
   it('banishes settler', () => {
     let state: any = {
-      population: { settlers: [{ id: 's1', firstName: 'A', lastName: 'B', role: null }] },
+      population: {
+        settlers: [{ id: 's1', firstName: 'A', lastName: 'B', role: null }],
+      },
       buildings: {},
       log: [],
     };

@@ -9,10 +9,12 @@ import { deepClone } from '../../utils/clone.ts';
 import type { GameState } from '../../state/useGame.tsx';
 import type { Settler } from '../candidates.ts';
 
-const createRng = (seed = 1) => () => {
-  seed = (seed * 16807) % 2147483647;
-  return (seed - 1) / 2147483646;
-};
+const createRng =
+  (seed = 1) =>
+  () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
 
 const createSettler = (overrides: Partial<Settler> = {}): Settler => ({
   id: 's',
@@ -54,10 +56,14 @@ describe('settlers tick', () => {
         totalFoodProdBase += rates[id]?.perSec || 0;
       }
     });
-    const bonusFoodPerSec =
-      totalFoodProdBase * (roleBonuses['farmer'] || 0);
+    const bonusFoodPerSec = totalFoodProdBase * (roleBonuses['farmer'] || 0);
 
-    const { state: final } = processSettlersTick(afterTick, 1, bonusFoodPerSec, rng);
+    const { state: final } = processSettlersTick(
+      afterTick,
+      1,
+      bonusFoodPerSec,
+      rng,
+    );
 
     const expected =
       afterTick.resources.potatoes.amount +

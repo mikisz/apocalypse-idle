@@ -15,6 +15,7 @@ node --loader ts-node/esm src/dev/economyReporter.ts --season=winter --weights=w
 ```
 
 Flags:
+
 - `--season=average|winter|spring|summer|autumn|all`
 - `--weights` comma list or path to JSON
 - `--targets` comma list of ownership counts (e.g. `1,10,50`)

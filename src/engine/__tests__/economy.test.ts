@@ -7,16 +7,15 @@ import { SEASON_DURATION } from '../time.ts';
 import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';
 import { calculateFoodCapacity } from '../../state/selectors.js';
-import type {
-  GameState,
-  BuildingEntry,
-} from '../../state/useGame.tsx';
+import type { GameState, BuildingEntry } from '../../state/useGame.tsx';
 import type { Settler } from '../candidates.ts';
 
-const createRng = (seed = 1) => () => {
-  seed = (seed * 16807) % 2147483647;
-  return (seed - 1) / 2147483646;
-};
+const createRng =
+  (seed = 1) =>
+  () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
 
 const createSettler = (overrides: Partial<Settler> = {}): Settler => ({
   id: 's',

@@ -56,7 +56,6 @@ export const RESOURCES = {
     category: 'CONSTRUCTION_MATERIALS',
     startingAmount: 0,
     startingCapacity: 40,
-
   },
   metalParts: {
     id: 'metalParts',

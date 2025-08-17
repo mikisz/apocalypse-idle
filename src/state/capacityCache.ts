@@ -9,7 +9,12 @@ interface GameState {
   research?: any;
 }
 
-interface Effect { type?: string; percent?: number; category?: string; resource?: string; }
+interface Effect {
+  type?: string;
+  percent?: number;
+  category?: string;
+  resource?: string;
+}
 
 let lastState: any = null;
 let lastBuildingsHash = '';
@@ -119,4 +124,3 @@ export function invalidateCapacityCache() {
   lastBuildingsHash = '';
   lastResearch = null;
 }
-

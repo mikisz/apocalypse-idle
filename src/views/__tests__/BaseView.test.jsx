@@ -6,4 +6,3 @@ describe('BaseView', () => {
     expect(typeof BaseView).toBe('function');
   });
 });
-

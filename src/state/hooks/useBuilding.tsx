@@ -54,7 +54,8 @@ export default function useBuilding(
     completedResearch.includes(building.requiresResearch);
   const buildTooltip = !unlocked
     ? `Requires: ${
-        RESEARCH_MAP[building.requiresResearch!]?.name || building.requiresResearch
+        RESEARCH_MAP[building.requiresResearch!]?.name ||
+        building.requiresResearch
       }`
     : atMax
       ? `Max ${building.maxCount}`
@@ -70,7 +71,9 @@ export default function useBuilding(
 
   const onDemolish = useCallback((): void => {
     if (count <= 0) return;
-    setState((prev: GameState): GameState => demolishBuilding(prev, building.id));
+    setState(
+      (prev: GameState): GameState => demolishBuilding(prev, building.id),
+    );
   }, [count, setState, building.id]);
 
   const onToggle = useCallback(

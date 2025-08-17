@@ -2,13 +2,12 @@ import * as fs from 'fs';
 import { pathToFileURL } from 'url';
 import { BUILDINGS } from '../data/buildings.js';
 import { SEASONS } from '../engine/time.ts';
-import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
-import {
-  marginalWeightedCost,
-  marginalWeightedDeltaProdPerSec,
-  pbtAtN,
-  valueWeightedStream,
-} from './economyMath.ts';
+import type {
+  BuildingData,
+  ResourceMap,
+  SeasonsRecord,
+} from './economyTypes.ts';
+import { pbtAtN, valueWeightedStream } from './economyMath.ts';
 
 export interface Options {
   season: 'average' | 'winter' | 'spring' | 'summer' | 'autumn' | 'all';
@@ -68,7 +67,8 @@ export function parseArgs(args = process.argv.slice(2)): Options {
           opts.weights = JSON.parse(txt);
         } else {
           value.split(',').forEach((pair) => {
-            const [r, v] = pair.split(':').length === 2 ? pair.split(':') : pair.split('=');
+            const [r, v] =
+              pair.split(':').length === 2 ? pair.split(':') : pair.split('=');
             if (r && v) opts.weights[r] = Number(v);
           });
         }
@@ -136,7 +136,8 @@ export function generateReport(opts: Options): string {
     if (!includeAll && !opts.include.split(',').includes(type + 's')) continue;
 
     const pbt: Record<string, number | Record<string, number>> = {};
-    const seasonsToCompute = opts.season === 'all' ? Object.keys(seasons) : [opts.season];
+    const seasonsToCompute =
+      opts.season === 'all' ? Object.keys(seasons) : [opts.season];
     for (const target of opts.targets) {
       if (opts.season === 'all') {
         const perSeason: Record<string, number> = {};
@@ -145,7 +146,13 @@ export function generateReport(opts: Options): string {
         }
         pbt[target] = perSeason;
       } else {
-        pbt[target] = pbtAtN(b, target - 1, opts.season as any, opts.weights, seasons);
+        pbt[target] = pbtAtN(
+          b,
+          target - 1,
+          opts.season as any,
+          opts.weights,
+          seasons,
+        );
       }
     }
 
@@ -187,17 +194,24 @@ export function generateReport(opts: Options): string {
 
     // outlier detection
     if (b.type === 'production' || b.type === 'processing') {
-      const th = b.type === 'processing' ? opts.thresholds.converters : opts.thresholds.generators;
+      const th =
+        b.type === 'processing'
+          ? opts.thresholds.converters
+          : opts.thresholds.generators;
       for (const target of opts.targets) {
         const value =
           opts.season === 'all'
-            ? (pbt[target] as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season]
+            ? (pbt[target] as Record<string, number>)[
+                opts.season === 'all' ? 'average' : opts.season
+              ]
             : (pbt[target] as number);
         if (!isFinite(value)) continue;
         const window = th[`pbt${target}`];
         if (!window) continue;
-        if (value < window[0]) outliers.tooFast.push({ id: b.id, target, value });
-        else if (value > window[1]) outliers.tooSlow.push({ id: b.id, target, value });
+        if (value < window[0])
+          outliers.tooFast.push({ id: b.id, target, value });
+        else if (value > window[1])
+          outliers.tooSlow.push({ id: b.id, target, value });
       }
     }
   }
@@ -275,7 +289,7 @@ export function generateReport(opts: Options): string {
       outStr += '| id | growth | in/s | out/s | ratio(out/in) |';
       for (const t of opts.targets) outStr += ` PBT@${t} |`;
       outStr += ' mode |\n| - | - | - | - | - |';
-      for (const t of opts.targets) outStr += ' - |';
+      for (const _ of opts.targets) outStr += ' - |';
       outStr += ' - |\n';
       for (const row of converterRows) {
         const pbtVals: string[] = [];
@@ -334,19 +348,22 @@ export function generateReport(opts: Options): string {
         const v = row.pbt[t];
         const val =
           typeof v === 'object'
-            ? (v as Record<string, number>)[opts.season === 'all' ? 'average' : opts.season]
+            ? (v as Record<string, number>)[
+                opts.season === 'all' ? 'average' : opts.season
+              ]
             : (v as number);
         pbtVals.push(String(val));
       }
-      outStr += [
-        row.id,
-        row.category,
-        row.type,
-        row.growth,
-        ...pbtVals,
-        JSON.stringify(row.outputs),
-        JSON.stringify(row.inputs),
-      ].join(',') + '\n';
+      outStr +=
+        [
+          row.id,
+          row.category,
+          row.type,
+          row.growth,
+          ...pbtVals,
+          JSON.stringify(row.outputs),
+          JSON.stringify(row.inputs),
+        ].join(',') + '\n';
     }
   }
 

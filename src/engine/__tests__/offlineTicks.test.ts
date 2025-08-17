@@ -16,17 +16,23 @@ const createBaseState = (): TestGameState =>
     },
     population: { settlers: [], candidate: null },
     colony: { radioTimer: 0, starvationTimerSeconds: 0 },
-  } as TestGameState);
+  }) as TestGameState;
 
-const createRng = (seed = 1): (() => number) => () => {
-  seed = (seed * 16807) % 2147483647;
-  return (seed - 1) / 2147483646;
-};
+const createRng =
+  (seed = 1): (() => number) =>
+  () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
 
 describe('offline progress', () => {
   it('invokes processTick in larger chunks', async () => {
     const mock = vi.fn<
-      (state: TestGameState, seconds?: number, roleBonuses?: Record<string, number>) => TestGameState
+      (
+        state: TestGameState,
+        seconds?: number,
+        roleBonuses?: Record<string, number>,
+      ) => TestGameState
     >((state) => state);
     vi.doMock('../production.ts', () => ({ processTick: mock }));
     const { applyOfflineProgress } = await import('../offline.ts');
@@ -58,9 +64,13 @@ describe('offline progress', () => {
     const { processTick } = await import('../production.ts');
     const base: Partial<TestGameState> = {
       buildings: { potatoField: { count: 2 }, largeGranary: { count: 100 } },
-      resources: { potatoes: { amount: 0, discovered: true, produced: 0 } as ResourceState },
+      resources: {
+        potatoes: { amount: 0, discovered: true, produced: 0 } as ResourceState,
+      },
       population: {
-        settlers: [{ id: 's1', isDead: false, role: null }] as unknown as TestGameState['population']['settlers'],
+        settlers: [
+          { id: 's1', isDead: false, role: null },
+        ] as unknown as TestGameState['population']['settlers'],
         candidate: null,
       },
       colony: { radioTimer: 0, starvationTimerSeconds: 0 },
@@ -80,11 +90,13 @@ describe('offline progress', () => {
       online = processTick(online, 1);
       const rates = getResourceRates(online);
       let totalFoodProdBase = 0;
-      (Object.keys(RESOURCES) as Array<keyof typeof RESOURCES>).forEach((id) => {
-        if (RESOURCES[id].category === 'FOOD') {
-          totalFoodProdBase += rates[id]?.perSec || 0;
-        }
-      });
+      (Object.keys(RESOURCES) as Array<keyof typeof RESOURCES>).forEach(
+        (id) => {
+          if (RESOURCES[id].category === 'FOOD') {
+            totalFoodProdBase += rates[id]?.perSec || 0;
+          }
+        },
+      );
       const settlersResult = processSettlersTick(
         online,
         1,
@@ -103,4 +115,3 @@ describe('offline progress', () => {
     );
   });
 });
-

@@ -31,13 +31,16 @@ export function applyOfflineProgress(
 ): OfflineResult {
   if (elapsedSeconds <= 0)
     return { state, gains: {} as Record<ResourceId, number>, events: [] };
-  const before = deepClone((state as any).resources) as Record<ResourceId, ResourceState>;
+  const before = deepClone((state as any).resources) as Record<
+    ResourceId,
+    ResourceState
+  >;
   const productionBonuses: RoleBonusMap = { ...roleBonuses };
   delete productionBonuses.farmer;
   let current = { ...(state as any) } as any;
   if (!current.research)
     current.research = { current: null, completed: [], progress: {} };
-  let events: OfflineEvent[] = [];
+  const events: OfflineEvent[] = [];
 
   const CHUNK_SECONDS = 60;
   for (let remaining = elapsedSeconds; remaining > 0; ) {

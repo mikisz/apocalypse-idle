@@ -4,10 +4,7 @@ import { defaultState } from '../../state/defaultState.js';
 import { deepClone } from '../../utils/clone.ts';
 import { getOutputCapacityFactors } from '../capacity.ts';
 import { ensureCapacityCache } from '../../state/capacityCache.ts';
-import {
-  PRODUCTION_BUILDINGS,
-  BUILDING_MAP,
-} from '../../data/buildings.js';
+import { PRODUCTION_BUILDINGS, BUILDING_MAP } from '../../data/buildings.js';
 import type { Building } from '../../data/buildings.js';
 import type {
   GameState,

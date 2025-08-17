@@ -77,7 +77,10 @@ describe('persistence migrations and validation', () => {
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
-      population: { settlers: [], candidate: null } as unknown as GameState['population'],
+      population: {
+        settlers: [],
+        candidate: null,
+      } as unknown as GameState['population'],
       colony: { radioTimer: 0 } as unknown as GameState['colony'],
     };
 
@@ -102,7 +105,10 @@ describe('persistence migrations and validation', () => {
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
-      population: { settlers: [], candidate: null } as unknown as GameState['population'],
+      population: {
+        settlers: [],
+        candidate: null,
+      } as unknown as GameState['population'],
       colony: { radioTimer: 0 } as unknown as GameState['colony'],
     };
 
@@ -127,7 +133,11 @@ describe('persistence migrations and validation', () => {
     };
 
     const { state, migratedFrom } = load(JSON.stringify(oldSave));
-    const log = state.log as unknown as { id: string; text: string; time?: number }[];
+    const log = state.log as unknown as {
+      id: string;
+      text: string;
+      time?: number;
+    }[];
     expect(migratedFrom).toBe(3);
     expect(state.version).toBe(CURRENT_SAVE_VERSION);
     expect(log).toHaveLength(1);
@@ -140,7 +150,9 @@ describe('persistence migrations and validation', () => {
     const oldSave: SaveFile = {
       version: 4,
       resources: { wood: { amount: 0, discovered: true } },
-      buildings: { loggingCamp: { count: 1 } } as unknown as GameState['buildings'],
+      buildings: {
+        loggingCamp: { count: 1 },
+      } as unknown as GameState['buildings'],
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [{ id: '1', text: 'hi' }] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
@@ -148,7 +160,11 @@ describe('persistence migrations and validation', () => {
     };
 
     const { state, migratedFrom } = load(JSON.stringify(oldSave));
-    const log = state.log as unknown as { id: string; text: string; time?: number }[];
+    const log = state.log as unknown as {
+      id: string;
+      text: string;
+      time?: number;
+    }[];
     expect(migratedFrom).toBe(4);
     expect(state.version).toBe(CURRENT_SAVE_VERSION);
     expect(state.population).toHaveProperty('candidate', null);
@@ -161,16 +177,25 @@ describe('persistence migrations and validation', () => {
     const oldSave: SaveFile = {
       version: 5,
       resources: { wood: { amount: 0, discovered: true } },
-      buildings: { loggingCamp: { count: 1 } } as unknown as GameState['buildings'],
+      buildings: {
+        loggingCamp: { count: 1 },
+      } as unknown as GameState['buildings'],
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [{ id: '1', text: 'hi' }] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
-      population: { settlers: [], candidate: null } as unknown as GameState['population'],
+      population: {
+        settlers: [],
+        candidate: null,
+      } as unknown as GameState['population'],
       colony: { radioTimer: 0 } as unknown as GameState['colony'],
     };
 
     const { state, migratedFrom } = load(JSON.stringify(oldSave));
-    const log = state.log as unknown as { id: string; text: string; time?: number }[];
+    const log = state.log as unknown as {
+      id: string;
+      text: string;
+      time?: number;
+    }[];
     expect(migratedFrom).toBe(5);
     expect(state.version).toBe(CURRENT_SAVE_VERSION);
     expect(state.population).toHaveProperty('candidate');
@@ -183,16 +208,25 @@ describe('persistence migrations and validation', () => {
     const oldSave: SaveFile = {
       version: 6,
       resources: { wood: { amount: 0, discovered: true } },
-      buildings: { loggingCamp: { count: 1 } } as unknown as GameState['buildings'],
+      buildings: {
+        loggingCamp: { count: 1 },
+      } as unknown as GameState['buildings'],
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [{ id: '1', text: 'hi', time: 123 }] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
-      population: { settlers: [], candidate: null } as unknown as GameState['population'],
+      population: {
+        settlers: [],
+        candidate: null,
+      } as unknown as GameState['population'],
       colony: { radioTimer: 0 } as unknown as GameState['colony'],
     };
 
     const { state, migratedFrom } = load(JSON.stringify(oldSave));
-    const log = state.log as unknown as { id: string; text: string; time?: number }[];
+    const log = state.log as unknown as {
+      id: string;
+      text: string;
+      time?: number;
+    }[];
     expect(migratedFrom).toBe(6);
     expect(state.version).toBe(CURRENT_SAVE_VERSION);
     expect(state.population).toHaveProperty('candidate');
@@ -211,7 +245,10 @@ describe('persistence migrations and validation', () => {
       ui: { activeTab: 'base', drawerOpen: false, offlineProgress: null },
       log: [{ id: '1', text: 'hi', time: 123 }] as unknown as GameState['log'],
       research: { current: null, completed: [], progress: {} },
-      population: { settlers: [], candidate: null } as unknown as GameState['population'],
+      population: {
+        settlers: [],
+        candidate: null,
+      } as unknown as GameState['population'],
       colony: { radioTimer: 0 } as unknown as GameState['colony'],
     };
 
@@ -238,7 +275,9 @@ describe('persistence migrations and validation', () => {
 
   it('throws on future save versions', () => {
     const futureVersion = CURRENT_SAVE_VERSION + 1;
-    const futureSave = { version: String(futureVersion) } as unknown as SaveFile;
+    const futureSave = {
+      version: String(futureVersion),
+    } as unknown as SaveFile;
     expect(() => load(JSON.stringify(futureSave))).toThrow(
       `Save version ${futureVersion} is newer than supported version ${CURRENT_SAVE_VERSION}`,
     );
@@ -269,7 +308,9 @@ describe('save backups', () => {
 
     saveGame(defaultState as unknown as GameState);
 
-    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ old: true }));
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(
+      JSON.stringify({ old: true }),
+    );
     expect(localStorage.getItem(BACKUP_KEY)).toBeNull();
 
     spy.mockRestore();
@@ -281,7 +322,9 @@ describe('save backups', () => {
     localStorage.setItem(BACKUP_KEY, JSON.stringify({ old: true }));
     localStorage.setItem(STORAGE_KEY, 'bad');
     expect(restoreBackup()).toBe(true);
-    expect(localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify({ old: true }));
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(
+      JSON.stringify({ old: true }),
+    );
     expect(localStorage.getItem(BACKUP_KEY)).toBeNull();
   });
 });

@@ -5,11 +5,7 @@ import { BUILDING_MAP } from '../../data/buildings.js';
 import { SKILL_LABELS } from '../../data/roles.js';
 import { useToast } from '../../components/ui/toast.tsx';
 import { getCapacity } from '../selectors.js';
-import type {
-  GameState,
-  BuildingEntry,
-  ResourceState,
-} from '../useGame.tsx';
+import type { GameState, BuildingEntry, ResourceState } from '../useGame.tsx';
 import type { Settler, SkillMap } from '../../engine/candidates.ts';
 import { createLogEntry } from '../../utils/log.js';
 
@@ -29,10 +25,10 @@ export default function useNotifications(
     setState(
       (prev: GameState): GameState => ({
         ...prev,
-        log: ([
-          createLogEntry(text),
-          ...(prev.log || []),
-        ].slice(0, 100) as GameState['log']),
+        log: [createLogEntry(text), ...(prev.log || [])].slice(
+          0,
+          100,
+        ) as GameState['log'],
       }),
     );
   };

@@ -24,7 +24,13 @@ describe('resourceOps helpers', () => {
     addResource(state, resources, 'potatoes', 500, foodPool);
     expect(foodPool.amount).toBe(foodPool.capacity);
     expect(resources.potatoes.amount).toBe(foodPool.capacity);
-    const consumed = consumeResource(state, resources, 'potatoes', 50, foodPool);
+    const consumed = consumeResource(
+      state,
+      resources,
+      'potatoes',
+      50,
+      foodPool,
+    );
     expect(consumed).toBe(50);
     expect(resources.potatoes.amount).toBe(foodPool.capacity - 50);
     expect(foodPool.amount).toBe(foodPool.capacity - 50);

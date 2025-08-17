@@ -87,9 +87,7 @@ export default function CandidateBox(): JSX.Element | null {
               sortedSkills.map(([id, s]) => {
                 const threshold = XP_TIME_TO_NEXT_LEVEL_SECONDS(s.level);
                 const prog =
-                  threshold > 0
-                    ? Math.min((s.xp || 0) / threshold, 1)
-                    : 0;
+                  threshold > 0 ? Math.min((s.xp || 0) / threshold, 1) : 0;
                 const pct = prog * 100;
                 return (
                   <li
