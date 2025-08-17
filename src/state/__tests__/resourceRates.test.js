@@ -9,7 +9,7 @@ import { ensureCapacityCache } from '../capacityCache.ts';
 describe('getResourceRates', () => {
   test('respects capacity when nearly full', () => {
     const state = deepClone(defaultState);
-    state.resources.wood.amount = 79.8;
+    state.resources.wood.amount = 49.8;
     state.resources.wood.discovered = true;
     state.buildings = { loggingCamp: { count: 1 } };
     state.population = { settlers: [] };
@@ -20,7 +20,7 @@ describe('getResourceRates', () => {
   test('capacity utility works with numeric resources', () => {
     const state = deepClone(defaultState);
     ensureCapacityCache(state);
-    const resources = { wood: 79.8, stone: 0 };
+    const resources = { wood: 49.8, stone: 0 };
     const desired = { wood: 1, stone: 1 };
     const factors = getOutputCapacityFactors(state, resources, desired, 0, 0);
     expect(factors.wood).toBeCloseTo(0.2, 5);
@@ -38,7 +38,7 @@ describe('getResourceRates', () => {
     state.buildings = { dual: { count: 1 } };
     state.gameTime.seconds = 270; // summer for neutral multipliers
     state.population = { settlers: [] };
-    state.resources.wood.amount = 79.5;
+    state.resources.wood.amount = 49.5;
     state.resources.wood.discovered = true;
     state.resources.stone.amount = 0;
     state.resources.stone.discovered = true;

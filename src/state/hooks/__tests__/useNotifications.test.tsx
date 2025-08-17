@@ -68,13 +68,13 @@ describe('useNotifications', () => {
   it('toasts when resource hits capacity', () => {
     const initial = {
       research: { current: null, completed: [] },
-      resources: { wood: { amount: 79 } },
+      resources: { wood: { amount: 49 } },
       population: { candidate: null, settlers: [] },
       buildings: {},
     };
     const next = {
       research: { current: null, completed: [] },
-      resources: { wood: { amount: 80 } },
+      resources: { wood: { amount: 50 } },
       population: { candidate: null, settlers: [] },
       buildings: {},
     };

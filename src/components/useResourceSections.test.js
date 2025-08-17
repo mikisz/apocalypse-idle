@@ -26,7 +26,7 @@ describe('useResourceSections', () => {
   test('marks resources at capacity', () => {
     const state = {
       resources: {
-        wood: { amount: 80, discovered: true },
+        wood: { amount: 50, discovered: true },
       },
       buildings: {},
       research: { completed: [] },

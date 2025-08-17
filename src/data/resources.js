@@ -22,7 +22,7 @@ export const RESOURCES = {
     icon: '🪵',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 80, // changed: 150 -> 80
+    startingCapacity: 50, // changed: 150 -> 50
   },
   stone: {
     id: 'stone',
@@ -30,7 +30,7 @@ export const RESOURCES = {
     icon: '🪨',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 50, // changed: 80 -> 50
+    startingCapacity: 30, // changed: 80 -> 30
   },
   scrap: {
     id: 'scrap',
@@ -38,7 +38,7 @@ export const RESOURCES = {
     icon: '♻️',
     category: 'RAW',
     startingAmount: 0,
-    startingCapacity: 60, // changed: 80 -> 60
+    startingCapacity: 40, // changed: 80 -> 40
   },
   planks: {
     id: 'planks',

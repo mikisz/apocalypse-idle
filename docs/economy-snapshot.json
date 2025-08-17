@@ -114,7 +114,7 @@
       "displayName": "Wood",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 80,
+      "startingCapacity": 50,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -126,7 +126,7 @@
       "displayName": "Stone",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 50,
+      "startingCapacity": 30,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -138,7 +138,7 @@
       "displayName": "Scrap",
       "category": "RAW",
       "startingAmount": 0,
-      "startingCapacity": 60,
+      "startingCapacity": 40,
       "unit": null,
       "origin": {
         "file": "resources.js",

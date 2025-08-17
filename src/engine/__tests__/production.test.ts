@@ -141,7 +141,7 @@ describe('production building on/off and power allocation', () => {
     const { state } = clone();
     ensureCapacityCache(state);
     const resources: Record<string, ResourceState> = {
-      wood: { amount: 79.8 },
+      wood: { amount: 49.8 },
       stone: { amount: 0 },
     };
     const desired: Record<string, number> = { wood: 1, stone: 1 };
@@ -164,13 +164,13 @@ describe('production building on/off and power allocation', () => {
     BUILDING_MAP[dual.id] = dual;
     buildings[dual.id] = { count: 1 };
     state.gameTime.seconds = 270; // ensure summer multipliers = 1
-    resources.wood.amount = 79.5;
+    resources.wood.amount = 49.5;
     resources.wood.discovered = true;
     resources.stone.amount = 0;
     resources.stone.discovered = true;
     const next = processTick(state, 1);
     const nextRes = next.resources as Record<string, ResourceState>;
-    expect(nextRes.wood.amount).toBeCloseTo(80, 5);
+    expect(nextRes.wood.amount).toBeCloseTo(50, 5);
     expect(nextRes.stone.amount).toBeCloseTo(1, 5);
     PRODUCTION_BUILDINGS.pop();
     delete BUILDING_MAP[dual.id];
