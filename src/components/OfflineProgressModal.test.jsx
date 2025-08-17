@@ -26,11 +26,7 @@ describe('OfflineProgressModal', () => {
       </GameContext.Provider>,
     );
 
-    expect(
-      screen.getByText('Agriculture research complete'),
-    ).toBeTruthy();
-    expect(
-      screen.getByText('Someone responded to the radio'),
-    ).toBeTruthy();
+    expect(screen.getByText('Agriculture research complete')).toBeTruthy();
+    expect(screen.getByText('Someone responded to the radio')).toBeTruthy();
   });
 });

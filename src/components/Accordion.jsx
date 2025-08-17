@@ -18,7 +18,10 @@ export default function GameAccordion({
       collapsible
       defaultValue={defaultOpen ? 'item' : undefined}
     >
-      <AccordionItem value="item" className={cn(noBottomBorder && 'last:border-b-0')}>
+      <AccordionItem
+        value="item"
+        className={cn(noBottomBorder && 'last:border-b-0')}
+      >
         <AccordionPrimitive.Header className="flex items-center bg-card">
           <AccordionPrimitive.Trigger
             className={cn(

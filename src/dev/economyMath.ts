@@ -1,5 +1,9 @@
 // @ts-nocheck
-import type { BuildingData, ResourceMap, SeasonsRecord } from './economyTypes.ts';
+import type {
+  BuildingData,
+  ResourceMap,
+  SeasonsRecord,
+} from './economyTypes.ts';
 import { RESOURCES } from '../data/resources.js';
 
 export function valueWeightedStream(
@@ -60,7 +64,7 @@ export function seasonMultiplier(
       return building.seasonProfile[seasonId] ?? 1;
     }
     const cat = resolveCategory();
-    return cat ? seasons[seasonId]?.multipliers?.[cat] ?? 1 : 1;
+    return cat ? (seasons[seasonId]?.multipliers?.[cat] ?? 1) : 1;
   }
 
   if (mode === 'average') {
@@ -93,7 +97,12 @@ export function pbtAtN(
   seasons: SeasonsRecord,
 ): number {
   const cost = marginalWeightedCost(building, nOwned, weights);
-  const delta = marginalWeightedDeltaProdPerSec(building, mode, weights, seasons);
+  const delta = marginalWeightedDeltaProdPerSec(
+    building,
+    mode,
+    weights,
+    seasons,
+  );
   if (delta <= 0) return Infinity;
   return cost / delta;
 }

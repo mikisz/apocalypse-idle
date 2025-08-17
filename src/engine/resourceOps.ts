@@ -59,7 +59,8 @@ export function consumeResource(
       amount: remaining,
       discovered: entry.discovered || remaining > 0,
     };
-    if (foodPool) foodPool.amount = Math.max(0, (foodPool.amount ?? 0) - consume);
+    if (foodPool)
+      foodPool.amount = Math.max(0, (foodPool.amount ?? 0) - consume);
   } else {
     resources[id] = {
       ...entry,

@@ -31,10 +31,12 @@ export function useBuildingGroups(): {
   const isUnlocked = (b: BuildingDefinition) =>
     !b.requiresResearch ||
     completedResearch.includes(b.requiresResearch) ||
-    ((state.buildings as Record<string, { count: number }>)[b.id]?.count || 0) > 0;
+    ((state.buildings as Record<string, { count: number }>)[b.id]?.count || 0) >
+      0;
 
   const prodBuildings = PRODUCTION_BUILDINGS.filter(isUnlocked);
-  const storageBuildings: BuildingDefinition[] = STORAGE_BUILDINGS.filter(isUnlocked);
+  const storageBuildings: BuildingDefinition[] =
+    STORAGE_BUILDINGS.filter(isUnlocked);
 
   const prodGroups: Record<string, BuildingDefinition[]> = {};
   prodBuildings.forEach((b) => {

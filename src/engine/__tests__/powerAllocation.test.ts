@@ -105,7 +105,11 @@ describe('power storage and allocation', () => {
   });
 
   test('turning ON higher-priority building displaces lower-priority consumers', () => {
-    const { state: base, buildings: baseBuildings, resources: baseResources } = clone();
+    const {
+      state: base,
+      buildings: baseBuildings,
+      resources: baseResources,
+    } = clone();
     baseBuildings.toolsmithy = { count: 1, isDesiredOn: true };
     baseBuildings.radio = { count: 1, isDesiredOn: false };
     baseResources.power.amount = 0.4;
@@ -123,7 +127,8 @@ describe('power storage and allocation', () => {
     expect(poweredResources.power.amount).toBeCloseTo(0, 5);
 
     const withRadio = deepClone(base) as GameState;
-    (withRadio.buildings as Record<string, BuildingEntry>).radio.isDesiredOn = true;
+    (withRadio.buildings as Record<string, BuildingEntry>).radio.isDesiredOn =
+      true;
     (withRadio.resources as Record<string, ResourceState>).power.amount = 0.4;
     const next = processTick(withRadio, 1);
     const nextBuildings = next.buildings as Record<string, BuildingEntry>;

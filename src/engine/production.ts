@@ -39,7 +39,6 @@ const ROLE_BY_RESOURCE_MAP = ROLE_BY_RESOURCE as Record<string, string>;
 const BUILDING_ROLES_MAP = BUILDING_ROLES as Record<string, string>;
 const ROLE_BUILDINGS_MAP = ROLE_BUILDINGS as Record<string, string[]>;
 
-
 export function applyProduction(
   state: GameState,
   seconds = 1,
@@ -50,7 +49,7 @@ export function applyProduction(
   const resources: Record<string, ResourceState> = { ...state.resources };
   const stateBuildings = state.buildings as Record<string, BuildingEntry>;
   const buildings: Record<string, BuildingEntry> = { ...stateBuildings };
-  let foodPool = state.foodPool
+  const foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(resources).reduce(
@@ -111,12 +110,7 @@ export function applyProduction(
       const bonus = roleBonuses[role] || 0;
       const researchBonus = getResearchOutputBonus(state, res);
       const gain =
-        base *
-        mult *
-        count *
-        (1 + bonus + researchBonus) *
-        seconds *
-        factor;
+        base * mult * count * (1 + bonus + researchBonus) * seconds * factor;
       addResource(state, resources, res, gain, foodPool);
       resources[res].discovered = resources[res].discovered || count > 0;
     });
@@ -241,7 +235,7 @@ export function applyProduction(
     const powerNeed =
       (b.inputsPerSecBase?.power || 0) * count * seconds * runFactor;
     demandTotal += powerNeed;
-    let available = supplyRemaining + stored;
+    const available = supplyRemaining + stored;
     if (available >= powerNeed) {
       if (supplyRemaining >= powerNeed) supplyRemaining -= powerNeed;
       else {
@@ -270,7 +264,12 @@ export function applyProduction(
     if (entry.amount > 0) entry.discovered = true;
   });
 
-  const powerStatus = { supply: supplyTotal, demand: demandTotal, stored, capacity };
+  const powerStatus = {
+    supply: supplyTotal,
+    demand: demandTotal,
+    stored,
+    capacity,
+  };
   return {
     ...state,
     resources,
@@ -318,7 +317,10 @@ export function buildBuilding(state: any, buildingId: string): any {
     ...state.buildings,
     [buildingId]: { count: count + 1 },
   };
-  const newState: GameState = { ...state, buildings: buildings as GameState['buildings'] };
+  const newState: GameState = {
+    ...state,
+    buildings: buildings as GameState['buildings'],
+  };
   ensureCapacityCache(newState);
   Object.keys(resources).forEach((res) => {
     addResource(newState, resources, res, 0, foodPool);
@@ -346,7 +348,7 @@ export function demolishBuilding(state: any, buildingId: string): any {
     [buildingId]: { count: count - 1 },
   };
   const resources: Record<string, ResourceState> = { ...state.resources };
-  let foodPool = state.foodPool
+  const foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(state.resources || {}).reduce(
@@ -359,7 +361,10 @@ export function demolishBuilding(state: any, buildingId: string): any {
         ),
         capacity: calculateFoodCapacity(state),
       };
-  const newState: GameState = { ...state, buildings: buildings as GameState['buildings'] };
+  const newState: GameState = {
+    ...state,
+    buildings: buildings as GameState['buildings'],
+  };
   ensureCapacityCache(newState);
   foodPool.capacity = calculateFoodCapacity(newState);
   Object.entries(prevCost).forEach(([res, amt]) => {

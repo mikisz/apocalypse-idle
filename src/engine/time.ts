@@ -84,8 +84,8 @@ export function getSeasonMultiplier(
   return season?.multipliers?.[category] ?? 1;
 }
 
-export function getSeasonModifiers(
-  state: { gameTime?: { seconds: number } },
-): Record<string, number> {
+export function getSeasonModifiers(state: {
+  gameTime?: { seconds: number };
+}): Record<string, number> {
   return getSeason(state).multipliers || {};
 }

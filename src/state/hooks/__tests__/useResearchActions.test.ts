@@ -2,7 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
 vi.mock('../../../engine/research.ts', () => ({
-  startResearch: vi.fn((state: any, id: string) => ({ ...state, research: id })),
+  startResearch: vi.fn((state: any, id: string) => ({
+    ...state,
+    research: id,
+  })),
   cancelResearch: vi.fn((state: any) => ({ ...state, research: null })),
 }));
 

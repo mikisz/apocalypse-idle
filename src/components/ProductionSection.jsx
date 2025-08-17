@@ -10,10 +10,15 @@ export default function ProductionSection({
 }) {
   return (
     <div className="space-y-4">
-      {productionGroups.map((group, index) => (
+      {productionGroups.map((group) => (
         <Card key={group.name} className="overflow-hidden rounded-xl">
           <CardContent className="p-0">
-            <Accordion title={group.name} defaultOpen contentClassName="p-0" noBottomBorder>
+            <Accordion
+              title={group.name}
+              defaultOpen
+              contentClassName="p-0"
+              noBottomBorder
+            >
               <div className="space-y-4">
                 {group.buildings.map((b) => (
                   <div className="space-y-2" key={b.id}>

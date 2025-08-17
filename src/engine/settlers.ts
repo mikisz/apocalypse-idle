@@ -33,7 +33,9 @@ type SettlerState = Settler & {
   skills?: Record<string, SkillProgress>;
 };
 
-export function computeRoleBonuses(settlers: Settler[]): Record<string, number> {
+export function computeRoleBonuses(
+  settlers: Settler[],
+): Record<string, number> {
   const bonuses: Record<string, number> = {};
   settlers.forEach((s: Settler) => {
     if (s.isDead || !s.role) return;
@@ -44,7 +46,10 @@ export function computeRoleBonuses(settlers: Settler[]): Record<string, number> 
   return bonuses;
 }
 
-export function assignmentsSummary(settlers: Settler[]): { assigned: number; living: number } {
+export function assignmentsSummary(settlers: Settler[]): {
+  assigned: number;
+  living: number;
+} {
   const living = settlers.filter((s: Settler) => !s.isDead);
   const assigned = living.filter((s: Settler) => s.role != null);
   return { assigned: assigned.length, living: living.length };
@@ -62,7 +67,9 @@ export function ageSettlers(
     ? ([...state.population.settlers] as SettlerState[])
     : [];
   const events: TelemetryEvent[] = [];
-  const living: SettlerState[] = settlers.filter((s: SettlerState) => !s.isDead);
+  const living: SettlerState[] = settlers.filter(
+    (s: SettlerState) => !s.isDead,
+  );
 
   const resMap = RESOURCES as Record<string, any>;
   const stateRes = state.resources as Record<string, any>;
@@ -73,9 +80,7 @@ export function ageSettlers(
   const overcrowdingPenalty =
     -overcrowded * BALANCE.HAPPINESS_OVERCR_PENALTY_PER;
   const foodTypes = Object.keys(resMap).filter(
-    (id) =>
-      resMap[id].category === 'FOOD' &&
-      (stateRes[id]?.amount || 0) > 0,
+    (id) => resMap[id].category === 'FOOD' && (stateRes[id]?.amount || 0) > 0,
   ).length;
   const foodVarietyBonus = FOOD_VARIETY_BONUS(foodTypes);
   const base = BALANCE.HAPPINESS_BASE;
@@ -104,12 +109,13 @@ export function ageSettlers(
   // Final food change per second after bonuses and consumption
   const netFoodPerSec = bonusGainPerSec - totalSettlersConsumption;
 
-  let foodPool = state.foodPool
+  const foodPool = state.foodPool
     ? { ...state.foodPool }
     : {
         amount: Object.keys(stateRes).reduce(
           (sum, id) =>
-            sum + (resMap[id].category === 'FOOD' ? stateRes[id]?.amount || 0 : 0),
+            sum +
+            (resMap[id].category === 'FOOD' ? stateRes[id]?.amount || 0 : 0),
           0,
         ),
         capacity: calculateFoodCapacity(state),
@@ -117,8 +123,13 @@ export function ageSettlers(
   const resources = { ...state.resources } as Record<string, any>;
 
   let remaining = totalSettlersConsumption * dt;
-  const foodIds = Object.keys(resMap).filter((id) => resMap[id].category === 'FOOD');
-  const prioritized = ['potatoes', ...foodIds.filter((id) => id !== 'potatoes')];
+  const foodIds = Object.keys(resMap).filter(
+    (id) => resMap[id].category === 'FOOD',
+  );
+  const prioritized = [
+    'potatoes',
+    ...foodIds.filter((id) => id !== 'potatoes'),
+  ];
   for (const id of prioritized) {
     if (remaining <= 0) break;
     const consumed = consumeResource(state, resources, id, remaining, foodPool);
@@ -136,7 +147,9 @@ export function ageSettlers(
   } else {
     starvationTimer += dt;
     if (starvationTimer >= BALANCE.STARVATION_DEATH_TIMER_SECONDS) {
-      const oldest = Math.max(...living.map((s: SettlerState) => s.ageDays || 0));
+      const oldest = Math.max(
+        ...living.map((s: SettlerState) => s.ageDays || 0),
+      );
       const victims = living.filter(
         (s: SettlerState) => (s.ageDays || 0) === oldest,
       );
@@ -154,9 +167,7 @@ export function ageSettlers(
           } as SettlerState;
           settlers[victimIndex] = updated;
           events.push(
-            createLogEntry(
-              `${updated.firstName} ${updated.lastName} died`,
-            ),
+            createLogEntry(`${updated.firstName} ${updated.lastName} died`),
           );
         }
       }

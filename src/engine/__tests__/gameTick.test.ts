@@ -25,11 +25,18 @@ vi.mock('../time.ts', () => ({
   DAYS_PER_YEAR: 365,
 }));
 
-import { applyProduction, applySettlers, applyYearUpdate } from '../gameTick.ts';
+import {
+  applyProduction,
+  applySettlers,
+  applyYearUpdate,
+} from '../gameTick.ts';
 import { processTick } from '../production.ts';
 import { processResearchTick } from '../research.ts';
 import { processSettlersTick, computeRoleBonuses } from '../settlers.ts';
-import { getResourceRates, calculateFoodCapacity } from '../../state/selectors.js';
+import {
+  getResourceRates,
+  calculateFoodCapacity,
+} from '../../state/selectors.js';
 import { updateRadio } from '../radio.ts';
 import { getYear, DAYS_PER_YEAR } from '../time.ts';
 import { RESOURCES } from '../../data/resources.js';
@@ -91,13 +98,9 @@ describe('applyProduction', () => {
     (calculateFoodCapacity as any).mockReturnValue(100);
     (RESOURCES as any).potatoes = { category: 'FOOD' };
 
-    const result = applyProduction(
-      { population: { settlers: [] } } as any,
-      1,
-      {
-        farmer: 1,
-      },
-    );
+    const result = applyProduction({ population: { settlers: [] } } as any, 1, {
+      farmer: 1,
+    });
 
     expect((result.state as any).resources.potatoes.amount).toBe(100);
   });

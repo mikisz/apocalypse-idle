@@ -75,12 +75,20 @@ describe('radio building production', () => {
 
 describe('buildings without inputs or outputs', () => {
   it('do not crash resource rate calculations', () => {
-    const state: TestState = { buildings: { shelter: { count: 1 } }, resources: {} };
+    const state: TestState = {
+      buildings: { shelter: { count: 1 } },
+      resources: {},
+    };
     expect(() => getResourceRates(state as unknown as GameState)).not.toThrow();
   });
 
   it('do not crash production calculations', () => {
-    const state: TestState = { buildings: { shelter: { count: 1 } }, resources: {} };
-    expect(() => applyProduction(state as unknown as GameState, 5, {})).not.toThrow();
+    const state: TestState = {
+      buildings: { shelter: { count: 1 } },
+      resources: {},
+    };
+    expect(() =>
+      applyProduction(state as unknown as GameState, 5, {}),
+    ).not.toThrow();
   });
 });

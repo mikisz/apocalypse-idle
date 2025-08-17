@@ -38,8 +38,15 @@ describe('applyOfflineProgress', () => {
       population: { candidate: null },
       colony: { radioTimer: 3 },
     };
-    const { state: next, events }: { state: GameState; events: OfflineEvent[] } =
-      applyOfflineProgress(state as GameState, 5, {}, rng);
+    const {
+      state: next,
+      events,
+    }: { state: GameState; events: OfflineEvent[] } = applyOfflineProgress(
+      state as GameState,
+      5,
+      {},
+      rng,
+    );
     expect(generateCandidateMock).toHaveBeenCalledOnce();
     expect(next.population.candidate).toEqual(fakeCandidate);
     expect(next.colony.radioTimer).toBe(0);
@@ -69,7 +76,10 @@ describe('applyOfflineProgress', () => {
       population: { candidate: null },
       colony: { radioTimer: 0 },
     };
-    const { state: next, gains }: { state: GameState; gains: Record<string, number> } =
+    const {
+      state: next,
+      gains,
+    }: { state: GameState; gains: Record<string, number> } =
       applyOfflineProgress(state as GameState, 5, {}, rng);
     expect(next.resources.wood.amount).toBe(100);
     expect(next.resources.power.amount).toBe(0);
@@ -84,7 +94,10 @@ describe('applyOfflineProgress', () => {
       population: { candidate: null },
       colony: { radioTimer: 0 },
     };
-    const { state: next, gains }: { state: GameState; gains: Record<string, number> } =
+    const {
+      state: next,
+      gains,
+    }: { state: GameState; gains: Record<string, number> } =
       applyOfflineProgress(state as GameState, 5, {}, rng);
     expect(next.resources.wood.amount).toBe(0);
     expect(next.resources.power.amount).toBe(0);
@@ -109,7 +122,7 @@ describe('applyOfflineProgress', () => {
         },
         population: { settlers: [], candidate: null },
         colony: { radioTimer: 0, starvationTimerSeconds: 0 },
-      } as GameState);
+      }) as GameState;
     const seconds = 10;
     const rng = createRng(5);
     const { state: offline }: { state: GameState } = applyOfflineProgress(
@@ -137,8 +150,14 @@ describe('applyOfflineProgress', () => {
       log: [],
     };
     const seconds = RESEARCH_MAP[id].timeSec + 5;
-    const { state: next, events }: { state: GameState; events: OfflineEvent[] } =
-      applyOfflineProgress(state as GameState, seconds, {});
+    const {
+      state: next,
+      events,
+    }: { state: GameState; events: OfflineEvent[] } = applyOfflineProgress(
+      state as GameState,
+      seconds,
+      {},
+    );
     expect(next.research.current).toBe(null);
     expect(next.research.completed).toContain(id);
     const evt: OfflineEvent | undefined = events.find(

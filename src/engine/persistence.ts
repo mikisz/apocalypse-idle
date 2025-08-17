@@ -149,14 +149,13 @@ export const migrations: Migration[] = [
         save.log = [] as unknown as GameState['log'];
       } else {
         const now = Date.now();
-        save.log = save.log
-          .map((entry) => ({
-            ...(entry as LogEntry),
-            time:
-              typeof (entry as LogEntry).time === 'number'
-                ? (entry as LogEntry).time
-                : now,
-          })) as unknown as GameState['log'];
+        save.log = save.log.map((entry) => ({
+          ...(entry as LogEntry),
+          time:
+            typeof (entry as LogEntry).time === 'number'
+              ? (entry as LogEntry).time
+              : now,
+        })) as unknown as GameState['log'];
       }
       return save;
     },
@@ -168,7 +167,11 @@ export const migrations: Migration[] = [
       if (save.buildings && typeof save.buildings === 'object') {
         Object.values(save.buildings).forEach((b) => {
           const building = b as BuildingEntry & Record<string, unknown>;
-          if (building && typeof building === 'object' && !('isDesiredOn' in building)) {
+          if (
+            building &&
+            typeof building === 'object' &&
+            !('isDesiredOn' in building)
+          ) {
             building.isDesiredOn = true;
           }
         });
@@ -228,9 +231,7 @@ export function validateSave(obj: SaveFile): void {
       if (!b || typeof b !== 'object')
         throw new Error(`Invalid save: building "${id}" must be object`);
       if (typeof b.count !== 'number')
-        throw new Error(
-          `Invalid save: building "${id}" has non-numeric count`,
-        );
+        throw new Error(`Invalid save: building "${id}" has non-numeric count`);
       if ('isDesiredOn' in b) {
         if (typeof b.isDesiredOn !== 'boolean')
           throw new Error(
@@ -404,4 +405,3 @@ export function exportSaveFile(state: GameState): SaveFile {
   URL.revokeObjectURL(url);
   return data;
 }
-
