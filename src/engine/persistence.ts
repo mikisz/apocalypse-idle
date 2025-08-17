@@ -81,7 +81,10 @@ export const migrations: Migration[] = [
             : {};
       }
       if (!save.population || typeof save.population !== 'object') {
-        save.population = { settlers: [] } as GameState['population'];
+        save.population = {
+          settlers: [],
+          candidate: null,
+        } as unknown as GameState['population'];
       } else if (!Array.isArray(save.population.settlers)) {
         save.population.settlers = [];
       }
@@ -93,7 +96,7 @@ export const migrations: Migration[] = [
     to: 4,
     up(save) {
       if (!Array.isArray(save.log)) {
-        save.log = [];
+        save.log = [] as unknown as GameState['log'];
       } else {
         save.log = save.log.map((entry) => {
           if (typeof entry === 'string') return createLogEntry(entry);
@@ -108,7 +111,7 @@ export const migrations: Migration[] = [
             return { id, text };
           }
           return createLogEntry(String(entry));
-        });
+        }) as unknown as GameState['log'];
       }
       return save;
     },
@@ -118,14 +121,20 @@ export const migrations: Migration[] = [
     to: 5,
     up(save) {
       if (!save.population || typeof save.population !== 'object') {
-        save.population = { settlers: [], candidate: null } as GameState['population'];
+        save.population = {
+          settlers: [],
+          candidate: null,
+        } as unknown as GameState['population'];
       } else {
         if (!Array.isArray(save.population.settlers))
           save.population.settlers = [];
-        if (!('candidate' in save.population)) save.population.candidate = null;
+        if (!('candidate' in (save.population as any)))
+          (save.population as any).candidate = null;
       }
       if (!save.colony || typeof save.colony !== 'object') {
-        save.colony = { radioTimer: RADIO_BASE_SECONDS } as GameState['colony'];
+        save.colony = {
+          radioTimer: RADIO_BASE_SECONDS,
+        } as unknown as GameState['colony'];
       } else if (typeof save.colony.radioTimer !== 'number') {
         save.colony.radioTimer = RADIO_BASE_SECONDS;
       }
@@ -137,16 +146,17 @@ export const migrations: Migration[] = [
     to: 6,
     up(save) {
       if (!Array.isArray(save.log)) {
-        save.log = [];
+        save.log = [] as unknown as GameState['log'];
       } else {
         const now = Date.now();
-        save.log = save.log.map((entry) => ({
-          ...(entry as LogEntry),
-          time:
-            typeof (entry as LogEntry).time === 'number'
-              ? (entry as LogEntry).time
-              : now,
-        }));
+        save.log = save.log
+          .map((entry) => ({
+            ...(entry as LogEntry),
+            time:
+              typeof (entry as LogEntry).time === 'number'
+                ? (entry as LogEntry).time
+                : now,
+          })) as unknown as GameState['log'];
       }
       return save;
     },

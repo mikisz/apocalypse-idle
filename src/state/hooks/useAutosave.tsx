@@ -13,7 +13,7 @@ export default function useAutosave(
 
   useEffect(() => {
     const save = () => {
-      setState(() => saveGame(stateRef.current));
+      setState(() => saveGame(stateRef.current) as unknown as GameState);
     };
     const id = setInterval(save, 10000);
     window.addEventListener('beforeunload', save);
