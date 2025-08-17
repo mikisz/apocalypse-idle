@@ -79,7 +79,7 @@ export const RESOURCES = {
     icon: '🔬',
     category: 'SOCIETY',
     startingAmount: 0,
-    startingCapacity: 400,
+    startingCapacity: 120, // changed: 400 -> 120
   },
   power: {
     id: 'power',

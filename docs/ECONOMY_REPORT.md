@@ -16,7 +16,7 @@ Each tick represents 1 second. For each building: base production is modified by
 | bricks | Bricks | CONSTRUCTION_MATERIALS | 0 | 40 |  | resources.js:RESOURCES.bricks |
 | metalParts | Metal Parts | CONSTRUCTION_MATERIALS | 0 | 24 |  | resources.js:RESOURCES.metalParts |
 | tools | Tools | CONSTRUCTION_MATERIALS | 0 | 24 |  | resources.js:RESOURCES.tools |
-| science | Science | SOCIETY | 0 | 400 |  | resources.js:RESOURCES.science |
+| science | Science | SOCIETY | 0 | 120 |  | resources.js:RESOURCES.science |
 | power | Power | ENERGY | 0 | 20 |  | resources.js:RESOURCES.power |
 
 ## 3) Seasons
@@ -39,7 +39,7 @@ Each tick represents 1 second. For each building: base production is modified by
 | sawmill | Sawmill | processing | {"wood":53,"scrap":20,"stone":13} | 1.13 | 0.5 | - | {"planks":0.5} | {"wood":0.8} | industry1 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[6] |
 | metalWorkshop | Metal Workshop | processing | {"wood":30,"scrap":30,"stone":10,"planks":10} | 1.13 | 0.5 | - | {"metalParts":0.4} | {"scrap":0.4} | industry1 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[7] |
 | toolsmithy | Toolsmithy | processing | {"wood":50,"scrap":30,"stone":20,"planks":25,"metalParts":15} | 1.13 | 0.5 | - | {"tools":0.18} | {"planks":0.25,"metalParts":0.15,"power":0.4} | industry2 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[8] |
-| school | School | production | {"wood":30,"scrap":12,"stone":12} | 1.13 | 0.5 | - | {"science":0.45} | - | - | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[9] |
+| school | School | production | {"wood":30,"scrap":12,"stone":12} | 1.13 | 0.5 | - | {"science":0.2} | - | - | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[9] |
 | woodGenerator | Wood Generator | production | {"wood":50,"stone":10,"planks":20,"metalParts":10} | 1.13 | 0.5 | - | {"power":1} | {"wood":0.25} | basicEnergy | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[10] |
 | shelter | Shelter | production | {"wood":30,"scrap":10} | 1.8 | 0.5 | - | - | - | - | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[11] |
 | radio | Radio | production | {"wood":80,"scrap":40,"stone":20,"planks":20,"metalParts":10} | 1 | 0.5 | - | - | {"power":0.1} | radio | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[12] |
@@ -99,7 +99,7 @@ Starting season: spring, Year: 1.
 | bricks | 0 | 40 | resources.js:RESOURCES.bricks.startingAmount/startingCapacity |
 | metalParts | 0 | 24 | resources.js:RESOURCES.metalParts.startingAmount/startingCapacity |
 | tools | 0 | 24 | resources.js:RESOURCES.tools.startingAmount/startingCapacity |
-| science | 0 | 400 | resources.js:RESOURCES.science.startingAmount/startingCapacity |
+| science | 0 | 120 | resources.js:RESOURCES.science.startingAmount/startingCapacity |
 | power | 0 | 20 | resources.js:RESOURCES.power.startingAmount/startingCapacity |
 
 ### Buildings
