@@ -9,12 +9,12 @@ describe('resourceOps helpers', () => {
     const resources: any = { ...state.resources };
     const foodPool = { ...state.foodPool };
     addResource(state, resources, 'wood', 100, foodPool);
-    expect(resources.wood.amount).toBe(80); // wood capacity 80
-    expect(resources.wood.produced).toBe(80);
+    expect(resources.wood.amount).toBe(50); // wood capacity 50
+    expect(resources.wood.produced).toBe(50);
     const consumed = consumeResource(state, resources, 'wood', 50, foodPool);
     expect(consumed).toBe(50);
-    expect(resources.wood.amount).toBe(30);
-    expect(resources.wood.produced).toBe(80); // consumption doesn't change produced
+    expect(resources.wood.amount).toBe(0);
+    expect(resources.wood.produced).toBe(50); // consumption doesn't change produced
   });
 
   it('updates food pool when adding and consuming food', () => {
