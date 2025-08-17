@@ -12,7 +12,7 @@ const RESEARCH_TRACKS = RESEARCH.reduce((acc, r) => {
 RESEARCH_TRACKS.forEach((track) => track.sort((a, b) => a.row - b.row));
 
 // Column offsets for each track to allow shifting entire tracks horizontally
-const TRACK_OFFSETS = [0, 0, 2];
+const TRACK_OFFSETS = [0, 0, 2, 4];
 const OFFSET_STEP_REM = 22; // width + gap of a research column
 
 function evaluate(node, state) {
