@@ -237,6 +237,17 @@ export const BUILDINGS = [
     description: 'Expanded storage for processed construction materials.',
   },
   {
+    id: 'library',
+    name: 'Library',
+    type: 'storage',
+    costBase: { wood: 40, stone: 20, scrap: 10 },
+    costGrowth: 1.22,
+    refund: 0.5,
+    capacityAdd: { science: 100 },
+    requiresResearch: 'library',
+    description: 'Stores scientific knowledge for future breakthroughs.',
+  },
+  {
     id: 'battery',
     name: 'Battery',
     type: 'storage',
