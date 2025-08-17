@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, test } from 'vitest';
 import { processTick, demolishBuilding } from '../production.ts';
 import { processSettlersTick } from '../settlers.ts';
@@ -8,15 +7,32 @@ import { SEASON_DURATION } from '../time.ts';
 import { deepClone } from '../../utils/clone.ts';
 import { BALANCE } from '../../data/balance.js';
 import { calculateFoodCapacity } from '../../state/selectors.js';
+import type {
+  GameState,
+  BuildingEntry,
+} from '../../state/useGame.tsx';
+import type { Settler } from '../candidates.ts';
 
 const createRng = (seed = 1) => () => {
   seed = (seed * 16807) % 2147483647;
   return (seed - 1) / 2147483646;
 };
 
+const createSettler = (overrides: Partial<Settler> = {}): Settler => ({
+  id: 's',
+  firstName: 'A',
+  lastName: 'B',
+  sex: 'M',
+  ageDays: 0,
+  isDead: false,
+  role: null,
+  skills: {},
+  ...overrides,
+});
+
 describe('economy basics', () => {
   test('spring potato field output', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     const next = processTick(state, 1);
     const potatoes = next.resources.potatoes.amount;
@@ -24,7 +40,7 @@ describe('economy basics', () => {
   });
 
   test('demolition refunds half last cost', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.buildings.potatoField.count = 2;
     const after = demolishBuilding(state, 'potatoField');
     const blueprint = BUILDING_MAP['potatoField'];
@@ -36,43 +52,43 @@ describe('economy basics', () => {
   });
 
   test('sawmill processes wood into planks when inputs available', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.resources.wood.amount = 10;
     state.buildings.loggingCamp.count = 0;
-    state.buildings.sawmill = { count: 1 };
+    state.buildings.sawmill = { count: 1 } as BuildingEntry;
     const next = processTick(state, 1);
     expect(next.resources.wood.amount).toBeCloseTo(9.2, 5);
     expect(next.resources.planks.amount).toBeCloseTo(0.5, 5);
   });
 
   test('sawmill halts without enough wood', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.resources.wood.amount = 0.5;
     state.buildings.loggingCamp.count = 0;
-    state.buildings.sawmill = { count: 1 };
+    state.buildings.sawmill = { count: 1 } as BuildingEntry;
     const next = processTick(state, 1);
     expect(next.resources.wood.amount).toBeCloseTo(0.5, 5);
     expect(next.resources.planks.amount).toBeCloseTo(0, 5);
   });
 
   test('sawmill respects plank capacity and partial runs', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.resources.wood.amount = 10;
     state.resources.planks.amount = 139.75;
     state.buildings.loggingCamp.count = 0;
-    state.buildings.sawmill = { count: 1 };
-    state.buildings.materialsDepot = { count: 1 };
+    state.buildings.sawmill = { count: 1 } as BuildingEntry;
+    state.buildings.materialsDepot = { count: 1 } as BuildingEntry;
     const next = processTick(state, 1);
     expect(next.resources.planks.amount).toBeCloseTo(140, 5);
     expect(next.resources.wood.amount).toBeCloseTo(9.6, 5);
   });
 
   test('brick kiln converts stone and wood into bricks', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.resources.stone.amount = 1;
     state.resources.wood.amount = 1;
     state.buildings.loggingCamp.count = 0;
-    state.buildings.brickKiln = { count: 1 };
+    state.buildings.brickKiln = { count: 1 } as BuildingEntry;
     const next = processTick(state, 1);
     expect(next.resources.bricks.amount).toBeCloseTo(0.4, 5);
     expect(next.resources.stone.amount).toBeCloseTo(0.6, 5);
@@ -80,18 +96,17 @@ describe('economy basics', () => {
   });
 
   test('removing last required building unassigns settlers', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     state.population = {
       settlers: [
-        {
+        createSettler({
           id: 's1',
-          firstName: 'A',
-          lastName: 'B',
           role: 'farmer',
-          skills: { farmer: { level: 3, xp: 0 } },
-        },
+          skills: { farmer: { level: 3 } },
+        }),
       ],
+      candidate: null,
     };
     const after = demolishBuilding(state, 'potatoField');
     expect(after.buildings.potatoField.count).toBe(0);
@@ -101,15 +116,15 @@ describe('economy basics', () => {
   });
 
   test("hunter's hut produces meat in winter", () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.gameTime.seconds = SEASON_DURATION * 3;
-    state.buildings.huntersHut = { count: 1 };
+    state.buildings.huntersHut = { count: 1 } as BuildingEntry;
     const next = processTick(state, 1);
     expect(next.resources.meat.amount).toBeCloseTo(0.22 * 0.6, 5); // changed: 0.19*0.6 -> 0.22*0.6
   });
 
   test('food pool capacity shared across food types', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     state.buildings.potatoField.count = 1;
     const cap = calculateFoodCapacity(state);
     state.resources.meat.amount = cap - 0.1;
@@ -121,12 +136,15 @@ describe('economy basics', () => {
   });
 
   test('settlers consume from multiple food resources', () => {
-    const state = deepClone(defaultState);
+    const state: GameState = deepClone(defaultState);
     const cap = calculateFoodCapacity(state);
     state.resources.potatoes.amount = 0.3;
     state.resources.meat.amount = 1;
     state.foodPool = { amount: 1.3, capacity: cap };
-    state.population.settlers = [{ id: 's1' }, { id: 's2' }];
+    state.population.settlers = [
+      createSettler({ id: 's1' }),
+      createSettler({ id: 's2' }),
+    ];
     const rng = createRng();
     const { state: after } = processSettlersTick(state, 1, 0, rng);
     const consumption = 2 * BALANCE.FOOD_CONSUMPTION_PER_SETTLER;
