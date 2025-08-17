@@ -1,7 +1,7 @@
 # Economy Report
 
 ## 1) Overview
-Economy generated from commit **1b5f7109aeab326544a4b683f2c570a0e9933e3d** on 2025-08-17 00:52:21 +0200. Save version: **7**.
+Economy generated from commit **bc91d321760499ffabb3a19f53ad4d61274fa663** on 2025-08-17 16:55:23 +0200. Save version: **7**.
 Each tick represents 1 second. For each building: base production is modified by season multipliers, summed, then clamped to capacity. Offline progress processes in 60-second chunks.
 
 ## 2) Resources
@@ -49,7 +49,8 @@ Each tick represents 1 second. For each building: base production is modified by
 | largeWarehouse | Large Warehouse | storage | {"wood":40,"stone":30,"bricks":20} | 1.15 | 0.5 | {"wood":400,"stone":160,"scrap":240} | - | - | masonry2 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[16] |
 | materialsDepot | Materials Depot | storage | {"wood":25,"scrap":10,"stone":5} | 1.22 | 0.5 | {"planks":100,"metalParts":40} | - | - | industry1 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[17] |
 | largeMaterialsDepot | Large Materials Depot | storage | {"wood":35,"bricks":25,"scrap":15} | 1.15 | 0.5 | {"planks":180,"metalParts":90,"bricks":180} | - | - | masonry2 | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[18] |
-| battery | Battery | storage | {"wood":40,"stone":20,"planks":20,"metalParts":10} | 1.22 | 0.5 | {"power":40} | - | - | basicEnergy | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[19] |
+| library | Library | storage | {"wood":40,"stone":20,"scrap":10} | 1.22 | 0.5 | {"science":100} | - | - | library | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[19] |
+| battery | Battery | storage | {"wood":40,"stone":20,"planks":20,"metalParts":10} | 1.22 | 0.5 | {"power":40} | - | - | basicEnergy | {"spring":1,"summer":1,"autumn":1,"winter":1} | buildings.js:BUILDINGS[20] |
 
 ## 5) Research
 | id | name | science cost | time (sec) | prereqs | milestones | unlocks | effects | source |
@@ -59,17 +60,18 @@ Each tick represents 1 second. For each building: base production is modified by
 | salvaging1 | Salvaging I | 60 | 90 | industry1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"SCRAP","percent":0.05,"type":"output"}] | research.js:RESEARCH[2] |
 | logistics1 | Logistics I | 60 | 90 | industry1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"RAW","percent":0.05,"type":"storage"},{"category":"CONSTRUCTION_MATERIALS","percent":0.05,"type":"storage"}] | research.js:RESEARCH[3] |
 | masonry1 | Masonry I | 90 | 150 | industry1 | - | {"resources":["bricks"],"buildings":["brickKiln"],"categories":[]} | - | research.js:RESEARCH[4] |
-| industry2 | Industry II | 200 | 240 | woodworking1, salvaging1, logistics1 | {"produced":{"planks":50,"metalParts":30}} | {"resources":[],"buildings":["toolsmithy"],"categories":[]} | - | research.js:RESEARCH[5] |
-| industryProduction | Industry Production | 170 | 270 | woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"CONSTRUCTION_MATERIALS","percent":0.05,"type":"output"}] | research.js:RESEARCH[6] |
-| masonry2 | Masonry II | 140 | 210 | masonry1, logistics1 | - | {"resources":[],"buildings":["largeWarehouse","largeGranary","largeMaterialsDepot"],"categories":[]} | - | research.js:RESEARCH[7] |
-| woodworking2 | Woodworking II | 220 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"WOOD","percent":0.05,"type":"output"}] | research.js:RESEARCH[8] |
-| salvaging2 | Salvaging II | 220 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"SCRAP","percent":0.05,"type":"output"}] | research.js:RESEARCH[9] |
-| logistics2 | Logistics II | 230 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"RAW","percent":0.05,"type":"storage"},{"category":"CONSTRUCTION_MATERIALS","percent":0.05,"type":"storage"}] | research.js:RESEARCH[10] |
-| basicEnergy | Basic Energy | 150 | 210 | industry2 | - | {"resources":["power"],"buildings":["woodGenerator","battery"],"categories":["Energy"]} | - | research.js:RESEARCH[11] |
-| radio | Radio | 150 | 240 | basicEnergy | - | {"resources":[],"buildings":["radio"],"categories":[]} | - | research.js:RESEARCH[12] |
-| food1 | Food I | 50 | 90 | - | - | {"resources":[],"buildings":[],"categories":[]} | - | research.js:RESEARCH[13] |
-| huntingHut | Hunting Hut | 60 | 90 | food1 | - | {"resources":["meat"],"buildings":["huntersHut"],"categories":[]} | - | research.js:RESEARCH[14] |
-| food2 | Food II | 150 | 240 | huntingHut | - | {"resources":[],"buildings":[],"categories":[]} | [{"resource":"meat","percent":0.04,"type":"output"}] | research.js:RESEARCH[15] |
+| library | Library | 80 | 120 | industry1 | - | {"resources":[],"buildings":["library"],"categories":[]} | - | research.js:RESEARCH[5] |
+| industry2 | Industry II | 200 | 240 | woodworking1, salvaging1, logistics1 | {"produced":{"planks":50,"metalParts":30}} | {"resources":[],"buildings":["toolsmithy"],"categories":[]} | - | research.js:RESEARCH[6] |
+| industryProduction | Industry Production | 170 | 270 | woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"CONSTRUCTION_MATERIALS","percent":0.05,"type":"output"}] | research.js:RESEARCH[7] |
+| masonry2 | Masonry II | 140 | 210 | masonry1, logistics1 | - | {"resources":[],"buildings":["largeWarehouse","largeGranary","largeMaterialsDepot"],"categories":[]} | - | research.js:RESEARCH[8] |
+| woodworking2 | Woodworking II | 220 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"WOOD","percent":0.05,"type":"output"}] | research.js:RESEARCH[9] |
+| salvaging2 | Salvaging II | 220 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"SCRAP","percent":0.05,"type":"output"}] | research.js:RESEARCH[10] |
+| logistics2 | Logistics II | 230 | 360 | industry2, industryProduction, woodworking1, salvaging1, logistics1 | - | {"resources":[],"buildings":[],"categories":[]} | [{"category":"RAW","percent":0.05,"type":"storage"},{"category":"CONSTRUCTION_MATERIALS","percent":0.05,"type":"storage"}] | research.js:RESEARCH[11] |
+| basicEnergy | Basic Energy | 150 | 210 | industry2 | - | {"resources":["power"],"buildings":["woodGenerator","battery"],"categories":["Energy"]} | - | research.js:RESEARCH[12] |
+| radio | Radio | 150 | 240 | basicEnergy | - | {"resources":[],"buildings":["radio"],"categories":[]} | - | research.js:RESEARCH[13] |
+| food1 | Food I | 50 | 90 | - | - | {"resources":[],"buildings":[],"categories":[]} | - | research.js:RESEARCH[14] |
+| huntingHut | Hunting Hut | 60 | 90 | food1 | - | {"resources":["meat"],"buildings":["huntersHut"],"categories":[]} | - | research.js:RESEARCH[15] |
+| food2 | Food II | 150 | 240 | huntingHut | - | {"resources":[],"buildings":[],"categories":[]} | [{"resource":"meat","percent":0.04,"type":"output"}] | research.js:RESEARCH[16] |
 
 ## 6) Roles
 | id | name | skill | resources | buildings | source |

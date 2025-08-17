@@ -72,6 +72,19 @@ export const RESEARCH = [
     effects: [],
   },
   {
+    id: 'library',
+    name: 'Library',
+    type: 'unlock',
+    shortDesc: 'Unlocks the library for storing knowledge.',
+    cost: { science: 80 },
+    timeSec: 120,
+    prereqs: ['industry1'],
+    unlocks: { buildings: ['library'] },
+    row: 0,
+    track: 3,
+    effects: [],
+  },
+  {
     id: 'industry2',
     name: 'Industry II',
     type: 'unlock',
@@ -242,20 +255,6 @@ export const RESEARCH = [
     effects: [{ resource: 'meat', percent: 0.04, type: 'output' }],
     row: 2,
     track: 1,
-  },
-  // Knowledge track
-  {
-    id: 'library',
-    name: 'Library',
-    type: 'unlock',
-    shortDesc: 'Unlocks the library to improve research efforts.',
-    cost: { science: 120 },
-    timeSec: 180,
-    prereqs: [],
-    unlocks: {},
-    row: 0,
-    track: 3,
-    effects: [],
   },
 ];
 

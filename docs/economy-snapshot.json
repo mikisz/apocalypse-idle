@@ -1,5 +1,5 @@
 {
-  "version": "1b5f7109aeab326544a4b683f2c570a0e9933e3d",
+  "version": "bc91d321760499ffabb3a19f53ad4d61274fa663",
   "saveVersion": 7,
   "tickSeconds": 1,
   "seasons": {
@@ -768,6 +768,34 @@
       }
     },
     {
+      "id": "library",
+      "name": "Library",
+      "type": "storage",
+      "cost": {
+        "wood": 40,
+        "stone": 20,
+        "scrap": 10
+      },
+      "costGrowth": 1.22,
+      "refund": 0.5,
+      "storage": {
+        "science": 100
+      },
+      "outputsPerSec": {},
+      "inputsPerSec": {},
+      "requiresResearch": "library",
+      "seasonMults": {
+        "spring": 1,
+        "summer": 1,
+        "autumn": 1,
+        "winter": 1
+      },
+      "origin": {
+        "file": "buildings.js",
+        "path": "BUILDINGS[19]"
+      }
+    },
+    {
       "id": "battery",
       "name": "Battery",
       "type": "storage",
@@ -793,7 +821,7 @@
       },
       "origin": {
         "file": "buildings.js",
-        "path": "BUILDINGS[19]"
+        "path": "BUILDINGS[20]"
       }
     }
   ],
@@ -933,6 +961,28 @@
       }
     },
     {
+      "id": "library",
+      "name": "Library",
+      "scienceCost": 80,
+      "timeSec": 120,
+      "prereqs": [
+        "industry1"
+      ],
+      "milestones": null,
+      "unlocks": {
+        "resources": [],
+        "buildings": [
+          "library"
+        ],
+        "categories": []
+      },
+      "effects": [],
+      "origin": {
+        "file": "research.js",
+        "path": "RESEARCH[5]"
+      }
+    },
+    {
       "id": "industry2",
       "name": "Industry II",
       "scienceCost": 200,
@@ -958,7 +1008,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[5]"
+        "path": "RESEARCH[6]"
       }
     },
     {
@@ -986,7 +1036,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[6]"
+        "path": "RESEARCH[7]"
       }
     },
     {
@@ -1011,7 +1061,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[7]"
+        "path": "RESEARCH[8]"
       }
     },
     {
@@ -1041,7 +1091,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[8]"
+        "path": "RESEARCH[9]"
       }
     },
     {
@@ -1071,7 +1121,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[9]"
+        "path": "RESEARCH[10]"
       }
     },
     {
@@ -1106,7 +1156,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[10]"
+        "path": "RESEARCH[11]"
       }
     },
     {
@@ -1133,7 +1183,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[11]"
+        "path": "RESEARCH[12]"
       }
     },
     {
@@ -1155,7 +1205,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[12]"
+        "path": "RESEARCH[13]"
       }
     },
     {
@@ -1173,7 +1223,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[13]"
+        "path": "RESEARCH[14]"
       }
     },
     {
@@ -1197,7 +1247,7 @@
       "effects": [],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[14]"
+        "path": "RESEARCH[15]"
       }
     },
     {
@@ -1223,7 +1273,7 @@
       ],
       "origin": {
         "file": "research.js",
-        "path": "RESEARCH[15]"
+        "path": "RESEARCH[16]"
       }
     }
   ],
