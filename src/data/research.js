@@ -243,6 +243,20 @@ export const RESEARCH = [
     row: 2,
     track: 1,
   },
+  // Knowledge track
+  {
+    id: 'library',
+    name: 'Library',
+    type: 'unlock',
+    shortDesc: 'Unlocks the library to improve research efforts.',
+    cost: { science: 120 },
+    timeSec: 180,
+    prereqs: [],
+    unlocks: {},
+    row: 0,
+    track: 3,
+    effects: [],
+  },
 ];
 
 export const RESEARCH_MAP = Object.fromEntries(RESEARCH.map((r) => [r.id, r]));
