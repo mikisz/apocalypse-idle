@@ -122,7 +122,7 @@ export const BUILDINGS = [
     name: 'School',
     type: 'production',
     category: 'Science',
-    outputsPerSecBase: { science: 0.45 }, // changed: 0.5→0.45
+    outputsPerSecBase: { science: 0.2 }, // changed: 0.45→0.2
     costBase: { wood: 30, scrap: 12, stone: 12 }, // changed: wood 25→30, scrap 10→12, stone 10→12
     costGrowth: 1.13, // changed: 1.15→1.13
     refund: 0.5,

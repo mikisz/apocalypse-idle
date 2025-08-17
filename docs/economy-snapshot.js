@@ -198,7 +198,7 @@ export default {
       "displayName": "Science",
       "category": "SOCIETY",
       "startingAmount": 0,
-      "startingCapacity": 400,
+      "startingCapacity": 120,
       "unit": null,
       "origin": {
         "file": "resources.js",
@@ -491,7 +491,7 @@ export default {
       "refund": 0.5,
       "storage": {},
       "outputsPerSec": {
-        "science": 0.45
+        "science": 0.2
       },
       "inputsPerSec": {},
       "requiresResearch": "",
@@ -1462,7 +1462,7 @@ export default {
     },
     "science": {
       "amount": 0,
-      "capacity": 400
+      "capacity": 120
     },
     "power": {
       "amount": 0,
